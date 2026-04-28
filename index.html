@@ -3,99 +3,106 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>BrainPlay Daily - Real vs AI</title>
 
-<!-- Google Font -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800&display=swap" rel="stylesheet">
 
 <style>
 body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+  margin:0;
+  font-family: 'Montserrat', sans-serif;
+  background: radial-gradient(circle at top, #0f172a, #020617);
+  color:white;
+  text-align:center;
 }
 
 .container {
-  background: white;
-  padding: 25px;
-  border-radius: 18px;
-  width: 340px;
-  text-align: center;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+  max-width: 420px;
+  margin:auto;
+  padding:20px;
 }
 
-.logo {
-  font-size: 28px;
-  font-weight: 600;
-  margin-bottom: 5px;
+h1 {
+  font-size:28px;
+  margin-bottom:5px;
 }
 
-.tagline {
-  font-size: 14px;
-  color: #777;
-  margin-bottom: 15px;
+.sub {
+  color:#aaa;
+  margin-bottom:15px;
 }
 
-img {
-  width: 100%;
-  border-radius: 12px;
-  margin: 15px 0;
+.image-box img {
+  width:100%;
+  border-radius:14px;
+  box-shadow:0 0 25px rgba(0,0,0,0.6);
 }
 
 .buttons {
-  display: flex;
-  gap: 10px;
+  display:flex;
+  gap:10px;
+  margin-top:15px;
 }
 
 button {
-  flex: 1;
-  padding: 12px;
-  border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: 0.3s;
+  flex:1;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  font-size:18px;
+  cursor:pointer;
+  font-weight:700;
+  transition:0.3s;
 }
 
 .real {
-  background: #4CAF50;
-  color: white;
+  background:linear-gradient(45deg,#22c55e,#16a34a);
 }
 
 .ai {
-  background: #ff4d4d;
-  color: white;
+  background:linear-gradient(45deg,#ef4444,#dc2626);
 }
 
 button:hover {
-  transform: scale(1.05);
+  transform:scale(1.05);
+  box-shadow:0 0 15px rgba(255,255,255,0.3);
 }
 
 #result {
-  margin-top: 15px;
-  font-weight: 600;
-  font-size: 18px;
+  margin-top:15px;
+  font-size:18px;
+}
+
+#explanation {
+  font-size:14px;
+  color:#ccc;
+  margin-top:8px;
+}
+
+.progress {
+  margin:10px 0;
+  color:#facc15;
 }
 
 .share {
-  margin-top: 15px;
-  display: flex;
-  gap: 10px;
+  margin-top:20px;
+  display:flex;
+  gap:10px;
 }
 
 .share button {
-  flex: 1;
-  background: #333;
-  color: white;
+  flex:1;
+  background:#1e293b;
 }
 
 .whatsapp {
-  background: #25D366 !important;
+  background:#25D366 !important;
+}
+
+.footer {
+  margin-top:20px;
+  font-size:14px;
+  color:#aaa;
 }
 </style>
 </head>
@@ -104,63 +111,104 @@ button:hover {
 
 <div class="container">
 
-  <div class="logo">🧠 BrainPlay Daily</div>
-  <div class="tagline">Real vs AI Challenge</div>
+<h1>🧠 BrainPlay Daily</h1>
+<div class="sub">Real vs AI Challenge</div>
 
-  <img id="gameImage" src="https://via.placeholder.com/300">
+<div class="progress" id="progress">Round 1 / 3</div>
 
-  <div class="buttons">
-    <button class="real" onclick="check('Real')">Real</button>
-    <button class="ai" onclick="check('AI')">AI</button>
-  </div>
+<div class="image-box">
+<img id="gameImage" src="">
+</div>
 
-  <div id="result"></div>
+<div class="buttons">
+<button class="real" onclick="check('Real')">REAL</button>
+<button class="ai" onclick="check('AI')">AI</button>
+</div>
 
-  <div class="share">
-    <button onclick="copyResult()">Copy</button>
-    <button class="whatsapp" onclick="shareWhatsApp()">WhatsApp</button>
-  </div>
+<div id="result"></div>
+<div id="explanation"></div>
+
+<div class="share">
+<button onclick="copyResult()">Copy</button>
+<button class="whatsapp" onclick="shareWhatsApp()">WhatsApp</button>
+</div>
+
+<div class="footer" id="finalScore"></div>
 
 </div>
 
 <script>
+
+// 🔥 Add your images here
 const data = [
-  {
-    img: "https://via.placeholder.com/300",
-    answer: "AI"
-  },
-  {
-    img: "https://via.placeholder.com/300/ff0000",
-    answer: "Real"
-  }
+  {img:"images/1.jpg", answer:"Real", exp:"Natural lighting and imperfect texture."},
+  {img:"images/2.jpg", answer:"AI", exp:"Too smooth surface and unrealistic lighting."},
+  {img:"images/3.jpg", answer:"AI", exp:"Details are too perfect and slightly artificial."},
+  {img:"images/4.jpg", answer:"Real", exp:"Natural shadows and depth variation."},
+  {img:"images/5.jpg", answer:"AI", exp:"Edges look overly clean and synthetic."},
+  {img:"images/6.jpg", answer:"Real", exp:"Organic imperfections visible."}
 ];
 
-const index = Math.floor(Date.now()/86400000) % data.length;
+// 🎯 Daily rotation
+const baseIndex = Math.floor(Date.now()/86400000) % data.length;
 
-document.getElementById("gameImage").src = data[index].img;
+// Pick 3 questions
+let questions = [
+  data[baseIndex],
+  data[(baseIndex+1)%data.length],
+  data[(baseIndex+2)%data.length]
+];
 
-let userResult = "";
+let current = 0;
+let score = 0;
 
-function check(choice) {
-  if (choice === data[index].answer) {
-    userResult = "✅ Correct!";
-  } else {
-    userResult = "❌ Wrong!";
-  }
-  document.getElementById("result").innerText = userResult;
+function loadQuestion(){
+  document.getElementById("gameImage").src = questions[current].img;
+  document.getElementById("progress").innerText = `Round ${current+1} / 3`;
+  document.getElementById("result").innerText="";
+  document.getElementById("explanation").innerText="";
 }
 
-function copyResult() {
-  const text = `I played Real vs AI on BrainPlay Daily! ${userResult} Try it: ${window.location.href}`;
+function check(choice){
+  const q = questions[current];
+
+  if(choice === q.answer){
+    score++;
+    document.getElementById("result").innerText="✅ Correct!";
+  } else {
+    document.getElementById("result").innerText="❌ Wrong!";
+  }
+
+  document.getElementById("explanation").innerText = q.exp;
+
+  setTimeout(()=>{
+    current++;
+    if(current<3){
+      loadQuestion();
+    } else {
+      finishGame();
+    }
+  },1200);
+}
+
+function finishGame(){
+  document.getElementById("progress").innerText="Game Over";
+  document.getElementById("finalScore").innerHTML = `🔥 You scored ${score}/3 <br> Only few players get 3/3!`;
+}
+
+function copyResult(){
+  const text = `I scored ${score}/3 in Real vs AI 🔥 Try it: ${window.location.href}`;
   navigator.clipboard.writeText(text);
   alert("Copied!");
 }
 
-function shareWhatsApp() {
-  const text = `I played Real vs AI on BrainPlay Daily! ${userResult} Try it: ${window.location.href}`;
-  const url = "https://wa.me/?text=" + encodeURIComponent(text);
-  window.open(url, "_blank");
+function shareWhatsApp(){
+  const text = `I scored ${score}/3 in Real vs AI 🔥 Try it: ${window.location.href}`;
+  window.open("https://wa.me/?text="+encodeURIComponent(text));
 }
+
+loadQuestion();
+
 </script>
 
 </body>
