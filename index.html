@@ -3,35 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>BrainPlay Daily - Real vs AI</title>
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
 body {
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Poppins', sans-serif;
   background: linear-gradient(135deg, #667eea, #764ba2);
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  color: #333;
 }
 
 .container {
-  background: #fff;
+  background: white;
   padding: 25px;
-  border-radius: 16px;
-  width: 320px;
+  border-radius: 18px;
+  width: 340px;
   text-align: center;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.2);
 }
 
-h1 {
+.logo {
+  font-size: 28px;
+  font-weight: 600;
   margin-bottom: 5px;
 }
 
-p {
-  color: #666;
+.tagline {
+  font-size: 14px;
+  color: #777;
+  margin-bottom: 15px;
 }
 
 img {
@@ -42,15 +49,14 @@ img {
 
 .buttons {
   display: flex;
-  justify-content: space-between;
+  gap: 10px;
 }
 
 button {
   flex: 1;
   padding: 12px;
-  margin: 5px;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 16px;
   cursor: pointer;
   transition: 0.3s;
@@ -68,18 +74,28 @@ button {
 
 button:hover {
   transform: scale(1.05);
-  opacity: 0.9;
 }
 
 #result {
   margin-top: 15px;
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 18px;
 }
 
-.share-btn {
+.share {
   margin-top: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.share button {
+  flex: 1;
   background: #333;
   color: white;
+}
+
+.whatsapp {
+  background: #25D366 !important;
 }
 </style>
 </head>
@@ -87,8 +103,9 @@ button:hover {
 <body>
 
 <div class="container">
-  <h1>🤖 Real vs AI</h1>
-  <p>Can you guess correctly?</p>
+
+  <div class="logo">🧠 BrainPlay Daily</div>
+  <div class="tagline">Real vs AI Challenge</div>
 
   <img id="gameImage" src="https://via.placeholder.com/300">
 
@@ -99,7 +116,11 @@ button:hover {
 
   <div id="result"></div>
 
-  <button class="share-btn" onclick="copyResult()">Share Result</button>
+  <div class="share">
+    <button onclick="copyResult()">Copy</button>
+    <button class="whatsapp" onclick="shareWhatsApp()">WhatsApp</button>
+  </div>
+
 </div>
 
 <script>
@@ -118,18 +139,27 @@ const index = Math.floor(Date.now()/86400000) % data.length;
 
 document.getElementById("gameImage").src = data[index].img;
 
+let userResult = "";
+
 function check(choice) {
   if (choice === data[index].answer) {
-    document.getElementById("result").innerText = "✅ Correct!";
+    userResult = "✅ Correct!";
   } else {
-    document.getElementById("result").innerText = "❌ Wrong!";
+    userResult = "❌ Wrong!";
   }
+  document.getElementById("result").innerText = userResult;
 }
 
 function copyResult() {
-  const text = "I played Real vs AI on BrainPlay Daily! Try it!";
+  const text = `I played Real vs AI on BrainPlay Daily! ${userResult} Try it: ${window.location.href}`;
   navigator.clipboard.writeText(text);
   alert("Copied!");
+}
+
+function shareWhatsApp() {
+  const text = `I played Real vs AI on BrainPlay Daily! ${userResult} Try it: ${window.location.href}`;
+  const url = "https://wa.me/?text=" + encodeURIComponent(text);
+  window.open(url, "_blank");
 }
 </script>
 
