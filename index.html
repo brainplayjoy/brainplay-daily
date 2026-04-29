@@ -21,7 +21,6 @@ body{
 
 .container{max-width:520px;width:100%}
 
-/* HEADER */
 .header{
   display:flex;
   justify-content:space-between;
@@ -33,7 +32,6 @@ body{
 }
 
 .logo{display:flex;gap:10px;font-weight:900}
-
 .logo-text{
   background:linear-gradient(90deg,#e879f9,#9333ea);
   -webkit-background-clip:text;
@@ -48,13 +46,11 @@ body{
   font-weight:700;
 }
 
-/* TITLE */
 .title{text-align:center;margin-top:20px}
 
 .title h1{
   font-family:'Anton',sans-serif;
   font-size:56px;
-  letter-spacing:2px;
 }
 
 .real{color:#fff;text-shadow:0 0 12px cyan}
@@ -62,7 +58,6 @@ body{
 
 .subtitle{color:#9ca3af}
 
-/* NEW HOOK */
 .hook{
   margin-top:10px;
   text-align:center;
@@ -70,7 +65,6 @@ body{
   color:#facc15;
 }
 
-/* STAT */
 .stat{
   margin:20px auto;
   padding:12px;
@@ -79,9 +73,6 @@ body{
   background:#121226;
 }
 
-.highlight{color:#facc15;font-weight:800}
-
-/* TIMER BAR */
 .timer{
   height:6px;
   background:#1f2937;
@@ -94,10 +85,8 @@ body{
   height:100%;
   width:100%;
   background:linear-gradient(90deg,#22c55e,#ef4444);
-  transition:width 3s linear;
 }
 
-/* IMAGE */
 .image-box{
   border-radius:24px;
   overflow:hidden;
@@ -111,7 +100,6 @@ body{
   object-fit:cover;
 }
 
-/* FINAL OVERLAY */
 .final-overlay{
   position:absolute;
   inset:0;
@@ -134,14 +122,12 @@ body{
   cursor:pointer;
 }
 
-/* QUESTION */
 .question{
   text-align:center;
   margin-top:18px;
   font-weight:700;
 }
 
-/* BUTTONS */
 .buttons{display:flex;gap:12px;margin-top:16px}
 
 .btn{
@@ -160,9 +146,6 @@ body{
 .btn-real{background:linear-gradient(#16a34a,#065f46)}
 .btn-ai{background:linear-gradient(#ef4444,#7f1d1d)}
 
-.btn small{display:block;font-size:12px;opacity:0.7}
-
-/* RESULT */
 .result{
   margin-top:20px;
   padding:20px;
@@ -171,76 +154,47 @@ body{
   display:none;
 }
 
-.result-row{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
 .circle{
-  width:60px;
-  height:60px;
-  border-radius:50%;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:28px;
+  width:60px;height:60px;border-radius:50%;
+  display:flex;justify-content:center;align-items:center;font-size:28px;
 }
 
-.correct{background:#22c55e;box-shadow:0 0 20px #22c55e}
-.wrong{background:#ef4444;box-shadow:0 0 20px #ef4444}
+.correct{background:#22c55e}
+.wrong{background:#ef4444}
 
 .next{
   margin-left:auto;
   background:#1f2937;
-  padding:10px 14px;
+  padding:10px;
   border-radius:10px;
   color:#facc15;
-  cursor:pointer;
   border:none;
-  font-weight:700;
+  cursor:pointer;
 }
 
-/* FINAL SCORE */
-.final-score{
-  font-size:28px;
-  font-weight:900;
-  margin-top:10px;
-}
+#motivation{margin-top:10px;color:#facc15;font-weight:700}
 
-.rating{
-  margin-top:6px;
-  font-size:16px;
-  color:#facc15;
-}
+.final-score{font-size:28px;font-weight:900}
+.rating{color:#facc15;margin-top:6px}
 
-/* SHARE */
+.percentile{margin-top:6px;color:#22c55e;font-weight:700}
+.leaderboard{margin-top:10px;color:#9ca3af;font-size:14px}
+
 .share{margin-top:20px}
-
-.share-buttons{
-  display:flex;
-  gap:10px;
-  margin-top:10px;
-}
+.share-buttons{display:flex;gap:10px;margin-top:10px}
 
 .share-btn{
-  flex:1;
-  padding:12px;
-  border-radius:12px;
-  border:none;
-  font-weight:700;
-  cursor:pointer;
+  flex:1;padding:12px;border-radius:12px;border:none;
+  font-weight:700;cursor:pointer;
 }
 
 .copy{background:#1f2937;color:#fff}
 .whatsapp{background:#25D366;color:#fff}
 
-/* FOOTER */
 .footer{
   margin-top:20px;
   text-align:center;
   color:#9ca3af;
-  font-size:13px;
 }
 </style>
 </head>
@@ -252,29 +206,33 @@ body{
 <div class="header">
   <div class="logo">🧠 <span class="logo-text">BRAINPLAY DAILY</span></div>
   <div>
-    <span class="pill">🔥 7</span>
-    <span class="pill">#12</span>
+    <span class="pill">🔥 <span id="streak">1</span></span>
+    <span class="pill">🏆 <span id="best">0</span>/5</span>
   </div>
 </div>
 
 <div class="title">
   <h1><span class="real">REAL</span> vs <span class="ai">AI</span></h1>
   <div class="subtitle">Can you spot the difference?</div>
-  <div class="hook">⚡ 95% people fail this test!</div>
+  <div class="hook">⚡ Only 3% reach Genius level</div>
 </div>
 
 <div class="stat">
-  🧩 Only <span class="highlight" id="percent">38%</span> got this right today!
+  🧩 Only <span id="percent"></span> got this right today!
 </div>
 
-<div class="timer"><div class="timer-fill" id="timer"></div></div>
+<div class="timer"><div id="timer" class="timer-fill"></div></div>
 
 <div class="image-box">
   <img id="img">
-
   <div class="final-overlay" id="finalOverlay">
     <div class="final-score" id="finalText"></div>
     <div class="rating" id="rating"></div>
+    <div class="percentile" id="percentile"></div>
+    <div class="leaderboard">
+      🔝 Top Score Today: 5/5<br>
+      📊 Avg Score: 2.8
+    </div>
     <button class="start-btn" onclick="restart()">Try Again</button>
   </div>
 </div>
@@ -287,12 +245,13 @@ body{
 </div>
 
 <div class="result" id="result">
-  <div class="result-row">
+  <div style="display:flex;align-items:center;gap:10px;">
     <div id="circle" class="circle">✔</div>
     <h3 id="title"></h3>
     <button class="next" onclick="next()">NEXT →</button>
   </div>
   <p id="desc"></p>
+  <p id="motivation"></p>
 </div>
 
 <div class="share">
@@ -308,77 +267,93 @@ body{
 
 <script>
 
-let index = 0;
-let score = 0;
-let isReal;
+let index=0,score=0,isReal;
+
+let bestScore = localStorage.getItem("bestScore") || 0;
+let streak = localStorage.getItem("streak") || 1;
+
+document.getElementById("best").innerText=bestScore;
+document.getElementById("streak").innerText=streak;
 
 function getRandomImage(){
-  return "https://picsum.photos/800/600?random=" + Math.random();
+  return "https://picsum.photos/800/600?random="+Math.random();
 }
 
 function startTimer(){
-  let bar = document.getElementById("timer");
-  bar.style.transition = "none";
-  bar.style.width = "100%";
+  let bar=document.getElementById("timer");
+  bar.style.transition="none";
+  bar.style.width="100%";
   setTimeout(()=>{
-    bar.style.transition = "width 5s linear";
-    bar.style.width = "0%";
+    bar.style.transition="width 5s linear";
+    bar.style.width="0%";
   },50);
 }
 
 function load(){
-  document.getElementById("img").src = getRandomImage();
-  isReal = Math.random()>0.5;
+  document.getElementById("img").src=getRandomImage();
+  isReal=Math.random()>0.5;
   document.getElementById("result").style.display="none";
   startTimer();
 }
 
 function answer(choice){
-  let correct = (choice==="real" && isReal) || (choice==="ai" && !isReal);
+  let correct=(choice==="real"&&isReal)||(choice==="ai"&&!isReal);
 
-  let circle = document.getElementById("circle");
-  let title = document.getElementById("title");
-  let desc = document.getElementById("desc");
+  let circle=document.getElementById("circle");
+  let title=document.getElementById("title");
+  let desc=document.getElementById("desc");
 
   if(correct){
     score++;
     circle.className="circle correct";
     circle.innerHTML="✔";
     title.innerHTML="Correct!";
-    desc.innerHTML="Good eye! That was real.";
+    desc.innerHTML="Good eye!";
   }else{
     circle.className="circle wrong";
     circle.innerHTML="✖";
     title.innerHTML="Wrong!";
-    desc.innerHTML="That was AI-generated.";
+    desc.innerHTML="That was AI.";
   }
+
+  document.getElementById("motivation").innerText=
+    "Beat your best score: "+bestScore;
 
   document.getElementById("result").style.display="block";
 }
 
 function next(){
   index++;
-  if(index>=5){
-    showFinal();
-  }else{
-    load();
-  }
+  if(index>=5){showFinal()} else load();
 }
 
 function showFinal(){
-  let ratingText="";
-  if(score<=2) ratingText="😐 Needs Practice";
-  else if(score<=4) ratingText="👍 Sharp Mind";
-  else ratingText="🏆 Genius Level";
 
-  document.getElementById("finalText").innerHTML = score + "/5";
-  document.getElementById("rating").innerHTML = ratingText;
+  if(score>bestScore){
+    bestScore=score;
+    localStorage.setItem("bestScore",bestScore);
+  }
+
+  streak++;
+  localStorage.setItem("streak",streak);
+
+  document.getElementById("best").innerText=bestScore;
+  document.getElementById("streak").innerText=streak;
+
+  let ratingText= score<=2?"😐 Needs Practice":score<=4?"👍 Sharp Mind":"🏆 Genius";
+
+  let percentile=Math.floor(Math.random()*30+60);
+
+  document.getElementById("finalText").innerHTML=score+"/5";
+  document.getElementById("rating").innerHTML=ratingText;
+  document.getElementById("percentile").innerHTML=
+    "You scored better than "+percentile+"% players";
+
   document.getElementById("finalOverlay").style.display="flex";
 }
 
 function restart(){
-  index=0;
-  score=0;
+  index=0;score=0;
   document.getElementById("finalOverlay").style.display="none";
   load();
 }
@@ -389,10 +364,12 @@ function copyLink(){
 }
 
 function shareWA(){
-  window.open("https://wa.me/?text=Play this game: "+location.href);
+  let text="I scored "+score+"/5 in BrainPlay! Can you beat me? "+location.href;
+  window.open("https://wa.me/?text="+encodeURIComponent(text));
 }
 
-document.getElementById("percent").innerText = Math.floor(Math.random()*50+30) + "%";
+document.getElementById("percent").innerText=
+  Math.floor(Math.random()*50+30)+"%";
 
 load();
 
