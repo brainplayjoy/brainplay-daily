@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>BrainPlay Daily</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800&display=swap" rel="stylesheet">
@@ -30,33 +29,27 @@ justify-content:space-between;
 align-items:center;
 padding:14px;
 border-radius:20px;
-background:rgba(255,255,255,0.03);
+background:rgba(255,255,255,0.04);
 backdrop-filter:blur(10px);
 border:1px solid rgba(255,255,255,0.08);
 }
 
 .logo{
-font-size:20px;
 font-weight:800;
 color:#c084fc;
 }
 
-.stats{
-display:flex;
-gap:10px;
-}
-
 .stat{
-padding:10px 14px;
-border-radius:14px;
 background:rgba(255,255,255,0.05);
+padding:8px 12px;
+border-radius:12px;
 font-size:12px;
 }
 
 /* TITLE */
 .title{
 text-align:center;
-margin:25px 0 10px;
+margin:20px 0;
 }
 
 .title h1{
@@ -67,20 +60,16 @@ margin:0;
 .green{color:#22c55e;}
 .red{color:#ef4444;}
 
-.sub{
-color:#9ca3af;
-}
+.sub{color:#aaa;}
 
-/* PERCENT BADGE */
+/* BADGE */
 .percent{
-margin:15px auto;
-padding:10px 15px;
+margin:12px auto;
+padding:10px;
 border-radius:30px;
 background:rgba(255,255,255,0.05);
-border:1px solid rgba(255,255,255,0.1);
-width:85%;
 text-align:center;
-color:#eab308;
+color:#facc15;
 }
 
 /* IMAGE */
@@ -90,14 +79,12 @@ border-radius:18px;
 box-shadow:0 0 40px rgba(0,0,0,0.8);
 }
 
-/* QUESTION TEXT */
+/* QUESTION */
 .question{
-margin-top:20px;
-font-size:16px;
-color:#ddd;
+margin-top:18px;
 }
 
-/* BUTTONS */
+/* BUTTONS (PRO STYLE) */
 .buttons{
 display:flex;
 gap:12px;
@@ -107,79 +94,94 @@ margin-top:12px;
 button{
 flex:1;
 padding:16px;
-border:none;
 border-radius:16px;
+border:none;
 font-size:18px;
 font-weight:800;
+color:#fff;
 cursor:pointer;
-transition:.3s;
+position:relative;
+overflow:hidden;
+}
+
+/* glossy effect */
+button::after{
+content:"";
+position:absolute;
+top:0;
+left:-100%;
+width:100%;
+height:100%;
+background:linear-gradient(120deg,transparent,rgba(255,255,255,0.3),transparent);
+transition:.5s;
+}
+
+button:hover::after{
+left:100%;
 }
 
 .real{
-background:linear-gradient(45deg,#22c55e,#16a34a);
-box-shadow:0 0 15px rgba(34,197,94,0.6);
+background:linear-gradient(145deg,#22c55e,#15803d);
+box-shadow:0 4px 20px rgba(34,197,94,0.5);
 }
 
 .ai{
-background:linear-gradient(45deg,#ef4444,#dc2626);
-box-shadow:0 0 15px rgba(239,68,68,0.6);
-}
-
-button:hover{
-transform:scale(1.06);
+background:linear-gradient(145deg,#ef4444,#b91c1c);
+box-shadow:0 4px 20px rgba(239,68,68,0.5);
 }
 
 /* RESULT CARD */
 .result{
 margin-top:18px;
-padding:16px;
-border-radius:18px;
+padding:18px;
+border-radius:20px;
 background:rgba(255,255,255,0.05);
-border:1px solid rgba(255,255,255,0.1);
+border:1px solid rgba(255,255,255,0.08);
 display:none;
-animation:fade .5s ease;
+animation:fade .4s ease;
 }
 
 @keyframes fade{
 from{opacity:0;transform:translateY(10px);}
-to{opacity:1;}
 }
 
-.correct{color:#22c55e;}
-.wrong{color:#ef4444;}
-
-/* CONFETTI */
-.confetti{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-pointer-events:none;
-overflow:hidden;
+/* SUCCESS ICON */
+.success-icon{
+width:70px;
+height:70px;
+margin:auto;
+border-radius:50%;
+background:radial-gradient(circle,#22c55e,#15803d);
+display:flex;
+align-items:center;
+justify-content:center;
+box-shadow:0 0 25px rgba(34,197,94,0.8);
+animation:pop .4s ease;
 }
 
-.confetti span{
-position:absolute;
-width:6px;
-height:6px;
-background:#22c55e;
-animation:fall 2s linear forwards;
+@keyframes pop{
+from{transform:scale(0);}
+to{transform:scale(1);}
 }
 
-@keyframes fall{
-0%{transform:translateY(-10px);}
-100%{transform:translateY(100vh);}
+svg{
+width:40px;
+height:40px;
+stroke:#fff;
+stroke-width:4;
+fill:none;
+stroke-dasharray:50;
+stroke-dashoffset:50;
+animation:draw .5s forwards .2s;
+}
+
+@keyframes draw{
+to{stroke-dashoffset:0;}
 }
 
 /* SHARE */
 .share{
 margin-top:20px;
-}
-
-.share-title{
-text-align:center;
-margin-bottom:10px;
 }
 
 .share-buttons{
@@ -195,7 +197,6 @@ color:#fff;
 .whatsapp{
 background:linear-gradient(45deg,#25D366,#128C7E);
 color:#fff;
-font-weight:700;
 }
 
 /* TIMER */
@@ -216,10 +217,7 @@ text-align:center;
 
 <div class="header">
 <div class="logo">🧠 BrainPlay</div>
-<div class="stats">
 <div class="stat">🔥 7</div>
-<div class="stat">📅 #12</div>
-</div>
 </div>
 
 <div class="title">
@@ -227,7 +225,7 @@ text-align:center;
 <div class="sub">Can you spot the difference?</div>
 </div>
 
-<div class="percent">👥 Only <b>38%</b> players got this right today!</div>
+<div class="percent">👥 Only 38% players got this right today!</div>
 
 <div class="image-box">
 <img id="gameImage">
@@ -241,16 +239,17 @@ text-align:center;
 </div>
 
 <div class="result" id="resultBox">
-<div id="resultText"></div>
-<div id="explanation"></div>
-<br>
-<button class="copy">💡 Learn More</button>
+
+<div id="icon"></div>
+
+<h2 id="resultText"></h2>
+<p id="explanation"></p>
+
 </div>
 
 <div class="share">
-<div class="share-title">🔗 Share your result with friends!</div>
 <div class="share-buttons">
-<button class="copy" onclick="copyResult()">📋 Copy Link</button>
+<button class="copy" onclick="copyResult()">📋 Copy</button>
 <button class="whatsapp" onclick="shareWhatsApp()">🟢 WhatsApp</button>
 </div>
 </div>
@@ -266,8 +265,7 @@ text-align:center;
 
 const data=[
 {img:"images/1.jpg",answer:"Real",exp:"Natural lighting and realistic imperfections."},
-{img:"images/2.jpg",answer:"AI",exp:"Overly smooth textures and artificial feel."},
-{img:"images/3.jpg",answer:"AI",exp:"Too perfect to be natural."}
+{img:"images/2.jpg",answer:"AI",exp:"Overly smooth textures."}
 ];
 
 let current=0,score=0;
@@ -279,42 +277,40 @@ document.getElementById("gameImage").src=data[current].img;
 function check(choice){
 let q=data[current];
 
-let result=document.getElementById("resultBox");
-let text=document.getElementById("resultText");
+let resultBox=document.getElementById("resultBox");
+let icon=document.getElementById("icon");
 
 if(choice===q.answer){
 score++;
-text.innerHTML="<div class='correct'>✅ CORRECT!</div>";
-confetti();
+
+icon.innerHTML=`
+<div class="success-icon">
+<svg viewBox="0 0 52 52">
+<path d="M14 27 L22 35 L38 18"/>
+</svg>
+</div>
+`;
+
+document.getElementById("resultText").innerText="CORRECT!";
 }else{
-text.innerHTML="<div class='wrong'>❌ WRONG!</div>";
+
+icon.innerHTML="";
+document.getElementById("resultText").innerText="WRONG!";
 }
 
 document.getElementById("explanation").innerText=q.exp;
-result.style.display="block";
-
+resultBox.style.display="block";
 }
 
-function confetti(){
-let c=document.createElement("div");
-c.className="confetti";
-for(let i=0;i<40;i++){
-let s=document.createElement("span");
-s.style.left=Math.random()*100+"%";
-c.appendChild(s);
-}
-document.body.appendChild(c);
-setTimeout(()=>c.remove(),2000);
-}
-
+// SHARE
 function copyResult(){
-let text=`I scored ${score}/3 🔥 Try this game: ${location.href}`;
+let text=`I scored ${score} 🔥 ${location.href}`;
 navigator.clipboard.writeText(text);
 alert("Copied!");
 }
 
 function shareWhatsApp(){
-let text=`I scored ${score}/3 🔥 Try this game: ${location.href}`;
+let text=`I scored ${score} 🔥 ${location.href}`;
 window.open("https://wa.me/?text="+encodeURIComponent(text));
 }
 
@@ -333,6 +329,7 @@ let s=Math.floor(diff/1000)%60;
 document.getElementById("countdown").innerText=
 `${h}h : ${m}m : ${s}s`;
 }
+
 setInterval(timer,1000);
 
 load();
