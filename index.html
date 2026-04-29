@@ -62,6 +62,14 @@ body{
 
 .subtitle{color:#9ca3af}
 
+/* NEW HOOK */
+.hook{
+  margin-top:10px;
+  text-align:center;
+  font-weight:700;
+  color:#facc15;
+}
+
 /* STAT */
 .stat{
   margin:20px auto;
@@ -72,6 +80,22 @@ body{
 }
 
 .highlight{color:#facc15;font-weight:800}
+
+/* TIMER BAR */
+.timer{
+  height:6px;
+  background:#1f2937;
+  border-radius:10px;
+  overflow:hidden;
+  margin-top:10px;
+}
+
+.timer-fill{
+  height:100%;
+  width:100%;
+  background:linear-gradient(90deg,#22c55e,#ef4444);
+  transition:width 3s linear;
+}
 
 /* IMAGE */
 .image-box{
@@ -128,7 +152,10 @@ body{
   border:none;
   cursor:pointer;
   color:#fff;
+  transition:transform 0.1s;
 }
+
+.btn:active{transform:scale(0.95)}
 
 .btn-real{background:linear-gradient(#16a34a,#065f46)}
 .btn-ai{background:linear-gradient(#ef4444,#7f1d1d)}
@@ -174,17 +201,21 @@ body{
   font-weight:700;
 }
 
+/* FINAL SCORE */
+.final-score{
+  font-size:28px;
+  font-weight:900;
+  margin-top:10px;
+}
+
+.rating{
+  margin-top:6px;
+  font-size:16px;
+  color:#facc15;
+}
+
 /* SHARE */
 .share{margin-top:20px}
-
-.share-title{
-  text-align:center;
-  color:#9ca3af;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:6px;
-}
 
 .share-buttons{
   display:flex;
@@ -198,10 +229,6 @@ body{
   border-radius:12px;
   border:none;
   font-weight:700;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:6px;
   cursor:pointer;
 }
 
@@ -233,59 +260,49 @@ body{
 <div class="title">
   <h1><span class="real">REAL</span> vs <span class="ai">AI</span></h1>
   <div class="subtitle">Can you spot the difference?</div>
+  <div class="hook">⚡ 95% people fail this test!</div>
 </div>
 
 <div class="stat">
-  🧩 Only <span class="highlight" id="percent">38%</span> players got this right today!
+  🧩 Only <span class="highlight" id="percent">38%</span> got this right today!
 </div>
+
+<div class="timer"><div class="timer-fill" id="timer"></div></div>
 
 <div class="image-box">
   <img id="img">
 
   <div class="final-overlay" id="finalOverlay">
-    <h2 id="finalText"></h2>
-    <button class="start-btn" onclick="restart()">Start New</button>
+    <div class="final-score" id="finalText"></div>
+    <div class="rating" id="rating"></div>
+    <button class="start-btn" onclick="restart()">Try Again</button>
   </div>
 </div>
 
-<div class="question">🤔 Is this image Real or AI?</div>
+<div class="question">🤔 Real or AI?</div>
 
 <div class="buttons">
-  <button class="btn btn-real" onclick="answer('real')">
-    REAL <small>Looks authentic?</small>
-  </button>
-  <button class="btn btn-ai" onclick="answer('ai')">
-    AI <small>Looks generated?</small>
-  </button>
+  <button class="btn btn-real" onclick="answer('real')">REAL</button>
+  <button class="btn btn-ai" onclick="answer('ai')">AI</button>
 </div>
 
 <div class="result" id="result">
   <div class="result-row">
     <div id="circle" class="circle">✔</div>
     <h3 id="title"></h3>
-    <button class="next" onclick="next()">>> NEXT</button>
+    <button class="next" onclick="next()">NEXT →</button>
   </div>
   <p id="desc"></p>
 </div>
 
-<!-- SHARE SECTION BACK -->
 <div class="share">
-  <div class="share-title">
-    <svg width="16" fill="#9ca3af" viewBox="0 0 24 24">
-      <path d="M18 8a3 3 0 10-2.83-4H15a3 3 0 003 3zM6 14a3 3 0 10-2.83-4H3a3 3 0 003 3zm12 6a3 3 0 10-2.83-4H15a3 3 0 003 3zM8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/>
-    </svg>
-    Share your result with friends!
-  </div>
-
   <div class="share-buttons">
-    <button class="share-btn copy" onclick="copyLink()">📋 Copy Link</button>
+    <button class="share-btn copy" onclick="copyLink()">Copy Link</button>
     <button class="share-btn whatsapp" onclick="shareWA()">WhatsApp</button>
   </div>
 </div>
 
-<div class="footer">
-  🧠 Save to phone for daily challenge
-</div>
+<div class="footer">Play daily. Improve your brain.</div>
 
 </div>
 
@@ -299,10 +316,21 @@ function getRandomImage(){
   return "https://picsum.photos/800/600?random=" + Math.random();
 }
 
+function startTimer(){
+  let bar = document.getElementById("timer");
+  bar.style.transition = "none";
+  bar.style.width = "100%";
+  setTimeout(()=>{
+    bar.style.transition = "width 5s linear";
+    bar.style.width = "0%";
+  },50);
+}
+
 function load(){
   document.getElementById("img").src = getRandomImage();
   isReal = Math.random()>0.5;
   document.getElementById("result").style.display="none";
+  startTimer();
 }
 
 function answer(choice){
@@ -316,13 +344,13 @@ function answer(choice){
     score++;
     circle.className="circle correct";
     circle.innerHTML="✔";
-    title.innerHTML="CORRECT";
-    desc.innerHTML="This image is REAL. Natural lighting and textures match real-world physics.";
+    title.innerHTML="Correct!";
+    desc.innerHTML="Good eye! That was real.";
   }else{
     circle.className="circle wrong";
     circle.innerHTML="✖";
-    title.innerHTML="WRONG";
-    desc.innerHTML="This image is AI-generated. Look for unnatural textures and repeating patterns.";
+    title.innerHTML="Wrong!";
+    desc.innerHTML="That was AI-generated.";
   }
 
   document.getElementById("result").style.display="block";
@@ -338,12 +366,13 @@ function next(){
 }
 
 function showFinal(){
-  let text="";
-  if(score<=2) text="😐 Poor ("+score+"/5)";
-  else if(score<=4) text="👍 Good ("+score+"/5)";
-  else text="🏆 Excellent ("+score+"/5) 🥇";
+  let ratingText="";
+  if(score<=2) ratingText="😐 Needs Practice";
+  else if(score<=4) ratingText="👍 Sharp Mind";
+  else ratingText="🏆 Genius Level";
 
-  document.getElementById("finalText").innerHTML=text;
+  document.getElementById("finalText").innerHTML = score + "/5";
+  document.getElementById("rating").innerHTML = ratingText;
   document.getElementById("finalOverlay").style.display="flex";
 }
 
