@@ -13,10 +13,10 @@
 body{
   background:#050510;
   font-family:'Inter',sans-serif;
+  color:#fff;
   display:flex;
   justify-content:center;
   padding:20px;
-  color:#fff;
 }
 
 .container{
@@ -31,18 +31,11 @@ body{
   align-items:center;
   padding:14px 18px;
   border-radius:22px;
-  background:linear-gradient(180deg,#0c0c18,#090912);
+  background:#0c0c18;
   border:1px solid rgba(255,255,255,0.08);
-  box-shadow:inset 0 0 20px rgba(255,255,255,0.03);
 }
 
-.logo{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-weight:900;
-  font-size:20px;
-}
+.logo{display:flex;gap:10px;font-weight:900}
 
 .logo-text{
   background:linear-gradient(90deg,#e879f9,#9333ea);
@@ -50,65 +43,49 @@ body{
   color:transparent;
 }
 
-.pills{display:flex;gap:10px;}
-
 .pill{
-  padding:10px 14px;
-  border-radius:14px;
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.1);
-  font-weight:700;
+  padding:8px 12px;
+  border-radius:12px;
+  background:#121226;
   font-size:13px;
-  backdrop-filter:blur(10px);
+  font-weight:700;
 }
 
 /* TITLE */
-.title{
-  text-align:center;
-  margin-top:20px;
-}
+.title{text-align:center;margin-top:20px}
 
 .title h1{
-  font-size:56px;
   font-family:'Permanent Marker',cursive;
+  font-size:56px;
 }
 
-.real{
-  color:#22c55e;
-  text-shadow:0 0 14px #22c55e;
-}
-.ai{
-  color:#ef4444;
-  text-shadow:0 0 14px #ef4444;
-}
+.real{color:#22c55e;text-shadow:0 0 10px #22c55e}
+.ai{color:#ef4444;text-shadow:0 0 10px #ef4444}
 
-.subtitle{
-  margin-top:8px;
-  color:#9ca3af;
-}
+.subtitle{color:#9ca3af}
 
 /* STAT */
 .stat{
   margin:20px auto;
-  padding:12px 20px;
-  border-radius:999px;
-  background:rgba(255,255,255,0.05);
-  border:1px solid rgba(255,255,255,0.1);
-  backdrop-filter:blur(14px);
+  padding:12px;
+  border-radius:30px;
   text-align:center;
+  background:#121226;
 }
+
+.highlight{color:#facc15;font-weight:800}
 
 /* IMAGE */
 .image-box{
-  border-radius:26px;
+  border-radius:24px;
   overflow:hidden;
-  border:1px solid rgba(255,255,255,0.08);
-  box-shadow:0 20px 60px rgba(0,0,0,0.7);
+  margin-top:20px;
 }
 
 .image-box img{
   width:100%;
-  display:block;
+  height:320px;
+  object-fit:cover;
 }
 
 /* QUESTION */
@@ -119,134 +96,102 @@ body{
 }
 
 /* BUTTONS */
-.buttons{
-  display:flex;
-  gap:14px;
-  margin-top:16px;
-}
+.buttons{display:flex;gap:12px;margin-top:16px}
 
 .btn{
   flex:1;
-  padding:18px;
-  border-radius:20px;
+  padding:16px;
+  border-radius:18px;
+  font-weight:800;
   border:none;
   cursor:pointer;
-  position:relative;
   color:#fff;
-  font-weight:800;
-  font-size:20px;
 }
 
-.btn small{
-  display:block;
-  font-size:12px;
-  opacity:0.7;
-  margin-top:4px;
-}
+.btn-real{background:linear-gradient(#16a34a,#065f46)}
+.btn-ai{background:linear-gradient(#ef4444,#7f1d1d)}
 
-/* REAL */
-.btn-real{
-  background:linear-gradient(135deg,#16a34a,#064e3b);
-  box-shadow:0 0 25px rgba(34,197,94,0.5);
-}
-
-.btn-real::after{
-  content:'';
-  position:absolute;
-  inset:0;
-  border-radius:20px;
-  border:2px solid rgba(255,255,255,0.15);
-}
-
-/* AI */
-.btn-ai{
-  background:linear-gradient(135deg,#ef4444,#7f1d1d);
-  box-shadow:0 0 25px rgba(239,68,68,0.5);
-}
-
-.btn-ai::after{
-  content:'';
-  position:absolute;
-  inset:0;
-  border-radius:20px;
-  border:2px solid rgba(255,255,255,0.15);
-}
+.btn small{display:block;font-size:12px;opacity:0.7}
 
 /* RESULT */
 .result{
   margin-top:20px;
   padding:20px;
-  border-radius:24px;
-  background:linear-gradient(145deg,#0c0c18,#12122a);
-  border:1px solid rgba(255,255,255,0.08);
+  border-radius:20px;
+  background:#121226;
   display:none;
 }
 
-.result-top{
+.result-row{
   display:flex;
   justify-content:space-between;
   align-items:center;
-}
-
-.result-left{
-  display:flex;
-  align-items:center;
-  gap:12px;
 }
 
 .circle{
   width:60px;
   height:60px;
   border-radius:50%;
-  background:radial-gradient(circle,#22c55e,#166534);
   display:flex;
   justify-content:center;
   align-items:center;
+  font-size:28px;
 }
 
-.learn{
+.correct{background:#22c55e;box-shadow:0 0 20px #22c55e}
+.wrong{background:#ef4444;box-shadow:0 0 20px #ef4444}
+
+.next{
+  background:#1f2937;
   padding:10px 14px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,0.1);
-  background:rgba(255,255,255,0.05);
+  border-radius:10px;
+  color:#facc15;
   cursor:pointer;
-}
-
-.result p{
-  margin-top:10px;
-  color:#cbd5f5;
+  border:none;
+  font-weight:700;
 }
 
 /* SHARE */
-.share{
-  margin-top:20px;
-}
+.share{margin-top:20px}
 
 .share-title{
   text-align:center;
   color:#9ca3af;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:6px;
 }
 
 .share-buttons{
   display:flex;
-  gap:12px;
+  gap:10px;
   margin-top:10px;
 }
 
 .share-btn{
   flex:1;
-  padding:14px;
-  border-radius:16px;
+  padding:12px;
+  border-radius:12px;
   border:none;
   font-weight:700;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:6px;
   cursor:pointer;
 }
 
-.copy{background:#1f2937;}
-.whatsapp{
-  background:linear-gradient(135deg,#25D366,#128C7E);
-}
+.copy{background:#1f2937;color:#fff}
+.whatsapp{background:#25D366;color:#fff}
 
+/* FOOTER */
+.footer{
+  margin-top:20px;
+  text-align:center;
+  color:#9ca3af;
+  font-size:13px;
+}
 </style>
 </head>
 
@@ -254,92 +199,117 @@ body{
 
 <div class="container">
 
-<!-- HEADER -->
 <div class="header">
-  <div class="logo">
-    🧠 <span class="logo-text">BRAINPLAY DAILY</span>
-  </div>
-  <div class="pills">
-    <div class="pill">🔥 7</div>
-    <div class="pill">📅 #12</div>
+  <div class="logo">🧠 <span class="logo-text">BRAINPLAY DAILY</span></div>
+  <div>
+    <span class="pill">🔥 7</span>
+    <span class="pill">#12</span>
   </div>
 </div>
 
-<!-- TITLE -->
 <div class="title">
   <h1><span class="real">REAL</span> vs <span class="ai">AI</span></h1>
   <div class="subtitle">Can you spot the difference?</div>
 </div>
 
-<!-- STAT -->
-<div class="stat">🧩 Only 38% players got this right today!</div>
+<div class="stat">
+  🧩 Only <span class="highlight" id="percent">38%</span> players got this right today!
+</div>
 
-<!-- IMAGE -->
 <div class="image-box">
-  <img src="https://picsum.photos/800/600">
+  <img id="img" src="">
 </div>
 
-<!-- QUESTION -->
-<div class="question">Is this image Real or AI?</div>
+<div class="question">🤔 Is this image Real or AI?</div>
 
-<!-- BUTTONS -->
 <div class="buttons">
-  <button class="btn btn-real" onclick="submitChoice('real')">
-    REAL
-    <small>Looks authentic?</small>
+  <button class="btn btn-real" onclick="answer('real')">
+    REAL <small>Looks authentic?</small>
   </button>
-  <button class="btn btn-ai" onclick="submitChoice('ai')">
-    AI
-    <small>Looks generated?</small>
+  <button class="btn btn-ai" onclick="answer('ai')">
+    AI <small>Looks generated?</small>
   </button>
 </div>
 
-<!-- RESULT -->
-<div class="result" id="resultBox">
-  <div class="result-top">
-    <div class="result-left">
-      <div class="circle">✔</div>
-      <h2 id="resultTitle">CORRECT!</h2>
-    </div>
-    <button class="learn">💡 Learn</button>
+<div class="result" id="result">
+  <div class="result-row">
+    <div id="circle" class="circle">✔</div>
+    <button class="next" onclick="next()">>> NEXT</button>
   </div>
-  <p id="resultText">This image is REAL. The lighting, textures and details match natural patterns.</p>
+  <h3 id="title"></h3>
+  <p id="desc"></p>
 </div>
 
-<!-- SHARE -->
 <div class="share">
-  <div class="share-title">Share your result with friends!</div>
-  <div class="share-buttons">
-    <button class="share-btn copy" onclick="copyLink()">COPY LINK</button>
-    <button class="share-btn whatsapp" onclick="shareWhatsApp()">WHATSAPP</button>
+  <div class="share-title">
+    <!-- SHARE SVG -->
+    <svg width="16" fill="#9ca3af" viewBox="0 0 24 24">
+      <path d="M18 8a3 3 0 10-2.83-4H15a3 3 0 003 3zM6 14a3 3 0 10-2.83-4H3a3 3 0 003 3zm12 6a3 3 0 10-2.83-4H15a3 3 0 003 3zM8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/>
+    </svg>
+    Share your result with friends!
   </div>
+
+  <div class="share-buttons">
+    <button class="share-btn copy" onclick="copyLink()">
+      📋 Copy Link
+    </button>
+    <button class="share-btn whatsapp" onclick="shareWA()">
+      <!-- WA SVG -->
+      <svg width="16" fill="white" viewBox="0 0 24 24">
+        <path d="M12 2a10 10 0 00-8.95 14.32L2 22l5.84-1.05A10 10 0 1012 2zm5.2 14.3c-.22.62-1.28 1.18-1.76 1.24-.45.06-1 .09-1.62-.1-.38-.12-.87-.28-1.5-.55-2.65-1.15-4.38-3.83-4.51-4-.12-.17-1.08-1.43-1.08-2.72 0-1.28.67-1.91.91-2.17.24-.26.52-.33.7-.33h.5c.16 0 .38-.06.6.47.22.53.75 1.83.82 1.96.07.13.11.28.02.45-.09.17-.13.28-.26.43-.13.15-.27.33-.38.44-.13.13-.27.27-.12.52.15.25.67 1.1 1.44 1.79 1 .89 1.84 1.17 2.1 1.3.26.13.41.11.56-.07.15-.17.65-.76.82-1.02.17-.26.35-.22.58-.13.24.09 1.52.72 1.78.85.26.13.43.2.49.31.06.11.06.64-.16 1.26z"/>
+      </svg>
+      WhatsApp
+    </button>
+  </div>
+</div>
+
+<div class="footer">
+  🧠 Save to phone for daily challenge
 </div>
 
 </div>
 
 <script>
-let isReal=Math.random()>0.5;
 
-function submitChoice(choice){
-  const box=document.getElementById("resultBox");
-  const title=document.getElementById("resultTitle");
-  const text=document.getElementById("resultText");
+let images = [
+"https://images.unsplash.com/photo-1501785888041-af3ef285b470",
+"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+"https://images.unsplash.com/photo-1519125323398-675f0ddb6308"
+];
 
-  let correct=(choice==="real"&&isReal)||(choice==="ai"&&!isReal);
+let index = 0;
+let isReal;
+
+function load(){
+  document.getElementById("img").src = images[index] + "?q=80&w=800";
+  isReal = Math.random()>0.5;
+  document.getElementById("result").style.display="none";
+}
+
+function answer(choice){
+  let correct = (choice==="real" && isReal) || (choice==="ai" && !isReal);
+  let circle = document.getElementById("circle");
+  let title = document.getElementById("title");
+  let desc = document.getElementById("desc");
 
   if(correct){
+    circle.className="circle correct";
+    circle.innerHTML="✔";
     title.innerHTML="CORRECT!";
-    text.innerHTML=isReal
-    ?"This image is REAL. Lighting and textures match natural patterns."
-    :"This image is AI-generated.";
+    desc.innerHTML="This image is REAL. Natural lighting and textures match real-world physics.";
   }else{
+    circle.className="circle wrong";
+    circle.innerHTML="✖";
     title.innerHTML="WRONG";
-    text.innerHTML=isReal
-    ?"Actually REAL image."
-    :"Actually AI-generated image.";
+    desc.innerHTML="This image is AI-generated. Look for unnatural textures and repeating patterns.";
   }
 
-  box.style.display="block";
+  document.getElementById("result").style.display="block";
+}
+
+function next(){
+  index = (index+1)%images.length;
+  load();
 }
 
 function copyLink(){
@@ -347,9 +317,15 @@ function copyLink(){
   alert("Copied!");
 }
 
-function shareWhatsApp(){
+function shareWA(){
   window.open("https://wa.me/?text=Play this game: "+location.href);
 }
+
+/* Dynamic percentage */
+document.getElementById("percent").innerText = Math.floor(Math.random()*50+30) + "%";
+
+load();
+
 </script>
 
 </body>
