@@ -254,106 +254,129 @@ let totalRounds = 3;
 let current = 0;
 let score = 0;
 let timerDuration = 5000;
-let timer;
+let timer = null;
 
-// RANDOM IMAGE (stable)
+// SAFE RANDOM IMAGE (very reliable)
 function getRandomImage(){
-return `https://picsum.photos/800/600?random=${Date.now()}`;
+  return "https://picsum.photos/800/600?random=" + Math.floor(Math.random()*100000);
 }
 
-// LOAD
+// LOAD IMAGE
 function load(){
-let img = document.getElementById("gameImage");
+  const img = document.getElementById("gameImage");
+  const resultBox = document.getElementById("resultBox");
 
-img.src = getRandomImage();
+  if(!img) return;
 
-// fallback
-img.onerror = function(){
-img.src = "https://via.placeholder.com/800x600?text=Image+Error";
-};
+  img.src = getRandomImage();
 
-document.getElementById("resultBox").style.display="none";
-startTimer();
+  // fallback (avoid blank screen)
+  img.onerror = function(){
+    img.src = "https://picsum.photos/800/600";
+  };
+
+  if(resultBox) resultBox.style.display = "none";
+
+  startTimer();
 }
 
 // TIMER
 function startTimer(){
-clearTimeout(timer);
-timer = setTimeout(nextRound, timerDuration);
+  if(timer) clearTimeout(timer);
+  timer = setTimeout(nextRound, timerDuration);
 }
 
 // CHECK
 function check(choice){
-clearTimeout(timer);
+  if(timer) clearTimeout(timer);
 
-let icon = document.getElementById("icon");
+  const icon = document.getElementById("icon");
+  const resultText = document.getElementById("resultText");
+  const explanation = document.getElementById("explanation");
+  const resultBox = document.getElementById("resultBox");
 
-if(choice==="Real"){
-score++;
+  if(choice === "Real"){
+    score++;
 
-icon.innerHTML=`
-<div class="success-icon">
-<svg viewBox="0 0 52 52">
-<path d="M14 27 L22 35 L38 18"/>
-</svg>
-</div>`;
-document.getElementById("resultText").innerText="CORRECT!";
-}else{
-icon.innerHTML="";
-document.getElementById("resultText").innerText="WRONG!";
-}
+    if(icon){
+      icon.innerHTML = `
+      <div class="success-icon">
+        <svg viewBox="0 0 52 52">
+          <path d="M14 27 L22 35 L38 18"/>
+        </svg>
+      </div>`;
+    }
 
-document.getElementById("explanation").innerText="Random internet image";
-document.getElementById("resultBox").style.display="block";
+    if(resultText) resultText.innerText = "CORRECT!";
+  } else {
+    if(icon) icon.innerHTML = "";
+    if(resultText) resultText.innerText = "WRONG!";
+  }
 
-setTimeout(nextRound,1200);
+  if(explanation) explanation.innerText = "Random internet image";
+  if(resultBox) resultBox.style.display = "block";
+
+  setTimeout(nextRound, 1200);
 }
 
 // NEXT
 function nextRound(){
-current++;
-if(current<totalRounds){
-load();
-}else{
-document.getElementById("resultBox").style.display="block";
-document.getElementById("icon").innerHTML="";
-document.getElementById("resultText").innerText=`🔥 Final Score: ${score}/${totalRounds}`;
-document.getElementById("explanation").innerText="Game Over";
-}
+  current++;
+
+  if(current < totalRounds){
+    load();
+  } else {
+    endGame();
+  }
 }
 
-// SHARE
+// END
+function endGame(){
+  const resultBox = document.getElementById("resultBox");
+  const icon = document.getElementById("icon");
+  const resultText = document.getElementById("resultText");
+  const explanation = document.getElementById("explanation");
+
+  if(resultBox) resultBox.style.display = "block";
+  if(icon) icon.innerHTML = "";
+  if(resultText) resultText.innerText = "🔥 Final Score: " + score + "/" + totalRounds;
+  if(explanation) explanation.innerText = "Game Over";
+}
+
+// SHARE (unchanged)
 function copyResult(){
-let text=`I scored ${score}/${totalRounds} 🔥 ${location.href}`;
-navigator.clipboard.writeText(text);
-alert("Copied!");
+  const text = `I scored ${score}/${totalRounds} 🔥 ${location.href}`;
+  navigator.clipboard.writeText(text);
+  alert("Copied!");
 }
 
 function shareWhatsApp(){
-let text=`I scored ${score}/${totalRounds} 🔥 ${location.href}`;
-window.open("https://wa.me/?text="+encodeURIComponent(text));
+  const text = `I scored ${score}/${totalRounds} 🔥 ${location.href}`;
+  window.open("https://wa.me/?text=" + encodeURIComponent(text));
 }
 
-// CLOCK
-function timerClock(){
-let now=new Date();
-let next=new Date();
-next.setHours(24,0,0,0);
+// CLOCK (unchanged)
+function timer(){
+  const now = new Date();
+  const next = new Date();
+  next.setHours(24,0,0,0);
 
-let diff=next-now;
+  const diff = next - now;
 
-let h=Math.floor(diff/1000/60/60);
-let m=Math.floor(diff/1000/60)%60;
-let s=Math.floor(diff/1000)%60;
+  const h = Math.floor(diff/1000/60/60);
+  const m = Math.floor(diff/1000/60)%60;
+  const s = Math.floor(diff/1000)%60;
 
-document.getElementById("countdown").innerText=
-`${h}h : ${m}m : ${s}s`;
+  const el = document.getElementById("countdown");
+  if(el){
+    el.innerText = `${h}h : ${m}m : ${s}s`;
+  }
 }
 
-setInterval(timerClock,1000);
+setInterval(timer,1000);
 
-// START
-window.onload=load;
+// SAFE START
+window.addEventListener("load", load);
 
 </script>
 
