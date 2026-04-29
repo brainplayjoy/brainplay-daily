@@ -1,143 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Real vs AI Game</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800&display=swap" rel="stylesheet">
-
-<style>
-body{
-margin:0;
-font-family:'Montserrat',sans-serif;
-background:#020617;
-color:#fff;
-text-align:center;
-}
-
-.container{
-max-width:420px;
-margin:auto;
-padding:15px;
-}
-
-h1{
-font-size:30px;
-}
-
-.image-box img{
-width:100%;
-border-radius:16px;
-margin-top:10px;
-}
-
-/* BUTTONS */
-.buttons{
-display:flex;
-gap:10px;
-margin-top:15px;
-}
-
-button{
-flex:1;
-padding:15px;
-border:none;
-border-radius:14px;
-font-size:18px;
-font-weight:800;
-color:#fff;
-cursor:pointer;
-}
-
-.real{
-background:linear-gradient(145deg,#22c55e,#15803d);
-}
-
-.ai{
-background:linear-gradient(145deg,#ef4444,#b91c1c);
-}
-
-/* TIMER BAR */
-.timer-bar{
-height:6px;
-background:#111;
-margin-top:10px;
-border-radius:10px;
-overflow:hidden;
-}
-
-.timer-fill{
-height:100%;
-width:100%;
-background:#22c55e;
-transition:width linear;
-}
-
-/* RESULT */
-.result{
-margin-top:15px;
-font-size:18px;
-}
-
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-<h1>REAL vs AI</h1>
-
-<div class="image-box">
-<img id="gameImage">
-</div>
-
-<div class="timer-bar">
-<div class="timer-fill" id="timerFill"></div>
-</div>
-
-<div class="buttons">
-<button class="real" onclick="check('Real')">🌿 REAL</button>
-<button class="ai" onclick="check('AI')">🤖 AI</button>
-</div>
-
-<div class="result" id="result"></div>
-
-</div>
-
 <script>
 
-// CONFIG
-let round = 0;
+// SETTINGS
 let totalRounds = 3;
+let current = 0;
 let score = 0;
 let timerDuration = 5000;
 let timer;
 
 // RANDOM UNSPLASH IMAGE
-function getImage(){
+function getRandomImage(){
 return `https://source.unsplash.com/800x600/?nature,landscape&sig=${Math.random()}`;
 }
 
 // LOAD IMAGE
-function loadImage(){
-document.getElementById("gameImage").src = getImage();
-document.getElementById("result").innerText="";
+function load(){
+document.getElementById("gameImage").src = getRandomImage();
+document.getElementById("resultBox").style.display = "none";
 startTimer();
 }
 
-// TIMER FUNCTION
+// TIMER START
 function startTimer(){
-let fill = document.getElementById("timerFill");
-
-fill.style.transition = "none";
-fill.style.width = "100%";
-
-setTimeout(()=>{
-fill.style.transition = `width ${timerDuration}ms linear`;
-fill.style.width = "0%";
-},50);
+clearTimeout(timer);
 
 timer = setTimeout(()=>{
 nextRound();
@@ -148,32 +32,81 @@ nextRound();
 function check(choice){
 clearTimeout(timer);
 
-// All Unsplash images treated as REAL
+// ⚠️ For now: Unsplash images treated as REAL
 if(choice === "Real"){
 score++;
-document.getElementById("result").innerText="✅ Correct!";
+
+document.getElementById("icon").innerHTML=`
+<div class="success-icon">
+<svg viewBox="0 0 52 52">
+<path d="M14 27 L22 35 L38 18"/>
+</svg>
+</div>
+`;
+
+document.getElementById("resultText").innerText="CORRECT!";
 }else{
-document.getElementById("result").innerText="❌ Wrong!";
+document.getElementById("icon").innerHTML="";
+document.getElementById("resultText").innerText="WRONG!";
 }
 
-setTimeout(nextRound,1000);
+document.getElementById("explanation").innerText="Auto image from internet (demo mode)";
+document.getElementById("resultBox").style.display="block";
+
+// move next after 1.2s
+setTimeout(nextRound,1200);
 }
 
 // NEXT ROUND
 function nextRound(){
-round++;
+current++;
 
-if(round < totalRounds){
-loadImage();
+if(current < totalRounds){
+load();
 }else{
-document.getElementById("result").innerText = `🔥 Final Score: ${score}/${totalRounds}`;
+endGame();
 }
 }
+
+// END GAME
+function endGame(){
+document.getElementById("resultBox").style.display="block";
+document.getElementById("icon").innerHTML="";
+document.getElementById("resultText").innerText=`🔥 Final Score: ${score}/${totalRounds}`;
+document.getElementById("explanation").innerText="Game Over";
+}
+
+// SHARE
+function copyResult(){
+let text=`I scored ${score}/${totalRounds} 🔥 ${location.href}`;
+navigator.clipboard.writeText(text);
+alert("Copied!");
+}
+
+function shareWhatsApp(){
+let text=`I scored ${score}/${totalRounds} 🔥 ${location.href}`;
+window.open("https://wa.me/?text="+encodeURIComponent(text));
+}
+
+// TIMER (your existing countdown stays same)
+function timerClock(){
+let now=new Date();
+let next=new Date();
+next.setHours(24,0,0,0);
+
+let diff=next-now;
+
+let h=Math.floor(diff/1000/60/60);
+let m=Math.floor(diff/1000/60)%60;
+let s=Math.floor(diff/1000)%60;
+
+document.getElementById("countdown").innerText=
+`${h}h : ${m}m : ${s}s`;
+}
+
+setInterval(timerClock,1000);
 
 // START GAME
-loadImage();
+load();
 
 </script>
-
-</body>
-</html>
