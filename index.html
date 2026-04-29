@@ -1,579 +1,377 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>BrainPlay Daily — Real vs AI</title>
-  <!-- Google Fonts: Poppins as primary match image style -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    body {
-      background: radial-gradient(circle at 30% 10%, #0A0F1E, #02050F);
-      font-family: 'Poppins', system-ui, -apple-system, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px 16px;
-    }
+<title>BrainPlay Daily</title>
 
-    /* main card — matches the glass/dark look from the image */
-    .game-container {
-      max-width: 500px;
-      width: 100%;
-      margin: 0 auto;
-      background: rgba(6, 12, 24, 0.65);
-      backdrop-filter: blur(4px);
-      border-radius: 40px;
-      padding: 24px 20px 28px;
-      box-shadow: 0 30px 45px -20px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.08);
-      transition: all 0.2s;
-    }
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&display=swap" rel="stylesheet">
 
-    /* ----- TOP BAR : STREAK & CHALLENGE #12 (exactly like image) ----- */
-    .top-strip {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(255,255,255,0.03);
-      border-radius: 100px;
-      padding: 8px 12px 8px 20px;
-      margin-bottom: 28px;
-      border: 0.5px solid rgba(255,255,255,0.1);
-    }
+<style>
 
-    .brainplay-logo {
-      font-weight: 800;
-      font-size: 1.25rem;
-      letter-spacing: -0.3px;
-      background: linear-gradient(120deg, #FFFFFF, #A5B4FC);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
+body{
+margin:0;
+font-family:'Montserrat',sans-serif;
+background:radial-gradient(circle at top,#0f172a,#020617);
+color:#fff;
+}
 
-    .right-badges {
-      display: flex;
-      gap: 12px;
-    }
+.container{
+max-width:420px;
+margin:auto;
+padding:15px;
+}
 
-    .badge-streak {
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(4px);
-      padding: 6px 14px;
-      border-radius: 40px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: #FACC15;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      border: 0.5px solid rgba(250,204,21,0.3);
-      letter-spacing: 0.2px;
-    }
+/* HEADER */
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+background:#0b1220;
+padding:12px;
+border-radius:16px;
+box-shadow:0 0 20px rgba(0,0,0,0.5);
+}
 
-    .badge-challenge {
-      background: rgba(255,255,255,0.08);
-      border-color: rgba(255,255,255,0.2);
-      color: #CBD5E6;
-    }
+.logo{
+font-weight:800;
+font-size:18px;
+}
 
-    /* ----- MAIN TITLE REAL vs AI (big & bold) ----- */
-    .versus-title {
-      text-align: center;
-      font-size: 2.7rem;
-      font-weight: 800;
-      letter-spacing: -1px;
-      line-height: 1.2;
-      margin-bottom: 4px;
-    }
-    .real-word {
-      background: linear-gradient(135deg, #4ADE80, #16A34A);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      text-shadow: 0 0 12px rgba(74,222,128,0.3);
-    }
-    .ai-word {
-      background: linear-gradient(135deg, #F87171, #DC2626);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      text-shadow: 0 0 12px rgba(239,68,68,0.3);
-    }
+.stats{
+display:flex;
+gap:10px;
+}
 
-    .sub-caption {
-      text-align: center;
-      font-weight: 500;
-      font-size: 0.9rem;
-      color: #9CA3AF;
-      margin-top: -6px;
-      margin-bottom: 16px;
-    }
+.stat-box{
+background:#111827;
+padding:8px 12px;
+border-radius:10px;
+font-size:12px;
+}
 
-    /* ----- STATS BANNER (🔥 Only 38% players got this right today!) ----- */
-    .stats-badge {
-      background: rgba(255,255,255,0.05);
-      border-radius: 100px;
-      padding: 10px 14px;
-      margin: 8px 0 18px 0;
-      text-align: center;
-      font-size: 0.85rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      backdrop-filter: blur(4px);
-      border: 0.5px solid rgba(255,255,255,0.08);
-    }
-    .fire-emoji {
-      font-size: 1rem;
-    }
+/* TITLE */
+.title{
+text-align:center;
+margin:20px 0;
+}
 
-    /* ----- IMAGE ZONE (dynamic by user) ----- */
-    .image-frame {
-      background: #030712;
-      border-radius: 28px;
-      overflow: hidden;
-      margin-bottom: 18px;
-      box-shadow: 0 16px 28px -12px black;
-      border: 1px solid rgba(255,255,255,0.15);
-    }
-    .game-image {
-      width: 100%;
-      display: block;
-      aspect-ratio: 4 / 3;
-      object-fit: cover;
-      transition: transform 0.2s ease;
-    }
-    .game-image:hover {
-      transform: scale(1.01);
-    }
+.title h1{
+font-size:32px;
+margin:0;
+}
 
-    /* ----- Question + "Looks authentic? / Looks generated?" tags (exact match) ----- */
-    .question-row {
-      text-align: center;
-      font-weight: 700;
-      font-size: 1.35rem;
-      margin: 12px 0 8px 0;
-      letter-spacing: -0.2px;
-    }
+.green{color:#22c55e;}
+.red{color:#ef4444;}
 
-    .duality-hint {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      margin-bottom: 18px;
-    }
-    .hint-tag {
-      background: rgba(255,255,255,0.03);
-      padding: 4px 14px;
-      border-radius: 40px;
-      font-size: 0.7rem;
-      font-weight: 500;
-      color: #B9C8FF;
-      letter-spacing: 0.3px;
-    }
-    .left-hint {
-      border-left: 2px solid #4ADE80;
-      padding-left: 12px;
-    }
-    .right-hint {
-      border-right: 2px solid #F87171;
-      padding-right: 12px;
-    }
+.sub{
+color:#9ca3af;
+}
 
-    /* ----- BUTTONS (REAL / AI) ----- */
-    .action-buttons {
-      display: flex;
-      gap: 14px;
-      margin: 6px 0 20px 0;
-    }
-    .btn {
-      flex: 1;
-      border: none;
-      padding: 14px 0;
-      border-radius: 60px;
-      font-weight: 800;
-      font-size: 1.1rem;
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-      font-family: 'Poppins', sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    .btn-real {
-      background: linear-gradient(100deg, #22C55E, #15803D);
-      color: white;
-      box-shadow: 0 8px 18px rgba(34,197,94,0.25);
-    }
-    .btn-ai {
-      background: linear-gradient(100deg, #EF4444, #B91C1C);
-      color: white;
-      box-shadow: 0 8px 18px rgba(239,68,68,0.25);
-    }
-    .btn:hover {
-      transform: translateY(-2px);
-      filter: brightness(1.04);
-      box-shadow: 0 12px 24px -8px rgba(0,0,0,0.5);
-    }
-    .btn:active {
-      transform: translateY(1px);
-    }
+/* PERCENT BOX */
+.percent{
+margin:10px auto;
+background:#111827;
+padding:10px;
+border-radius:20px;
+width:80%;
+text-align:center;
+color:#facc15;
+font-size:14px;
+}
 
-    /* ----- RESULT CARD (CORRECT! + explanation) exactly like design ----- */
-    .result-card {
-      background: rgba(12, 20, 30, 0.85);
-      backdrop-filter: blur(12px);
-      border-radius: 28px;
-      padding: 1rem 1.2rem;
-      margin: 0 0 18px 0;
-      border: 1px solid rgba(255,255,255,0.15);
-      display: none;
-    }
-    .result-status {
-      font-weight: 800;
-      font-size: 1.35rem;
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .correct-status {
-      color: #4ADE80;
-    }
-    .wrong-status {
-      color: #F87171;
-    }
-    .explanation {
-      color: #CBD5E6;
-      font-size: 0.82rem;
-      line-height: 1.4;
-      border-left: 2px solid #3B82F6;
-      padding-left: 12px;
-      margin-top: 6px;
-    }
+/* IMAGE */
+.image-box img{
+width:100%;
+border-radius:16px;
+box-shadow:0 0 25px rgba(0,0,0,0.7);
+}
 
-    /* ----- SHARE SECTION (exactly: Share your result with friends! + buttons) ----- */
-    .share-headline {
-      text-align: center;
-      font-weight: 600;
-      font-size: 0.8rem;
-      letter-spacing: 0.3px;
-      color: #A5B4FC;
-      margin: 12px 0 12px 0;
-    }
-    .share-buttons {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    .share-item {
-      flex: 1;
-      background: #1E293B;
-      border: none;
-      padding: 12px 0;
-      border-radius: 60px;
-      font-weight: 700;
-      font-size: 0.8rem;
-      color: #F1F5F9;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: 'Poppins', sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    .wa-share {
-      background: #25D366;
-      color: #0F2B1D;
-    }
-    .share-item:hover {
-      opacity: 0.9;
-      transform: scale(0.97);
-    }
+/* BUTTONS */
+.buttons{
+display:flex;
+gap:10px;
+margin-top:15px;
+}
 
-    /* ----- TIMER BLOCK (Next challenge in 12h : 22m : 45s) ----- */
-    .timer-area {
-      background: rgba(0, 0, 0, 0.6);
-      border-radius: 60px;
-      text-align: center;
-      padding: 10px 12px;
-      font-family: 'Poppins', monospace;
-      font-weight: 600;
-      font-size: 0.9rem;
-      color: #FACC15;
-      border: 0.5px solid rgba(250,204,21,0.35);
-      backdrop-filter: blur(2px);
-    }
-    .timer-prefix {
-      font-weight: 500;
-      font-size: 0.7rem;
-      color: #94A3B8;
-      margin-right: 8px;
-    }
-    .timer-digits {
-      letter-spacing: 1px;
-    }
+button{
+flex:1;
+padding:14px;
+border:none;
+border-radius:12px;
+font-weight:700;
+cursor:pointer;
+transition:.3s;
+}
 
-    /* micro spacing */
-    .hidden {
-      display: none;
-    }
-    footer {
-      text-align: center;
-      font-size: 0.6rem;
-      color: #334155;
-      margin-top: 14px;
-    }
+.real{
+background:linear-gradient(45deg,#22c55e,#16a34a);
+color:#fff;
+}
 
-    @media (max-width: 480px) {
-      .game-container {
-        padding: 18px 16px 22px;
-      }
-      .versus-title {
-        font-size: 2.2rem;
-      }
-      .btn {
-        font-size: 1rem;
-        padding: 12px 0;
-      }
-      .duality-hint {
-        gap: 1rem;
-      }
-    }
-  </style>
+.ai{
+background:linear-gradient(45deg,#ef4444,#dc2626);
+color:#fff;
+}
+
+button:hover{
+transform:scale(1.05);
+}
+
+/* PROGRESS BAR */
+.progress-bar{
+height:8px;
+background:#1f2937;
+border-radius:10px;
+overflow:hidden;
+margin:10px 0;
+}
+
+.progress-fill{
+height:100%;
+width:0%;
+background:linear-gradient(90deg,#22c55e,#4ade80);
+transition:.4s;
+}
+
+/* RESULT CARD */
+.result-card{
+margin-top:15px;
+background:#0b1220;
+padding:15px;
+border-radius:14px;
+display:none;
+}
+
+.correct{
+color:#22c55e;
+font-weight:700;
+}
+
+.wrong{
+color:#ef4444;
+font-weight:700;
+}
+
+/* SHARE */
+.share{
+margin-top:20px;
+}
+
+.share-title{
+margin-bottom:10px;
+color:#cbd5f5;
+}
+
+.share-buttons{
+display:flex;
+gap:10px;
+}
+
+.copy{
+background:#1e293b;
+color:#fff;
+}
+
+.whatsapp{
+background:linear-gradient(45deg,#25D366,#128C7E);
+color:#fff;
+box-shadow:0 0 10px rgba(37,211,102,0.6);
+}
+
+/* TIMER */
+.timer{
+margin-top:20px;
+background:#0b1220;
+padding:15px;
+border-radius:14px;
+text-align:center;
+}
+
+/* INSTALL BUTTON */
+.install{
+margin-top:20px;
+background:#6366f1;
+color:#fff;
+padding:12px;
+border-radius:12px;
+width:100%;
+font-weight:700;
+display:none;
+}
+
+</style>
 </head>
+
 <body>
 
-<div class="game-container">
-  <!-- top bar: BRAINPLAY DAILY + STREAK 7 + CHALLENGE #12 -->
-  <div class="top-strip">
-    <div class="brainplay-logo">🧠 BRAINPLAY DAILY</div>
-    <div class="right-badges">
-      <span class="badge-streak">🔥 STREAK 7</span>
-      <span class="badge-streak badge-challenge">#12</span>
-    </div>
-  </div>
+<div class="container">
 
-  <!-- MAIN TITLE: REAL vs AI -->
-  <div class="versus-title">
-    <span class="real-word">REAL</span> vs <span class="ai-word">AI</span>
-  </div>
-  <div class="sub-caption">Can you spot the difference?</div>
+<!-- HEADER -->
+<div class="header">
+<div class="logo">🧠 BrainPlay</div>
+<div class="stats">
+<div class="stat-box">🔥 7</div>
+<div class="stat-box">#12</div>
+</div>
+</div>
 
-  <!-- STATS BANNER: exactly "🔥 Only 38% players got this right today!" -->
-  <div class="stats-badge">
-    <span class="fire-emoji">🔥</span> Only <strong>38%</strong> players got this right today!
-  </div>
+<!-- TITLE -->
+<div class="title">
+<h1><span class="green">REAL</span> vs <span class="red">AI</span></h1>
+<div class="sub">Can you spot the difference?</div>
+</div>
 
-  <!-- DYNAMIC IMAGE (user can replace URL) -->
-  <div class="image-frame">
-    <img id="mainGameImage" class="game-image" alt="Real vs AI challenge" src="https://picsum.photos/id/20/600/450" loading="eager">
-  </div>
+<div class="percent">Only 38% players got this right today!</div>
 
-  <!-- QUESTION LINE -->
-  <div class="question-row">📸 Is this image Real or AI?</div>
+<!-- PROGRESS BAR -->
+<div class="progress-bar">
+<div class="progress-fill" id="progressFill"></div>
+</div>
 
-  <!-- "Looks authentic? / Looks generated?" TAGS exactly as reference -->
-  <div class="duality-hint">
-    <span class="hint-tag left-hint">✅ Looks authentic?</span>
-    <span class="hint-tag right-hint">⚡ Looks generated?</span>
-  </div>
+<!-- IMAGE -->
+<div class="image-box">
+<img id="gameImage">
+</div>
 
-  <!-- REAL & AI BUTTONS -->
-  <div class="action-buttons">
-    <button class="btn btn-real" id="realChoiceBtn">✅ REAL</button>
-    <button class="btn btn-ai" id="aiChoiceBtn">❌ AI</button>
-  </div>
+<!-- BUTTONS -->
+<div class="buttons">
+<button class="real" onclick="check('Real')">REAL</button>
+<button class="ai" onclick="check('AI')">AI</button>
+</div>
 
-  <!-- RESULT CARD (hidden initially, appears after guess) -->
-  <div id="resultCard" class="result-card">
-    <div id="resultStatusText" class="result-status"></div>
-    <div id="explanationText" class="explanation"></div>
-  </div>
+<!-- RESULT -->
+<div class="result-card" id="resultCard">
+<div id="resultText"></div>
+<div id="explanation"></div>
+</div>
 
-  <!-- SHARE HEADLINE + buttons: COPY LINK & SHARE ON WHATSAPP -->
-  <div class="share-headline">✨ Share your result with friends! ✨</div>
-  <div class="share-buttons">
-    <button class="share-item" id="copyLinkBtn">🔗 COPY LINK</button>
-    <button class="share-item wa-share" id="whatsappShareBtn">💬 SHARE ON WHATSAPP</button>
-  </div>
+<!-- SHARE -->
+<div class="share">
+<div class="share-title">Share your result</div>
+<div class="share-buttons">
+<button class="copy" onclick="copyResult()">Copy</button>
+<button class="whatsapp" onclick="shareWhatsApp()">WhatsApp</button>
+</div>
+</div>
 
-  <!-- TIMER: Next challenge in 12h : 22m : 45s style -->
-  <div class="timer-area">
-    <span class="timer-prefix">⏳ NEXT CHALLENGE IN</span>
-    <span id="countdownClock" class="timer-digits">--h : --m : --s</span>
-  </div>
-  <footer>daily refresh — new image every 24h</footer>
+<!-- TIMER -->
+<div class="timer">
+Next challenge in <br>
+<b id="countdown"></b>
+</div>
+
+<!-- INSTALL -->
+<button class="install" id="installBtn">📲 Add to Home Screen</button>
+
 </div>
 
 <script>
-  // ============================================================
-  // Game configuration – exact match with reference image 1000161868
-  // The central image can be changed any time (user uploads new url)
-  // We keep a realistic example but the answer and explanation 
-  // must match the image content. For demo, current image = real photo.
-  // You can modify both "imageUrl" and "correctAnswer" + explanation.
-  // ============================================================
 
-  // **** CHANGE THIS IMAGE URL TO YOUR OWN UPLOADED IMAGE ****
-  // The current URL is a high-res authentic photo (real dog portrait)
-  // but you can replace it with any image (local or hosted).
-  const GAME = {
-    // Used a beautiful natural photograph with realistic lighting
-    imageUrl: "https://images.pexels.com/photos/1108099/pexels-photo-1108099.jpeg?auto=compress&cs=tinysrgb&w=600",
-    // The answer must be either "Real" or "AI" based on the image:
-    correctAnswer: "Real",
-    // Explanation text that appears in the result card (style from reference)
-    explanationMsg: "This image is REAL. The lighting, textures and details match natural patterns. Look at the organic shadows, consistent skin tones, and natural depth — all signs of a genuine photograph."
-  };
+// DATA
+const data=[
+{img:"images/1.jpg",answer:"Real",exp:"Natural lighting and imperfections"},
+{img:"images/2.jpg",answer:"AI",exp:"Too smooth and artificial"},
+{img:"images/3.jpg",answer:"AI",exp:"Unrealistic perfection"},
+{img:"images/4.jpg",answer:"Real",exp:"Natural depth & shadows"}
+];
 
-  // Optional fallback in case primary image fails (still a real image)
-  const FALLBACK_IMAGE = "https://images.pexels.com/photos/2071873/pexels-photo-2071873.jpeg?auto=compress&cs=tinysrgb&w=600";
+// DAILY ROTATION
+const baseIndex=Math.floor(Date.now()/86400000)%data.length;
 
-  // DOM elements
-  const imgElement = document.getElementById('mainGameImage');
-  const realBtn = document.getElementById('realChoiceBtn');
-  const aiBtn = document.getElementById('aiChoiceBtn');
-  const resultCardDiv = document.getElementById('resultCard');
-  const resultStatusSpan = document.getElementById('resultStatusText');
-  const explanationPara = document.getElementById('explanationText');
+let questions=[
+data[baseIndex],
+data[(baseIndex+1)%data.length],
+data[(baseIndex+2)%data.length]
+];
 
-  // Helper: Show result after user makes a guess
-  function revealResult(selectedOption) {
-    const isCorrect = (selectedOption === GAME.correctAnswer);
-    
-    // Build status content (exactly like CORRECT! or ❌ WRONG! but maintain style)
-    if (isCorrect) {
-      resultStatusSpan.innerHTML = '✅ CORRECT!';
-      resultStatusSpan.className = 'result-status correct-status';
-    } else {
-      resultStatusSpan.innerHTML = '❌ WRONG!';
-      resultStatusSpan.className = 'result-status wrong-status';
-    }
-    // Explanation text always shows the description (lighting, textures)
-    explanationPara.innerText = GAME.explanationMsg;
-    
-    // display result card with smooth reveal
-    resultCardDiv.style.display = 'block';
-    // optional auto-scroll into view for better UX
-    resultCardDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
+let current=0,score=0;
 
-  // Attach event listeners
-  realBtn.addEventListener('click', () => revealResult('Real'));
-  aiBtn.addEventListener('click', () => revealResult('AI'));
+function loadQuestion(){
+document.getElementById("gameImage").src=questions[current].img;
+document.getElementById("resultCard").style.display="none";
 
-  // Set image and if error, fallback to reliable real photo
-  imgElement.src = GAME.imageUrl;
-  imgElement.onerror = () => {
-    imgElement.src = FALLBACK_IMAGE;
-    // keep answer consistency (fallback image is also real photograph)
-  };
+// update progress bar
+let percent=((current)/3)*100;
+document.getElementById("progressFill").style.width=percent+"%";
+}
 
-  // ========== TIMER: EXACT FORMAT "12h : 22m : 45s" ==========
-  // Daily reset at midnight local time -> shows countdown like 12h : 22m : 45s
-  function getNextMidnight() {
-    const now = new Date();
-    const nextMidnight = new Date(now);
-    nextMidnight.setHours(24, 0, 0, 0);
-    return nextMidnight;
-  }
+function check(choice){
+let q=questions[current];
 
-  function updateCountdownTimer() {
-    const now = new Date();
-    const target = getNextMidnight();
-    let diffMs = target - now;
-    
-    if (diffMs <= 0) {
-      // edge: recalc for next day
-      const tomorrow = new Date(now);
-      tomorrow.setDate(now.getDate() + 1);
-      tomorrow.setHours(0, 0, 0, 0);
-      diffMs = tomorrow - now;
-      if (diffMs <= 0) {
-        document.getElementById('countdownClock').innerText = '0h : 0m : 0s';
-        return;
-      }
-    }
-    
-    const hours = Math.floor(diffMs / 3600000);
-    const minutes = Math.floor((diffMs % 3600000) / 60000);
-    const seconds = Math.floor((diffMs % 60000) / 1000);
-    
-    // format exactly "12h : 22m : 45s" with spaces around colons
-    document.getElementById('countdownClock').innerHTML = `${hours}h : ${minutes}m : ${seconds}s`;
-  }
-  
-  // update timer immediately and every second
-  updateCountdownTimer();
-  setInterval(updateCountdownTimer, 1000);
+let resultText=document.getElementById("resultText");
 
-  // ========== SHARE FUNCTIONALITY ==========
-  // COPY LINK (copies current page URL or fallback link)
-  function getShareableURL() {
-    // Use actual page URL, if running in local file or sandbox fallback to a demo link
-    if (window.location.href && !window.location.href.includes('about:blank') && window.location.href !== 'about:blank') {
-      return window.location.href;
-    }
-    return "https://brainplaydaily.com/challenge/real-vs-ai";
-  }
+if(choice===q.answer){
+score++;
+resultText.innerHTML="<div class='correct'>✅ Correct</div>";
+}else{
+resultText.innerHTML="<div class='wrong'>❌ Wrong</div>";
+}
 
-  async function handleCopyLink() {
-    const link = getShareableURL();
-    try {
-      await navigator.clipboard.writeText(link);
-      const copyBtn = document.getElementById('copyLinkBtn');
-      const originalText = copyBtn.innerHTML;
-      copyBtn.innerHTML = '✓ COPIED!';
-      setTimeout(() => {
-        copyBtn.innerHTML = originalText;
-      }, 1800);
-    } catch (err) {
-      alert('⚠️ Press Ctrl+C to copy the link: ' + link);
-    }
-  }
+document.getElementById("explanation").innerText=q.exp;
+document.getElementById("resultCard").style.display="block";
 
-  function handleWhatsAppShare() {
-    const shareUrl = getShareableURL();
-    const shareMessage = `🧠 BRAINPLAY DAILY ✨\nCan YOU spot the difference? I just played Real vs AI — only 38% got it right! 🔥\nTry the challenge: ${shareUrl}`;
-    const encodedMsg = encodeURIComponent(shareMessage);
-    window.open(`https://wa.me/?text=${encodedMsg}`, '_blank');
-  }
+setTimeout(()=>{
+current++;
+if(current<3){
+loadQuestion();
+}else{
+finishGame();
+}
+},1200);
+}
 
-  document.getElementById('copyLinkBtn').addEventListener('click', handleCopyLink);
-  document.getElementById('whatsappShareBtn').addEventListener('click', handleWhatsAppShare);
+function finishGame(){
+document.getElementById("progressFill").style.width="100%";
+document.getElementById("resultText").innerHTML=`🔥 You scored ${score}/3`;
+}
 
-  // ========== Additional polishing to match exact look ==========
-  // Ensure result card starts hidden
-  resultCardDiv.style.display = 'none';
+// SHARE
+function copyResult(){
+let text=`I scored ${score}/3 🔥 Play now: ${location.href}`;
+navigator.clipboard.writeText(text);
+alert("Copied!");
+}
 
-  // small dynamic: if user clicks multiple times it updates explanation + status.
-  // All consistent with reference UI.
+function shareWhatsApp(){
+let text=`I scored ${score}/3 🔥 Play now: ${location.href}`;
+window.open("https://wa.me/?text="+encodeURIComponent(text));
+}
 
-  // EXTRA: make the image dynamic per user request – just change GAME.imageUrl variable
-  // No extra hill picture; we used a natural real image as placeholder but user can replace.
-  console.log('BrainPlay | Real vs AI — UI matches image 1000161868 (streak, tags, timer format)');
+// COUNTDOWN
+function updateTimer(){
+let now=new Date();
+let next=new Date();
+next.setHours(24,0,0,0);
 
-  // Force style for timer text to look exactly as "12h : 22m : 45s"
-  // In case of weird numbers digits we keep same.
-  // Additionally we embed the "Looks authentic? / Looks generated?" exactly as reference.
-  
-  // Optional: if the user modifies the image and answer needs to be changed,
-  // they can edit GAME.correctAnswer and GAME.explanationMsg.
-  // For demonstration we keep it REAL because the placeholder images are real.
-  // ========== End ==========
+let diff=next-now;
+
+let h=Math.floor(diff/1000/60/60);
+let m=Math.floor(diff/1000/60)%60;
+let s=Math.floor(diff/1000)%60;
+
+document.getElementById("countdown").innerText=
+`${h}h : ${m}m : ${s}s`;
+}
+
+setInterval(updateTimer,1000);
+
+// PWA INSTALL
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt',e=>{
+e.preventDefault();
+deferredPrompt=e;
+document.getElementById("installBtn").style.display="block";
+});
+
+document.getElementById("installBtn").onclick=()=>{
+deferredPrompt.prompt();
+};
+
+loadQuestion();
+
 </script>
+
 </body>
 </html>
