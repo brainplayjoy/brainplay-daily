@@ -6,14 +6,14 @@
 
 <title>BrainPlay Daily</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800&display=swap" rel="stylesheet">
 
 <style>
 
 body{
 margin:0;
 font-family:'Montserrat',sans-serif;
-background:radial-gradient(circle at top,#0f172a,#020617);
+background: radial-gradient(circle at top,#020617,#000);
 color:#fff;
 }
 
@@ -28,15 +28,17 @@ padding:15px;
 display:flex;
 justify-content:space-between;
 align-items:center;
-background:#0b1220;
-padding:12px;
-border-radius:16px;
-box-shadow:0 0 20px rgba(0,0,0,0.5);
+padding:14px;
+border-radius:20px;
+background:rgba(255,255,255,0.03);
+backdrop-filter:blur(10px);
+border:1px solid rgba(255,255,255,0.08);
 }
 
 .logo{
+font-size:20px;
 font-weight:800;
-font-size:18px;
+color:#c084fc;
 }
 
 .stats{
@@ -44,21 +46,21 @@ display:flex;
 gap:10px;
 }
 
-.stat-box{
-background:#111827;
-padding:8px 12px;
-border-radius:10px;
+.stat{
+padding:10px 14px;
+border-radius:14px;
+background:rgba(255,255,255,0.05);
 font-size:12px;
 }
 
 /* TITLE */
 .title{
 text-align:center;
-margin:20px 0;
+margin:25px 0 10px;
 }
 
 .title h1{
-font-size:32px;
+font-size:34px;
 margin:0;
 }
 
@@ -69,89 +71,105 @@ margin:0;
 color:#9ca3af;
 }
 
-/* PERCENT BOX */
+/* PERCENT BADGE */
 .percent{
-margin:10px auto;
-background:#111827;
-padding:10px;
-border-radius:20px;
-width:80%;
+margin:15px auto;
+padding:10px 15px;
+border-radius:30px;
+background:rgba(255,255,255,0.05);
+border:1px solid rgba(255,255,255,0.1);
+width:85%;
 text-align:center;
-color:#facc15;
-font-size:14px;
+color:#eab308;
 }
 
 /* IMAGE */
 .image-box img{
 width:100%;
-border-radius:16px;
-box-shadow:0 0 25px rgba(0,0,0,0.7);
+border-radius:18px;
+box-shadow:0 0 40px rgba(0,0,0,0.8);
+}
+
+/* QUESTION TEXT */
+.question{
+margin-top:20px;
+font-size:16px;
+color:#ddd;
 }
 
 /* BUTTONS */
 .buttons{
 display:flex;
-gap:10px;
-margin-top:15px;
+gap:12px;
+margin-top:12px;
 }
 
 button{
 flex:1;
-padding:14px;
+padding:16px;
 border:none;
-border-radius:12px;
-font-weight:700;
+border-radius:16px;
+font-size:18px;
+font-weight:800;
 cursor:pointer;
 transition:.3s;
 }
 
 .real{
 background:linear-gradient(45deg,#22c55e,#16a34a);
-color:#fff;
+box-shadow:0 0 15px rgba(34,197,94,0.6);
 }
 
 .ai{
 background:linear-gradient(45deg,#ef4444,#dc2626);
-color:#fff;
+box-shadow:0 0 15px rgba(239,68,68,0.6);
 }
 
 button:hover{
-transform:scale(1.05);
-}
-
-/* PROGRESS BAR */
-.progress-bar{
-height:8px;
-background:#1f2937;
-border-radius:10px;
-overflow:hidden;
-margin:10px 0;
-}
-
-.progress-fill{
-height:100%;
-width:0%;
-background:linear-gradient(90deg,#22c55e,#4ade80);
-transition:.4s;
+transform:scale(1.06);
 }
 
 /* RESULT CARD */
-.result-card{
-margin-top:15px;
-background:#0b1220;
-padding:15px;
-border-radius:14px;
+.result{
+margin-top:18px;
+padding:16px;
+border-radius:18px;
+background:rgba(255,255,255,0.05);
+border:1px solid rgba(255,255,255,0.1);
 display:none;
+animation:fade .5s ease;
 }
 
-.correct{
-color:#22c55e;
-font-weight:700;
+@keyframes fade{
+from{opacity:0;transform:translateY(10px);}
+to{opacity:1;}
 }
 
-.wrong{
-color:#ef4444;
-font-weight:700;
+.correct{color:#22c55e;}
+.wrong{color:#ef4444;}
+
+/* CONFETTI */
+.confetti{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+pointer-events:none;
+overflow:hidden;
+}
+
+.confetti span{
+position:absolute;
+width:6px;
+height:6px;
+background:#22c55e;
+animation:fall 2s linear forwards;
+}
+
+@keyframes fall{
+0%{transform:translateY(-10px);}
+100%{transform:translateY(100vh);}
 }
 
 /* SHARE */
@@ -160,8 +178,8 @@ margin-top:20px;
 }
 
 .share-title{
+text-align:center;
 margin-bottom:10px;
-color:#cbd5f5;
 }
 
 .share-buttons{
@@ -177,28 +195,16 @@ color:#fff;
 .whatsapp{
 background:linear-gradient(45deg,#25D366,#128C7E);
 color:#fff;
-box-shadow:0 0 10px rgba(37,211,102,0.6);
+font-weight:700;
 }
 
 /* TIMER */
 .timer{
 margin-top:20px;
-background:#0b1220;
 padding:15px;
-border-radius:14px;
+border-radius:16px;
+background:rgba(255,255,255,0.05);
 text-align:center;
-}
-
-/* INSTALL BUTTON */
-.install{
-margin-top:20px;
-background:#6366f1;
-color:#fff;
-padding:12px;
-border-radius:12px;
-width:100%;
-font-weight:700;
-display:none;
 }
 
 </style>
@@ -208,139 +214,112 @@ display:none;
 
 <div class="container">
 
-<!-- HEADER -->
 <div class="header">
 <div class="logo">🧠 BrainPlay</div>
 <div class="stats">
-<div class="stat-box">🔥 7</div>
-<div class="stat-box">#12</div>
+<div class="stat">🔥 7</div>
+<div class="stat">📅 #12</div>
 </div>
 </div>
 
-<!-- TITLE -->
 <div class="title">
 <h1><span class="green">REAL</span> vs <span class="red">AI</span></h1>
 <div class="sub">Can you spot the difference?</div>
 </div>
 
-<div class="percent">Only 38% players got this right today!</div>
+<div class="percent">👥 Only <b>38%</b> players got this right today!</div>
 
-<!-- PROGRESS BAR -->
-<div class="progress-bar">
-<div class="progress-fill" id="progressFill"></div>
-</div>
-
-<!-- IMAGE -->
 <div class="image-box">
 <img id="gameImage">
 </div>
 
-<!-- BUTTONS -->
+<div class="question">Is this image Real or AI?</div>
+
 <div class="buttons">
-<button class="real" onclick="check('Real')">REAL</button>
-<button class="ai" onclick="check('AI')">AI</button>
+<button class="real" onclick="check('Real')">🌿 REAL</button>
+<button class="ai" onclick="check('AI')">🤖 AI</button>
 </div>
 
-<!-- RESULT -->
-<div class="result-card" id="resultCard">
+<div class="result" id="resultBox">
 <div id="resultText"></div>
 <div id="explanation"></div>
+<br>
+<button class="copy">💡 Learn More</button>
 </div>
 
-<!-- SHARE -->
 <div class="share">
-<div class="share-title">Share your result</div>
+<div class="share-title">🔗 Share your result with friends!</div>
 <div class="share-buttons">
-<button class="copy" onclick="copyResult()">Copy</button>
-<button class="whatsapp" onclick="shareWhatsApp()">WhatsApp</button>
+<button class="copy" onclick="copyResult()">📋 Copy Link</button>
+<button class="whatsapp" onclick="shareWhatsApp()">🟢 WhatsApp</button>
 </div>
 </div>
 
-<!-- TIMER -->
 <div class="timer">
-Next challenge in <br>
+⏱️ Next challenge in <br>
 <b id="countdown"></b>
 </div>
-
-<!-- INSTALL -->
-<button class="install" id="installBtn">📲 Add to Home Screen</button>
 
 </div>
 
 <script>
 
-// DATA
 const data=[
-{img:"images/1.jpg",answer:"Real",exp:"Natural lighting and imperfections"},
-{img:"images/2.jpg",answer:"AI",exp:"Too smooth and artificial"},
-{img:"images/3.jpg",answer:"AI",exp:"Unrealistic perfection"},
-{img:"images/4.jpg",answer:"Real",exp:"Natural depth & shadows"}
-];
-
-// DAILY ROTATION
-const baseIndex=Math.floor(Date.now()/86400000)%data.length;
-
-let questions=[
-data[baseIndex],
-data[(baseIndex+1)%data.length],
-data[(baseIndex+2)%data.length]
+{img:"images/1.jpg",answer:"Real",exp:"Natural lighting and realistic imperfections."},
+{img:"images/2.jpg",answer:"AI",exp:"Overly smooth textures and artificial feel."},
+{img:"images/3.jpg",answer:"AI",exp:"Too perfect to be natural."}
 ];
 
 let current=0,score=0;
 
-function loadQuestion(){
-document.getElementById("gameImage").src=questions[current].img;
-document.getElementById("resultCard").style.display="none";
-
-// update progress bar
-let percent=((current)/3)*100;
-document.getElementById("progressFill").style.width=percent+"%";
+function load(){
+document.getElementById("gameImage").src=data[current].img;
 }
 
 function check(choice){
-let q=questions[current];
+let q=data[current];
 
-let resultText=document.getElementById("resultText");
+let result=document.getElementById("resultBox");
+let text=document.getElementById("resultText");
 
 if(choice===q.answer){
 score++;
-resultText.innerHTML="<div class='correct'>✅ Correct</div>";
+text.innerHTML="<div class='correct'>✅ CORRECT!</div>";
+confetti();
 }else{
-resultText.innerHTML="<div class='wrong'>❌ Wrong</div>";
+text.innerHTML="<div class='wrong'>❌ WRONG!</div>";
 }
 
 document.getElementById("explanation").innerText=q.exp;
-document.getElementById("resultCard").style.display="block";
+result.style.display="block";
 
-setTimeout(()=>{
-current++;
-if(current<3){
-loadQuestion();
-}else{
-finishGame();
-}
-},1200);
 }
 
-function finishGame(){
-document.getElementById("progressFill").style.width="100%";
-document.getElementById("resultText").innerHTML=`🔥 You scored ${score}/3`;
+function confetti(){
+let c=document.createElement("div");
+c.className="confetti";
+for(let i=0;i<40;i++){
+let s=document.createElement("span");
+s.style.left=Math.random()*100+"%";
+c.appendChild(s);
+}
+document.body.appendChild(c);
+setTimeout(()=>c.remove(),2000);
 }
 
-// SHARE
 function copyResult(){
-let text=`I scored ${score}/3 🔥 Play now: ${location.href}`;
+let text=`I scored ${score}/3 🔥 Try this game: ${location.href}`;
 navigator.clipboard.writeText(text);
 alert("Copied!");
 }
 
 function shareWhatsApp(){
-let text=`I scored ${score}/3 🔥 Play now: ${location.href}`;
+let text=`I scored ${score}/3 🔥 Try this game: ${location.href}`;
 window.open("https://wa.me/?text="+encodeURIComponent(text));
 }
 
-// COUNTDOWN
-function updateTimer(){
+// TIMER
+function timer(){
 let now=new Date();
 let next=new Date();
 next.setHours(24,0,0,0);
@@ -354,22 +333,9 @@ let s=Math.floor(diff/1000)%60;
 document.getElementById("countdown").innerText=
 `${h}h : ${m}m : ${s}s`;
 }
+setInterval(timer,1000);
 
-setInterval(updateTimer,1000);
-
-// PWA INSTALL
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt',e=>{
-e.preventDefault();
-deferredPrompt=e;
-document.getElementById("installBtn").style.display="block";
-});
-
-document.getElementById("installBtn").onclick=()=>{
-deferredPrompt.prompt();
-};
-
-loadQuestion();
+load();
 
 </script>
 
