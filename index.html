@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>BrainPlay Daily</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Permanent+Marker&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Anton&display=swap" rel="stylesheet">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -19,67 +20,52 @@ body{
   padding:20px;
 }
 
-.container{
-  max-width:520px;
-  width:100%;
-}
+.container{max-width:520px;width:100%}
 
 /* HEADER */
 .header{
   display:flex;
   justify-content:space-between;
-  align-items:center;
-  padding:14px 18px;
-  border-radius:22px;
+  padding:14px;
+  border-radius:20px;
   background:#0c0c18;
-  border:1px solid rgba(255,255,255,0.08);
-}
-
-.logo{display:flex;gap:10px;font-weight:900}
-
-.logo-text{
-  background:linear-gradient(90deg,#e879f9,#9333ea);
-  -webkit-background-clip:text;
-  color:transparent;
-}
-
-.pill{
-  padding:8px 12px;
-  border-radius:12px;
-  background:#121226;
-  font-size:13px;
-  font-weight:700;
 }
 
 /* TITLE */
 .title{text-align:center;margin-top:20px}
 
 .title h1{
-  font-family:'Permanent Marker',cursive;
-  font-size:56px;
+  font-family:'Anton',sans-serif;
+  font-size:60px;
+  letter-spacing:2px;
 }
 
-.real{color:#22c55e;text-shadow:0 0 10px #22c55e}
-.ai{color:#ef4444;text-shadow:0 0 10px #ef4444}
+.real{
+  color:#fff;
+  text-shadow:0 0 12px cyan;
+}
+.ai{
+  color:#ff3b3b;
+  text-shadow:0 0 12px red;
+}
 
-.subtitle{color:#9ca3af}
+.subtitle{color:#aaa}
 
 /* STAT */
 .stat{
-  margin:20px auto;
-  padding:12px;
-  border-radius:30px;
+  margin:20px;
+  padding:10px;
   text-align:center;
   background:#121226;
+  border-radius:20px;
 }
 
-.highlight{color:#facc15;font-weight:800}
+.highlight{color:#facc15}
 
 /* IMAGE */
 .image-box{
-  border-radius:24px;
+  border-radius:20px;
   overflow:hidden;
-  margin-top:20px;
 }
 
 .image-box img{
@@ -89,108 +75,85 @@ body{
 }
 
 /* QUESTION */
-.question{
-  text-align:center;
-  margin-top:18px;
-  font-weight:700;
-}
+.question{text-align:center;margin-top:16px;font-weight:700}
 
 /* BUTTONS */
-.buttons{display:flex;gap:12px;margin-top:16px}
+.buttons{display:flex;gap:10px;margin-top:16px}
 
 .btn{
   flex:1;
-  padding:16px;
-  border-radius:18px;
-  font-weight:800;
+  padding:14px;
   border:none;
-  cursor:pointer;
+  border-radius:14px;
   color:#fff;
+  font-weight:800;
+  cursor:pointer;
 }
 
-.btn-real{background:linear-gradient(#16a34a,#065f46)}
-.btn-ai{background:linear-gradient(#ef4444,#7f1d1d)}
-
-.btn small{display:block;font-size:12px;opacity:0.7}
+.btn-real{background:#16a34a}
+.btn-ai{background:#ef4444}
 
 /* RESULT */
 .result{
   margin-top:20px;
-  padding:20px;
-  border-radius:20px;
+  padding:16px;
   background:#121226;
+  border-radius:20px;
   display:none;
 }
 
-.result-row{
+.row{
   display:flex;
-  justify-content:space-between;
   align-items:center;
+  gap:12px;
 }
 
 .circle{
-  width:60px;
-  height:60px;
+  width:50px;
+  height:50px;
   border-radius:50%;
   display:flex;
   justify-content:center;
   align-items:center;
-  font-size:28px;
+  font-size:22px;
 }
 
-.correct{background:#22c55e;box-shadow:0 0 20px #22c55e}
-.wrong{background:#ef4444;box-shadow:0 0 20px #ef4444}
+.correct{background:#22c55e}
+.wrong{background:#ef4444}
 
 .next{
+  margin-left:auto;
   background:#1f2937;
-  padding:10px 14px;
-  border-radius:10px;
   color:#facc15;
-  cursor:pointer;
+  padding:8px 12px;
   border:none;
-  font-weight:700;
+  border-radius:10px;
+  cursor:pointer;
 }
 
-/* SHARE */
-.share{margin-top:20px}
-
-.share-title{
-  text-align:center;
-  color:#9ca3af;
-  display:flex;
+/* FINAL RESULT */
+.final{
+  position:absolute;
+  inset:0;
+  background:#050510;
+  display:none;
   justify-content:center;
   align-items:center;
-  gap:6px;
+  text-align:center;
+  flex-direction:column;
 }
 
-.share-buttons{
-  display:flex;
-  gap:10px;
-  margin-top:10px;
-}
+.final h2{font-size:28px;margin-bottom:10px}
 
-.share-btn{
-  flex:1;
-  padding:12px;
+.start{
+  margin-top:16px;
+  padding:12px 18px;
+  background:orange;
+  color:#fff;
+  border:none;
   border-radius:12px;
-  border:none;
   font-weight:700;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:6px;
   cursor:pointer;
-}
-
-.copy{background:#1f2937;color:#fff}
-.whatsapp{background:#25D366;color:#fff}
-
-/* FOOTER */
-.footer{
-  margin-top:20px;
-  text-align:center;
-  color:#9ca3af;
-  font-size:13px;
 }
 </style>
 </head>
@@ -199,130 +162,114 @@ body{
 
 <div class="container">
 
-<div class="header">
-  <div class="logo">🧠 <span class="logo-text">BRAINPLAY DAILY</span></div>
-  <div>
-    <span class="pill">🔥 7</span>
-    <span class="pill">#12</span>
-  </div>
-</div>
-
 <div class="title">
   <h1><span class="real">REAL</span> vs <span class="ai">AI</span></h1>
   <div class="subtitle">Can you spot the difference?</div>
 </div>
 
 <div class="stat">
-  🧩 Only <span class="highlight" id="percent">38%</span> players got this right today!
+  Only <span class="highlight" id="percent"></span> players got this right today!
 </div>
 
 <div class="image-box">
-  <img id="img" src="">
+  <img id="img">
 </div>
 
 <div class="question">🤔 Is this image Real or AI?</div>
 
 <div class="buttons">
-  <button class="btn btn-real" onclick="answer('real')">
-    REAL <small>Looks authentic?</small>
-  </button>
-  <button class="btn btn-ai" onclick="answer('ai')">
-    AI <small>Looks generated?</small>
-  </button>
+  <button class="btn btn-real" onclick="answer('real')">REAL</button>
+  <button class="btn btn-ai" onclick="answer('ai')">AI</button>
 </div>
 
 <div class="result" id="result">
-  <div class="result-row">
-    <div id="circle" class="circle">✔</div>
+  <div class="row">
+    <div id="circle" class="circle"></div>
+    <h3 id="title"></h3>
     <button class="next" onclick="next()">>> NEXT</button>
   </div>
-  <h3 id="title"></h3>
   <p id="desc"></p>
 </div>
 
-<div class="share">
-  <div class="share-title">
-    <!-- SHARE SVG -->
-    <svg width="16" fill="#9ca3af" viewBox="0 0 24 24">
-      <path d="M18 8a3 3 0 10-2.83-4H15a3 3 0 003 3zM6 14a3 3 0 10-2.83-4H3a3 3 0 003 3zm12 6a3 3 0 10-2.83-4H15a3 3 0 003 3zM8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/>
-    </svg>
-    Share your result with friends!
-  </div>
-
-  <div class="share-buttons">
-    <button class="share-btn copy" onclick="copyLink()">
-      📋 Copy Link
-    </button>
-    <button class="share-btn whatsapp" onclick="shareWA()">
-      <!-- WA SVG -->
-      <svg width="16" fill="white" viewBox="0 0 24 24">
-        <path d="M12 2a10 10 0 00-8.95 14.32L2 22l5.84-1.05A10 10 0 1012 2zm5.2 14.3c-.22.62-1.28 1.18-1.76 1.24-.45.06-1 .09-1.62-.1-.38-.12-.87-.28-1.5-.55-2.65-1.15-4.38-3.83-4.51-4-.12-.17-1.08-1.43-1.08-2.72 0-1.28.67-1.91.91-2.17.24-.26.52-.33.7-.33h.5c.16 0 .38-.06.6.47.22.53.75 1.83.82 1.96.07.13.11.28.02.45-.09.17-.13.28-.26.43-.13.15-.27.33-.38.44-.13.13-.27.27-.12.52.15.25.67 1.1 1.44 1.79 1 .89 1.84 1.17 2.1 1.3.26.13.41.11.56-.07.15-.17.65-.76.82-1.02.17-.26.35-.22.58-.13.24.09 1.52.72 1.78.85.26.13.43.2.49.31.06.11.06.64-.16 1.26z"/>
-      </svg>
-      WhatsApp
-    </button>
-  </div>
-</div>
-
-<div class="footer">
-  🧠 Save to phone for daily challenge
+<!-- FINAL SCREEN -->
+<div class="final" id="final">
+  <h2 id="finalText"></h2>
+  <button class="start" onclick="restart()">Start New</button>
 </div>
 
 </div>
 
 <script>
 
-let images = [
+let images=[
 "https://images.unsplash.com/photo-1501785888041-af3ef285b470",
 "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
-"https://images.unsplash.com/photo-1519125323398-675f0ddb6308"
+"https://images.unsplash.com/photo-1519125323398-675f0ddb6308",
+"https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
+"https://images.unsplash.com/photo-1472214103451-9374bd1c798e"
 ];
 
-let index = 0;
-let isReal;
+let index=0;
+let score=0;
+let truth;
 
 function load(){
-  document.getElementById("img").src = images[index] + "?q=80&w=800";
-  isReal = Math.random()>0.5;
+  document.getElementById("img").src=images[index]+"?q=80&w=800";
+  truth=Math.random()>0.5;
   document.getElementById("result").style.display="none";
 }
 
 function answer(choice){
-  let correct = (choice==="real" && isReal) || (choice==="ai" && !isReal);
-  let circle = document.getElementById("circle");
-  let title = document.getElementById("title");
-  let desc = document.getElementById("desc");
+  let correct=(choice==="real"&&truth)||(choice==="ai"&&!truth);
+
+  let circle=document.getElementById("circle");
+  let title=document.getElementById("title");
+  let desc=document.getElementById("desc");
 
   if(correct){
+    score++;
     circle.className="circle correct";
     circle.innerHTML="✔";
-    title.innerHTML="CORRECT!";
-    desc.innerHTML="This image is REAL. Natural lighting and textures match real-world physics.";
+    title.innerHTML="CORRECT";
+    desc.innerHTML="Natural lighting & texture = REAL.";
   }else{
     circle.className="circle wrong";
     circle.innerHTML="✖";
     title.innerHTML="WRONG";
-    desc.innerHTML="This image is AI-generated. Look for unnatural textures and repeating patterns.";
+    desc.innerHTML="Artifacts & patterns = AI generated.";
   }
 
   document.getElementById("result").style.display="block";
 }
 
 function next(){
-  index = (index+1)%images.length;
+  index++;
+  if(index>=5){
+    showFinal();
+  }else{
+    load();
+  }
+}
+
+function showFinal(){
+  let text="";
+  if(score<=2) text="😐 Poor ("+score+"/5)";
+  else if(score<=4) text="👍 Good ("+score+"/5)";
+  else text="🏆 Excellent ("+score+"/5) 🥇";
+
+  document.getElementById("finalText").innerHTML=text;
+  document.getElementById("final").style.display="flex";
+}
+
+function restart(){
+  index=0;
+  score=0;
+  document.getElementById("final").style.display="none";
   load();
 }
 
-function copyLink(){
-  navigator.clipboard.writeText(location.href);
-  alert("Copied!");
-}
-
-function shareWA(){
-  window.open("https://wa.me/?text=Play this game: "+location.href);
-}
-
-/* Dynamic percentage */
-document.getElementById("percent").innerText = Math.floor(Math.random()*50+30) + "%";
+/* random percent */
+document.getElementById("percent").innerText=Math.floor(Math.random()*50+30)+"%";
 
 load();
 
