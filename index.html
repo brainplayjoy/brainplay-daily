@@ -1,40 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BrainPlay Daily</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+margin:0;
+font-family:'Montserrat',sans-serif;
+background: radial-gradient(circle at top,#020617,#000);
+color:#fff;
+}
+
+.container{
+max-width:420px;
+margin:auto;
+padding:15px;
+}
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:14px;
+border-radius:20px;
+background:rgba(255,255,255,0.04);
+backdrop-filter:blur(10px);
+border:1px solid rgba(255,255,255,0.08);
+}
+
+.logo{
+font-weight:800;
+color:#c084fc;
+}
+
+.stat{
+background:rgba(255,255,255,0.05);
+padding:8px 12px;
+border-radius:12px;
+font-size:12px;
+}
+
+.title{
+text-align:center;
+margin:20px 0;
+}
+
+.title h1{
+font-size:34px;
+margin:0;
+}
+
+.green{color:#22c55e;}
+.red{color:#ef4444;}
+
+.sub{color:#aaa;}
+
+.percent{
+margin:12px auto;
+padding:10px;
+border-radius:30px;
+background:rgba(255,255,255,0.05);
+text-align:center;
+color:#facc15;
+}
+
+.image-box img{
+width:100%;
+border-radius:18px;
+box-shadow:0 0 40px rgba(0,0,0,0.8);
+}
+
+.question{
+margin-top:18px;
+}
+
+.buttons{
+display:flex;
+gap:12px;
+margin-top:12px;
+}
+
+button{
+flex:1;
+padding:16px;
+border-radius:16px;
+border:none;
+font-size:18px;
+font-weight:800;
+color:#fff;
+cursor:pointer;
+position:relative;
+overflow:hidden;
+}
+
+button::after{
+content:"";
+position:absolute;
+top:0;
+left:-100%;
+width:100%;
+height:100%;
+background:linear-gradient(120deg,transparent,rgba(255,255,255,0.3),transparent);
+transition:.5s;
+}
+
+button:hover::after{
+left:100%;
+}
+
+.real{
+background:linear-gradient(145deg,#22c55e,#15803d);
+box-shadow:0 4px 20px rgba(34,197,94,0.5);
+}
+
+.ai{
+background:linear-gradient(145deg,#ef4444,#b91c1c);
+box-shadow:0 4px 20px rgba(239,68,68,0.5);
+}
+
+.result{
+margin-top:18px;
+padding:18px;
+border-radius:20px;
+background:rgba(255,255,255,0.05);
+border:1px solid rgba(255,255,255,0.08);
+display:none;
+animation:fade .4s ease;
+}
+
+@keyframes fade{
+from{opacity:0;transform:translateY(10px);}
+}
+
+.success-icon{
+width:70px;
+height:70px;
+margin:auto;
+border-radius:50%;
+background:radial-gradient(circle,#22c55e,#15803d);
+display:flex;
+align-items:center;
+justify-content:center;
+box-shadow:0 0 25px rgba(34,197,94,0.8);
+animation:pop .4s ease;
+}
+
+@keyframes pop{
+from{transform:scale(0);}
+to{transform:scale(1);}
+}
+
+svg{
+width:40px;
+height:40px;
+stroke:#fff;
+stroke-width:4;
+fill:none;
+stroke-dasharray:50;
+stroke-dashoffset:50;
+animation:draw .5s forwards .2s;
+}
+
+@keyframes draw{
+to{stroke-dashoffset:0;}
+}
+
+.share{
+margin-top:20px;
+}
+
+.share-buttons{
+display:flex;
+gap:10px;
+}
+
+.copy{
+background:#1e293b;
+color:#fff;
+}
+
+.whatsapp{
+background:linear-gradient(45deg,#25D366,#128C7E);
+color:#fff;
+}
+
+.timer{
+margin-top:20px;
+padding:15px;
+border-radius:16px;
+background:rgba(255,255,255,0.05);
+text-align:center;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+<div class="logo">🧠 BrainPlay</div>
+<div class="stat">🔥 7</div>
+</div>
+
+<div class="title">
+<h1><span class="green">REAL</span> vs <span class="red">AI</span></h1>
+<div class="sub">Can you spot the difference?</div>
+</div>
+
+<div class="percent">👥 Only 38% players got this right today!</div>
+
+<div class="image-box">
+<img id="gameImage">
+</div>
+
+<div class="question">Is this image Real or AI?</div>
+
+<div class="buttons">
+<button class="real" onclick="check('Real')">🌿 REAL</button>
+<button class="ai" onclick="check('AI')">🤖 AI</button>
+</div>
+
+<div class="result" id="resultBox">
+<div id="icon"></div>
+<h2 id="resultText"></h2>
+<p id="explanation"></p>
+</div>
+
+<div class="share">
+<div class="share-buttons">
+<button class="copy" onclick="copyResult()">📋 Copy</button>
+<button class="whatsapp" onclick="shareWhatsApp()">🟢 WhatsApp</button>
+</div>
+</div>
+
+<div class="timer">
+⏱️ Next challenge in <br>
+<b id="countdown"></b>
+</div>
+
+</div>
+
 <script>
 
-// GAME SETTINGS
+// SETTINGS
 let totalRounds = 3;
 let current = 0;
 let score = 0;
 let timerDuration = 5000;
 let timer;
 
-// RANDOM IMAGE (Unsplash)
+// RANDOM IMAGE (stable)
 function getRandomImage(){
-return `https://source.unsplash.com/800x600/?nature,people,city&sig=${Math.random()}`;
+return `https://picsum.photos/800/600?random=${Date.now()}`;
 }
 
-// LOAD IMAGE
+// LOAD
 function load(){
-document.getElementById("gameImage").src = getRandomImage();
-document.getElementById("resultBox").style.display = "none";
+let img = document.getElementById("gameImage");
+
+img.src = getRandomImage();
+
+// fallback
+img.onerror = function(){
+img.src = "https://via.placeholder.com/800x600?text=Image+Error";
+};
+
+document.getElementById("resultBox").style.display="none";
 startTimer();
 }
 
-// START TIMER (5 sec auto next)
+// TIMER
 function startTimer(){
 clearTimeout(timer);
-timer = setTimeout(()=>{
-nextRound();
-}, timerDuration);
+timer = setTimeout(nextRound, timerDuration);
 }
 
-// CHECK ANSWER
+// CHECK
 function check(choice){
 clearTimeout(timer);
 
 let icon = document.getElementById("icon");
 
-// ⚠️ For now all Unsplash images treated as REAL
-if(choice === "Real"){
+if(choice==="Real"){
 score++;
 
 icon.innerHTML=`
@@ -42,39 +296,30 @@ icon.innerHTML=`
 <svg viewBox="0 0 52 52">
 <path d="M14 27 L22 35 L38 18"/>
 </svg>
-</div>
-`;
-
+</div>`;
 document.getElementById("resultText").innerText="CORRECT!";
 }else{
 icon.innerHTML="";
 document.getElementById("resultText").innerText="WRONG!";
 }
 
-document.getElementById("explanation").innerText="Random image from internet";
+document.getElementById("explanation").innerText="Random internet image";
 document.getElementById("resultBox").style.display="block";
 
-// show result → then next
-setTimeout(nextRound, 1200);
+setTimeout(nextRound,1200);
 }
 
-// NEXT ROUND
+// NEXT
 function nextRound(){
 current++;
-
-if(current < totalRounds){
+if(current<totalRounds){
 load();
 }else{
-endGame();
-}
-}
-
-// FINAL RESULT
-function endGame(){
 document.getElementById("resultBox").style.display="block";
 document.getElementById("icon").innerHTML="";
 document.getElementById("resultText").innerText=`🔥 Final Score: ${score}/${totalRounds}`;
 document.getElementById("explanation").innerText="Game Over";
+}
 }
 
 // SHARE
@@ -89,7 +334,7 @@ let text=`I scored ${score}/${totalRounds} 🔥 ${location.href}`;
 window.open("https://wa.me/?text="+encodeURIComponent(text));
 }
 
-// TIMER (existing countdown)
+// CLOCK
 function timerClock(){
 let now=new Date();
 let next=new Date();
@@ -107,7 +352,10 @@ document.getElementById("countdown").innerText=
 
 setInterval(timerClock,1000);
 
-// START GAME
-load();
+// START
+window.onload=load;
 
 </script>
+
+</body>
+</html>
