@@ -1,318 +1,694 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BrainPlay Daily — REAL vs AI</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>BrainPlay · REAL vs AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    body {
+      background: #000000;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background-image: 
+        radial-gradient(circle at 15% 30%, #0a0a0a 0%, #000000 70%),
+        radial-gradient(circle at 85% 70%, #0c0c0c 0%, #000000 70%);
+      position: relative;
+      overflow-x: hidden;
+    }
 
-<style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
+    /* subtle animated ambient glow behind card */
+    body::before {
+      content: "";
+      position: fixed;
+      top: -20%;
+      left: -20%;
+      width: 140%;
+      height: 140%;
+      background: radial-gradient(circle at 30% 40%, rgba(120, 80, 255, 0.08) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 60%, rgba(255, 140, 40, 0.06) 0%, transparent 50%);
+      animation: ambientPulse 12s infinite alternate ease-in-out;
+      pointer-events: none;
+      z-index: 0;
+    }
 
-body{
-  font-family:'Inter',sans-serif;
-  background:#060612;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  min-height:100vh;
-  padding:20px;
-  color:#fff;
-}
+    @keyframes ambientPulse {
+      0% { opacity: 0.6; transform: scale(1); }
+      100% { opacity: 1; transform: scale(1.03); }
+    }
 
-/* MAIN CARD */
-.brain-card{
-  width:100%;
-  max-width:520px;
-  background:#0b0b18;
-  border-radius:36px;
-  padding:24px;
-  box-shadow:0 30px 80px rgba(0,0,0,0.6);
-}
+    .game-card {
+      position: relative;
+      z-index: 2;
+      max-width: 480px;
+      width: 100%;
+      margin: 0 auto;
+      background: rgba(8, 8, 12, 0.75);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-radius: 48px;
+      box-shadow: 
+        0 30px 50px -15px rgba(0,0,0,0.9),
+        0 0 0 1px rgba(255, 255, 255, 0.12),
+        inset 0 1px 0 rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      overflow: hidden;
+      transition: all 0.25s ease;
+    }
 
-/* HEADER */
-.top-bar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:20px;
-}
+    .card-inner {
+      padding: 28px 24px 32px;
+    }
 
-.logo{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-weight:800;
-  font-size:20px;
-  color:#c084fc;
-}
+    /* header */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
 
-.logo span{
-  background:linear-gradient(90deg,#e879f9,#a855f7);
-  -webkit-background-clip:text;
-  color:transparent;
-}
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(10px);
+      padding: 8px 20px 8px 16px;
+      border-radius: 50px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
 
-.pill{
-  display:flex;
-  gap:10px;
-}
+    .brain-icon {
+      font-size: 24px;
+      filter: drop-shadow(0 0 8px #b77cff);
+    }
 
-.badge{
-  background:#121226;
-  padding:10px 16px;
-  border-radius:18px;
-  font-weight:700;
-  font-size:14px;
-  display:flex;
-  align-items:center;
-  gap:6px;
-  border:1px solid rgba(255,255,255,0.08);
-}
+    .brand-text {
+      font-weight: 800;
+      font-size: 19px;
+      letter-spacing: -0.4px;
+      background: linear-gradient(135deg, #E2C6FF, #B06EFF);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
 
-.streak{ color:#facc15;}
-.challenge{ color:#a78bfa;}
+    .streak-badge {
+      background: rgba(255, 200, 40, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 8px 18px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(255, 210, 80, 0.35);
+      color: #FFD966;
+      letter-spacing: -0.2px;
+    }
 
-/* TITLE */
-.hero{
-  text-align:center;
-  margin-bottom:12px;
-}
+    /* duel title */
+    .hero-section {
+      text-align: center;
+      margin: 14px 0 10px;
+    }
 
-.hero h1{
-  font-size:48px;
-  font-weight:900;
-}
+    .versus {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
 
-.real{
-  color:#22c55e;
-}
-.ai{
-  color:#ef4444;
-}
+    .word-real {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 52px;
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      background: linear-gradient(180deg, #6EE7B7 0%, #10B981 80%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 0 14px rgba(16, 185, 129, 0.5));
+    }
 
-.sub{
-  color:#9ca3af;
-  margin-top:6px;
-  font-size:14px;
-}
+    .word-vs {
+      font-size: 28px;
+      font-weight: 700;
+      color: #5B5B7A;
+      margin: 0 2px;
+    }
 
-/* STATS */
-.stat{
-  margin:16px auto;
-  background:#111126;
-  padding:10px 18px;
-  border-radius:30px;
-  text-align:center;
-  font-weight:600;
-  font-size:14px;
-  border:1px solid rgba(255,255,255,0.08);
-}
+    .word-ai {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 52px;
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      background: linear-gradient(180deg, #FCA5A5 0%, #EF4444 80%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 0 14px rgba(239, 68, 68, 0.5));
+    }
 
-/* IMAGE */
-.image-box{
-  border-radius:24px;
-  overflow:hidden;
-  margin:16px 0;
-  box-shadow:0 10px 30px rgba(0,0,0,0.6);
-}
+    .daily-tag {
+      font-size: 14px;
+      font-weight: 600;
+      color: #A0A0CC;
+      margin-top: 6px;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
 
-.image-box img{
-  width:100%;
-  display:block;
-}
+    /* stat highlight */
+    .stat-pill {
+      background: rgba(250, 204, 21, 0.08);
+      border: 1px solid rgba(250, 204, 21, 0.35);
+      border-radius: 60px;
+      padding: 12px 20px;
+      margin: 20px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-weight: 600;
+      font-size: 15px;
+      color: #FDE047;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 0 20px rgba(250, 204, 21, 0.1);
+    }
 
-/* QUESTION */
-.question{
-  text-align:center;
-  font-weight:700;
-  margin:12px 0;
-}
+    /* image container */
+    .image-frame {
+      border-radius: 32px;
+      overflow: hidden;
+      background: #010101;
+      box-shadow: 
+        0 20px 30px -12px rgba(0,0,0,0.8),
+        inset 0 0 0 1px rgba(255,255,255,0.1);
+      margin-bottom: 8px;
+      position: relative;
+    }
 
-/* BUTTONS */
-.actions{
-  display:flex;
-  gap:14px;
-  margin-top:10px;
-}
+    #gameImage {
+      width: 100%;
+      display: block;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      background: #0a0a0f;
+      transition: opacity 0.3s;
+    }
 
-.btn{
-  flex:1;
-  padding:16px;
-  border:none;
-  border-radius:20px;
-  font-size:18px;
-  font-weight:800;
-  cursor:pointer;
-  transition:.25s;
-}
+    .question-badge {
+      margin: 20px auto 8px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 16px;
+      color: #D1D1F0;
+      background: rgba(255,255,255,0.03);
+      backdrop-filter: blur(8px);
+      width: fit-content;
+      padding: 8px 24px;
+      border-radius: 50px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
 
-.btn-real{
-  background:linear-gradient(135deg,#10b981,#065f46);
-  box-shadow:0 10px 20px rgba(16,185,129,0.3);
-}
+    /* buttons – premium look */
+    .button-row {
+      display: flex;
+      gap: 14px;
+      margin-top: 18px;
+    }
 
-.btn-ai{
-  background:linear-gradient(135deg,#ef4444,#7f1d1d);
-  box-shadow:0 10px 20px rgba(239,68,68,0.3);
-}
+    .game-btn {
+      flex: 1;
+      border: none;
+      font-weight: 700;
+      font-size: 18px;
+      padding: 17px 0;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      letter-spacing: 0.3px;
+      background: #12121c;
+      color: white;
+      border: 1px solid rgba(255,255,255,0.1);
+      backdrop-filter: blur(8px);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.6);
+    }
 
-.btn:hover{
-  transform:translateY(-2px);
-}
+    .btn-real {
+      background: linear-gradient(135deg, #0A2E1A 0%, #04170B 100%);
+      border: 1px solid rgba(74, 222, 128, 0.35);
+      color: #D1FAE5;
+    }
 
-/* RESULT CARD */
-.result{
-  margin-top:20px;
-  background:#121226;
-  border-radius:24px;
-  padding:20px;
-  display:none;
-  text-align:center;
-}
+    .btn-real::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #6EE7B7, transparent);
+      opacity: 0.8;
+    }
 
-.result h2{
-  font-size:24px;
-  margin:10px 0;
-}
+    .btn-real:hover {
+      background: linear-gradient(135deg, #0F3D24 0%, #06200E 100%);
+      border-color: #4ADE80;
+      box-shadow: 0 0 28px rgba(34, 197, 94, 0.6), 0 8px 20px rgba(0,0,0,0.6);
+      transform: translateY(-2px);
+    }
 
-.result p{
-  color:#cbd5f5;
-  font-size:14px;
-}
+    .btn-ai {
+      background: linear-gradient(135deg, #3D1111 0%, #1F0808 100%);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #FEE2E2;
+    }
 
-/* SHARE */
-.share{
-  margin-top:20px;
-}
+    .btn-ai::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #FCA5A5, transparent);
+      opacity: 0.8;
+    }
 
-.share-title{
-  text-align:center;
-  margin-bottom:10px;
-  color:#9ca3af;
-}
+    .btn-ai:hover {
+      background: linear-gradient(135deg, #521A1A 0%, #2A0A0A 100%);
+      border-color: #EF4444;
+      box-shadow: 0 0 28px rgba(239, 68, 68, 0.6), 0 8px 20px rgba(0,0,0,0.6);
+      transform: translateY(-2px);
+    }
 
-.share-buttons{
-  display:flex;
-  gap:12px;
-}
+    .game-btn:active {
+      transform: scale(0.96);
+      transition: 0.1s;
+    }
 
-.share-btn{
-  flex:1;
-  padding:12px;
-  border-radius:16px;
-  border:none;
-  font-weight:700;
-  cursor:pointer;
-}
+    .game-btn:disabled {
+      opacity: 0.5;
+      filter: grayscale(0.3);
+      pointer-events: none;
+      transform: none;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
 
-.copy{
-  background:#1f2937;
-  color:#fff;
-}
+    /* result panel – glass card */
+    .result-panel {
+      margin-top: 24px;
+      background: rgba(12, 12, 22, 0.8);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-radius: 36px;
+      padding: 24px 18px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      display: none;
+      animation: resultIn 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
 
-.whatsapp{
-  background:linear-gradient(135deg,#25D366,#128C7E);
-  color:#fff;
-}
+    @keyframes resultIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-</style>
+    .result-icon-wrap {
+      margin-bottom: 10px;
+    }
+
+    .circle-badge {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 44px;
+      font-weight: 700;
+      background: #1E1E2E;
+    }
+
+    .correct-circle {
+      background: radial-gradient(circle at 30% 30%, #22c55e, #0C4A2A);
+      box-shadow: 0 0 36px #22c55e80;
+    }
+
+    .wrong-circle {
+      background: radial-gradient(circle at 30% 30%, #ef4444, #7F1D1D);
+      box-shadow: 0 0 36px #ef444480;
+    }
+
+    .result-title-large {
+      font-size: 28px;
+      font-weight: 800;
+      margin: 12px 0 6px;
+      letter-spacing: -0.4px;
+    }
+
+    .result-desc-text {
+      font-size: 15px;
+      color: #C5C5E8;
+      max-width: 320px;
+      margin: 8px auto 0;
+      line-height: 1.5;
+    }
+
+    /* waiting timer */
+    .waiting-container {
+      margin-top: 20px;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(16px);
+      border-radius: 50px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #EAEAFF;
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .timer-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 24px;
+      background: rgba(255,255,255,0.1);
+      padding: 4px 16px;
+      border-radius: 40px;
+      letter-spacing: 1px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .progress-row {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #9B9BCC;
+      background: rgba(0,0,0,0.4);
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 6px 22px;
+      border-radius: 50px;
+      backdrop-filter: blur(8px);
+    }
+
+    .share-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .share-btn {
+      flex: 1;
+      background: rgba(20, 20, 35, 0.7);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 13px 0;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #E8E8FF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: 0.25s;
+    }
+
+    .whatsapp-btn {
+      background: rgba(18, 50, 38, 0.8);
+      border-color: rgba(37, 211, 102, 0.5);
+      color: #D1FAE5;
+    }
+
+    .share-btn:hover {
+      background: rgba(35, 35, 55, 0.8);
+      border-color: rgba(255,255,255,0.25);
+      transform: translateY(-1px);
+    }
+  </style>
 </head>
-
 <body>
+<div class="game-card">
+  <div class="card-inner">
+    <!-- Header -->
+    <div class="top-bar">
+      <div class="brand">
+        <span class="brain-icon">🧠</span>
+        <span class="brand-text">BRAINPLAY</span>
+      </div>
+      <div class="streak-badge">
+        🔥 STREAK 7
+      </div>
+    </div>
 
-<div class="brain-card">
+    <!-- REAL vs AI Title -->
+    <div class="hero-section">
+      <div class="versus">
+        <span class="word-real">REAL</span>
+        <span class="word-vs">vs</span>
+        <span class="word-ai">AI</span>
+      </div>
+      <div class="daily-tag">
+        <span>⚡</span> DAILY CHALLENGE <span>#12</span>
+      </div>
+    </div>
 
-  <!-- HEADER -->
-  <div class="top-bar">
-    <div class="logo">🧠 <span>BRAINPLAY</span></div>
-    <div class="pill">
-      <div class="badge streak">🔥 7</div>
-      <div class="badge challenge">📅 #12</div>
+    <!-- Stat Pill -->
+    <div class="stat-pill">
+      🧩 Only 38% of players got this right today
+    </div>
+
+    <!-- Image -->
+    <div class="image-frame">
+      <img id="gameImage" alt="Real or AI generated" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%230a0a12'/%3E%3Ctext x='200' y='160' font-size='18' fill='%23555' text-anchor='middle' font-family='Inter'%3ELoading...%3C/text%3E%3C/svg%3E">
+    </div>
+
+    <div class="question-badge">
+      🤔 Is this image Real or AI?
+    </div>
+
+    <!-- Buttons -->
+    <div class="button-row">
+      <button class="game-btn btn-real" id="realBtn" onclick="submitChoice('Real')">🌿 REAL</button>
+      <button class="game-btn btn-ai" id="aiBtn" onclick="submitChoice('AI')">✨ AI</button>
+    </div>
+
+    <!-- Result feedback -->
+    <div class="result-panel" id="resultPanel">
+      <div class="result-icon-wrap" id="resultIcon"></div>
+      <div id="resultTitle" class="result-title-large"></div>
+      <div id="resultDesc" class="result-desc-text"></div>
+    </div>
+
+    <!-- Waiting for next image -->
+    <div id="waitingContainer" class="hidden"></div>
+
+    <!-- Progress -->
+    <div class="progress-row" id="progressCounter">📸 1 / 5</div>
+
+    <!-- Share -->
+    <div class="share-row">
+      <button class="share-btn" onclick="copyResult()">📋 COPY</button>
+      <button class="share-btn whatsapp-btn" onclick="shareWhatsApp()">💬 WHATSAPP</button>
     </div>
   </div>
-
-  <!-- TITLE -->
-  <div class="hero">
-    <h1><span class="real">REAL</span> vs <span class="ai">AI</span></h1>
-    <div class="sub">Can you spot the difference?</div>
-  </div>
-
-  <!-- STAT -->
-  <div class="stat">🧩 Only 38% players got this right today!</div>
-
-  <!-- IMAGE -->
-  <div class="image-box">
-    <img id="gameImage" src="https://picsum.photos/800/600" />
-  </div>
-
-  <!-- QUESTION -->
-  <div class="question">Is this image Real or AI?</div>
-
-  <!-- BUTTONS -->
-  <div class="actions">
-    <button class="btn btn-real" onclick="submitChoice('Real')">🌿 REAL</button>
-    <button class="btn btn-ai" onclick="submitChoice('AI')">🤖 AI</button>
-  </div>
-
-  <!-- RESULT -->
-  <div class="result" id="resultBox">
-    <h2 id="resultTitle"></h2>
-    <p id="resultText"></p>
-  </div>
-
-  <!-- SHARE -->
-  <div class="share">
-    <div class="share-title">Share your result with friends!</div>
-    <div class="share-buttons">
-      <button class="share-btn copy" onclick="copyResults()">📋 COPY LINK</button>
-      <button class="share-btn whatsapp" onclick="shareWhatsApp()">💬 WHATSAPP</button>
-    </div>
-  </div>
-
 </div>
 
 <script>
+  (function() {
+    const TOTAL = 5;
+    let index = 0;
+    let score = 0;
+    let locked = false;
+    let timer = null;
 
-let isReal = Math.random() > 0.5;
+    const images = [];
+    const truths = []; // true = REAL
 
-function submitChoice(choice){
-  const resultBox = document.getElementById("resultBox");
-  const title = document.getElementById("resultTitle");
-  const text = document.getElementById("resultText");
+    const gameImg = document.getElementById('gameImage');
+    const realBtn = document.getElementById('realBtn');
+    const aiBtn = document.getElementById('aiBtn');
+    const resultPanel = document.getElementById('resultPanel');
+    const resultIcon = document.getElementById('resultIcon');
+    const resultTitle = document.getElementById('resultTitle');
+    const resultDesc = document.getElementById('resultDesc');
+    const waitingDiv = document.getElementById('waitingContainer');
+    const progressEl = document.getElementById('progressCounter');
 
-  let correct = (choice === "Real" && isReal) || (choice === "AI" && !isReal);
+    function generateData() {
+      images.length = 0;
+      truths.length = 0;
+      for (let i = 0; i < TOTAL; i++) {
+        images.push(`https://picsum.photos/800/600?random=${Date.now()+i+Math.floor(Math.random()*99999)}`);
+        truths.push(Math.random() < 0.5);
+      }
+    }
 
-  if(correct){
-    title.innerHTML = "✅ CORRECT!";
-    text.innerHTML = isReal
-      ? "This image is REAL. Natural lighting and textures match real-world physics."
-      : "This image is AI-generated. Smooth gradients and artificial patterns reveal it.";
-  } else {
-    title.innerHTML = "❌ WRONG";
-    text.innerHTML = isReal
-      ? "This was REAL. Notice natural imperfections and lighting depth."
-      : "This was AI. Look for repeating textures and unnatural edges.";
-  }
+    function resetGame() {
+      if (timer) { clearInterval(timer); timer = null; }
+      index = 0;
+      score = 0;
+      locked = false;
+      generateData();
+      resultPanel.style.display = 'none';
+      waitingDiv.classList.add('hidden');
+      waitingDiv.innerHTML = '';
+      realBtn.disabled = false;
+      aiBtn.disabled = false;
+      updateProgress();
+      loadImage();
+    }
 
-  resultBox.style.display = "block";
-}
+    function updateProgress() {
+      progressEl.textContent = `📸 ${index+1} / ${TOTAL}`;
+    }
 
-function copyResults(){
-  navigator.clipboard.writeText(window.location.href);
-  alert("Copied!");
-}
+    function loadImage() {
+      if (index >= TOTAL) { endGame(); return; }
+      if (gameImg) {
+        gameImg.src = images[index];
+        gameImg.onerror = () => { gameImg.src = 'https://picsum.photos/800/600?fallback=1'; };
+      }
+      updateProgress();
+    }
 
-function shareWhatsApp(){
-  window.open("https://wa.me/?text=Try this game: "+window.location.href);
-}
+    window.submitChoice = function(choice) {
+      if (locked || index >= TOTAL) return;
+      const isReal = truths[index];
+      const correct = (choice === 'Real' && isReal) || (choice === 'AI' && !isReal);
+      
+      locked = true;
+      realBtn.disabled = true;
+      aiBtn.disabled = true;
+      
+      if (correct) score++;
+      displayResult(correct, isReal);
+      startCountdown();
+    };
 
+    function displayResult(correct, isRealImage) {
+      if (correct) {
+        resultIcon.innerHTML = `<div class="circle-badge correct-circle">✓</div>`;
+        resultTitle.innerHTML = `🎉 CORRECT!`;
+        resultDesc.innerHTML = isRealImage ? 
+          `This image is REAL. Natural lighting and subtle grain confirm authenticity.` :
+          `You spotted the AI! Synthetic textures and unnatural smoothness give it away.`;
+      } else {
+        resultIcon.innerHTML = `<div class="circle-badge wrong-circle">✗</div>`;
+        resultTitle.innerHTML = `❌ WRONG`;
+        const answer = isRealImage ? 'REAL' : 'AI';
+        resultDesc.innerHTML = `💡 Correct answer: ${answer}. ${isRealImage ? 'Look for realistic shadows and noise.' : 'AI often struggles with consistent details.'}`;
+      }
+      resultPanel.style.display = 'block';
+    }
+
+    function startCountdown() {
+      let sec = 5;
+      waitingDiv.classList.remove('hidden');
+      waitingDiv.innerHTML = `
+        <div class="waiting-container">
+          <span>⏳ Next image in</span>
+          <span class="timer-number" id="timerDisplay">5s</span>
+          <span>• stay sharp</span>
+        </div>`;
+      const timerSpan = document.getElementById('timerDisplay');
+      if (timer) clearInterval(timer);
+      timer = setInterval(() => {
+        sec--;
+        if (timerSpan) timerSpan.textContent = sec + 's';
+        if (sec <= 0) {
+          clearInterval(timer);
+          timer = null;
+          moveToNext();
+        }
+      }, 1000);
+    }
+
+    function moveToNext() {
+      if (timer) { clearInterval(timer); timer = null; }
+      waitingDiv.classList.add('hidden');
+      waitingDiv.innerHTML = '';
+      resultPanel.style.display = 'none';
+      index++;
+      locked = false;
+      if (index < TOTAL) {
+        realBtn.disabled = false;
+        aiBtn.disabled = false;
+        loadImage();
+      } else {
+        endGame();
+      }
+    }
+
+    function endGame() {
+      locked = true;
+      realBtn.disabled = true;
+      aiBtn.disabled = true;
+      if (timer) { clearInterval(timer); timer = null; }
+      waitingDiv.classList.add('hidden');
+      
+      resultIcon.innerHTML = `<div style="font-size:48px;">🏆</div>`;
+      resultTitle.innerHTML = `FINAL SCORE: ${score}/${TOTAL}`;
+      let msg = score === TOTAL ? 'Perfect! You’re a Real vs AI master.' :
+                score >= 3 ? 'Great instincts! Keep training.' :
+                'Practice makes perfect. Try again!';
+      resultDesc.innerHTML = `${msg} Share your result.`;
+      resultPanel.style.display = 'block';
+      progressEl.textContent = `🏁 Game Over · ${score}/${TOTAL}`;
+    }
+
+    window.copyResult = function() {
+      const text = `🧠 BrainPlay REAL vs AI — I scored ${score}/${TOTAL}! Can you beat me? ${window.location.href}`;
+      navigator.clipboard.writeText(text).then(() => alert('✅ Copied to clipboard!'));
+    };
+
+    window.shareWhatsApp = function() {
+      const text = `🔥 BrainPlay REAL vs AI Challenge 🔥 My score: ${score}/${TOTAL}. Try it: ${window.location.href}`;
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    };
+
+    window.addEventListener('load', resetGame);
+  })();
 </script>
-
 </body>
 </html>
