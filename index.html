@@ -3,10 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>BrainPlay Daily</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Anton&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Anton&display=swap" rel="stylesheet">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -20,15 +19,36 @@ body{
   padding:20px;
 }
 
-.container{max-width:520px;width:100%}
+.container{
+  max-width:520px;
+  width:100%;
+}
 
 /* HEADER */
 .header{
   display:flex;
   justify-content:space-between;
-  padding:14px;
-  border-radius:20px;
+  align-items:center;
+  padding:14px 18px;
+  border-radius:22px;
   background:#0c0c18;
+  border:1px solid rgba(255,255,255,0.08);
+}
+
+.logo{display:flex;gap:10px;font-weight:900}
+
+.logo-text{
+  background:linear-gradient(90deg,#e879f9,#9333ea);
+  -webkit-background-clip:text;
+  color:transparent;
+}
+
+.pill{
+  padding:8px 12px;
+  border-radius:12px;
+  background:#121226;
+  font-size:13px;
+  font-weight:700;
 }
 
 /* TITLE */
@@ -36,36 +56,39 @@ body{
 
 .title h1{
   font-family:'Anton',sans-serif;
-  font-size:60px;
+  font-size:56px;
   letter-spacing:2px;
 }
 
 .real{
-  color:#fff;
+  color:#ffffff;
   text-shadow:0 0 12px cyan;
 }
+
 .ai{
   color:#ff3b3b;
   text-shadow:0 0 12px red;
 }
 
-.subtitle{color:#aaa}
+.subtitle{color:#9ca3af}
 
 /* STAT */
 .stat{
-  margin:20px;
-  padding:10px;
+  margin:20px auto;
+  padding:12px;
+  border-radius:30px;
   text-align:center;
   background:#121226;
-  border-radius:20px;
 }
 
-.highlight{color:#facc15}
+.highlight{color:#facc15;font-weight:800}
 
 /* IMAGE */
 .image-box{
-  border-radius:20px;
+  border-radius:24px;
   overflow:hidden;
+  margin-top:20px;
+  position:relative;
 }
 
 .image-box img{
@@ -74,86 +97,102 @@ body{
   object-fit:cover;
 }
 
-/* QUESTION */
-.question{text-align:center;margin-top:16px;font-weight:700}
-
-/* BUTTONS */
-.buttons{display:flex;gap:10px;margin-top:16px}
-
-.btn{
-  flex:1;
-  padding:14px;
-  border:none;
-  border-radius:14px;
-  color:#fff;
-  font-weight:800;
-  cursor:pointer;
-}
-
-.btn-real{background:#16a34a}
-.btn-ai{background:#ef4444}
-
-/* RESULT */
-.result{
-  margin-top:20px;
-  padding:16px;
-  background:#121226;
-  border-radius:20px;
-  display:none;
-}
-
-.row{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.circle{
-  width:50px;
-  height:50px;
-  border-radius:50%;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:22px;
-}
-
-.correct{background:#22c55e}
-.wrong{background:#ef4444}
-
-.next{
-  margin-left:auto;
-  background:#1f2937;
-  color:#facc15;
-  padding:8px 12px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-}
-
-/* FINAL RESULT */
-.final{
+/* FINAL OVERLAY */
+.final-overlay{
   position:absolute;
   inset:0;
   background:#050510;
   display:none;
   justify-content:center;
   align-items:center;
-  text-align:center;
   flex-direction:column;
+  text-align:center;
 }
 
-.final h2{font-size:28px;margin-bottom:10px}
-
-.start{
-  margin-top:16px;
-  padding:12px 18px;
+.start-btn{
+  margin-top:14px;
   background:orange;
   color:#fff;
+  padding:12px 18px;
   border:none;
   border-radius:12px;
   font-weight:700;
   cursor:pointer;
+}
+
+/* QUESTION */
+.question{
+  text-align:center;
+  margin-top:18px;
+  font-weight:700;
+}
+
+/* BUTTONS */
+.buttons{display:flex;gap:12px;margin-top:16px}
+
+.btn{
+  flex:1;
+  padding:16px;
+  border-radius:18px;
+  font-weight:800;
+  border:none;
+  cursor:pointer;
+  color:#fff;
+}
+
+.btn-real{background:linear-gradient(#16a34a,#065f46)}
+.btn-ai{background:linear-gradient(#ef4444,#7f1d1d)}
+
+.btn small{display:block;font-size:12px;opacity:0.7}
+
+/* RESULT */
+.result{
+  margin-top:20px;
+  padding:20px;
+  border-radius:20px;
+  background:#121226;
+  display:none;
+}
+
+.result-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.circle{
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:28px;
+}
+
+.correct{background:#22c55e;box-shadow:0 0 20px #22c55e}
+.wrong{background:#ef4444;box-shadow:0 0 20px #ef4444}
+
+.next{
+  margin-left:auto;
+  background:#1f2937;
+  padding:10px 14px;
+  border-radius:10px;
+  color:#facc15;
+  cursor:pointer;
+  border:none;
+  font-weight:700;
+}
+
+/* SHARE */
+.share{margin-top:20px}
+
+/* FOOTER */
+.footer{
+  margin-top:20px;
+  text-align:center;
+  color:#9ca3af;
+  font-size:13px;
 }
 </style>
 </head>
@@ -162,46 +201,62 @@ body{
 
 <div class="container">
 
+<div class="header">
+  <div class="logo">🧠 <span class="logo-text">BRAINPLAY DAILY</span></div>
+  <div>
+    <span class="pill">🔥 7</span>
+    <span class="pill">#12</span>
+  </div>
+</div>
+
 <div class="title">
   <h1><span class="real">REAL</span> vs <span class="ai">AI</span></h1>
   <div class="subtitle">Can you spot the difference?</div>
 </div>
 
 <div class="stat">
-  Only <span class="highlight" id="percent"></span> players got this right today!
+  🧩 Only <span class="highlight" id="percent">38%</span> players got this right today!
 </div>
 
 <div class="image-box">
   <img id="img">
+
+  <!-- FINAL RESULT INSIDE IMAGE -->
+  <div class="final-overlay" id="finalOverlay">
+    <h2 id="finalText"></h2>
+    <button class="start-btn" onclick="restart()">Start New</button>
+  </div>
 </div>
 
 <div class="question">🤔 Is this image Real or AI?</div>
 
 <div class="buttons">
-  <button class="btn btn-real" onclick="answer('real')">REAL</button>
-  <button class="btn btn-ai" onclick="answer('ai')">AI</button>
+  <button class="btn btn-real" onclick="answer('real')">
+    REAL <small>Looks authentic?</small>
+  </button>
+  <button class="btn btn-ai" onclick="answer('ai')">
+    AI <small>Looks generated?</small>
+  </button>
 </div>
 
 <div class="result" id="result">
-  <div class="row">
-    <div id="circle" class="circle"></div>
+  <div class="result-row">
+    <div id="circle" class="circle">✔</div>
     <h3 id="title"></h3>
     <button class="next" onclick="next()">>> NEXT</button>
   </div>
   <p id="desc"></p>
 </div>
 
-<!-- FINAL SCREEN -->
-<div class="final" id="final">
-  <h2 id="finalText"></h2>
-  <button class="start" onclick="restart()">Start New</button>
+<div class="footer">
+  🧠 Save to phone for daily challenge
 </div>
 
 </div>
 
 <script>
 
-let images=[
+let images = [
 "https://images.unsplash.com/photo-1501785888041-af3ef285b470",
 "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
 "https://images.unsplash.com/photo-1519125323398-675f0ddb6308",
@@ -209,34 +264,34 @@ let images=[
 "https://images.unsplash.com/photo-1472214103451-9374bd1c798e"
 ];
 
-let index=0;
-let score=0;
-let truth;
+let index = 0;
+let score = 0;
+let isReal;
 
 function load(){
-  document.getElementById("img").src=images[index]+"?q=80&w=800";
-  truth=Math.random()>0.5;
+  document.getElementById("img").src = images[index] + "?q=80&w=800";
+  isReal = Math.random()>0.5;
   document.getElementById("result").style.display="none";
 }
 
 function answer(choice){
-  let correct=(choice==="real"&&truth)||(choice==="ai"&&!truth);
+  let correct = (choice==="real" && isReal) || (choice==="ai" && !isReal);
 
-  let circle=document.getElementById("circle");
-  let title=document.getElementById("title");
-  let desc=document.getElementById("desc");
+  let circle = document.getElementById("circle");
+  let title = document.getElementById("title");
+  let desc = document.getElementById("desc");
 
   if(correct){
     score++;
     circle.className="circle correct";
     circle.innerHTML="✔";
     title.innerHTML="CORRECT";
-    desc.innerHTML="Natural lighting & texture = REAL.";
+    desc.innerHTML="This image is REAL. Natural lighting and textures match real-world physics.";
   }else{
     circle.className="circle wrong";
     circle.innerHTML="✖";
     title.innerHTML="WRONG";
-    desc.innerHTML="Artifacts & patterns = AI generated.";
+    desc.innerHTML="This image is AI-generated. Look for unnatural textures and repeating patterns.";
   }
 
   document.getElementById("result").style.display="block";
@@ -258,18 +313,17 @@ function showFinal(){
   else text="🏆 Excellent ("+score+"/5) 🥇";
 
   document.getElementById("finalText").innerHTML=text;
-  document.getElementById("final").style.display="flex";
+  document.getElementById("finalOverlay").style.display="flex";
 }
 
 function restart(){
   index=0;
   score=0;
-  document.getElementById("final").style.display="none";
+  document.getElementById("finalOverlay").style.display="none";
   load();
 }
 
-/* random percent */
-document.getElementById("percent").innerText=Math.floor(Math.random()*50+30)+"%";
+document.getElementById("percent").innerText = Math.floor(Math.random()*50+30) + "%";
 
 load();
 
