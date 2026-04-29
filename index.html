@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>BrainPlay — REAL vs AI</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <title>BrainPlay Daily — REAL vs AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -13,9 +13,9 @@
     }
 
     body {
-      background: #05050F;
+      background: #070714;
       font-family: 'Inter', sans-serif;
-      color: #F2F2F7;
+      color: #FFFFFF;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -23,130 +23,123 @@
       padding: 20px;
     }
 
-    /* main card — mimics the modern "BRAINPLAY" daily card */
-    .challenge-card {
-      max-width: 460px;
+    /* main game container — inspired by the attached sleek card */
+    .brain-card {
+      max-width: 500px;
       width: 100%;
       margin: 0 auto;
-      background: #0C0C1A;
-      border-radius: 48px;
+      background: #0F0F1A;
+      border-radius: 56px;
       overflow: hidden;
-      box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      box-shadow: 0 30px 40px -20px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.06);
       backdrop-filter: blur(2px);
       transition: all 0.2s ease;
     }
 
-    /* inner container keeps spacing consistent */
-    .card-inner {
-      padding: 24px 22px 32px;
+    .card-container {
+      padding: 28px 24px 34px;
     }
 
-    /* header with streak + brainplay logo */
-    .game-header {
+    /* header with BrainPlay + streak */
+    .top-bar {
       display: flex;
       justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 24px;
+      align-items: center;
+      margin-bottom: 20px;
     }
 
-    .brand {
+    .logo-area {
       display: flex;
       align-items: center;
-      gap: 6px;
-      background: rgba(255, 255, 255, 0.03);
-      padding: 6px 14px;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 6px 18px 6px 14px;
       border-radius: 60px;
-      backdrop-filter: blur(4px);
+      backdrop-filter: blur(5px);
     }
 
-    .brand-icon {
-      font-size: 22px;
-      filter: drop-shadow(0 2px 4px rgba(192, 132, 252, 0.4));
+    .brain-icon {
+      font-size: 24px;
     }
 
-    .brand-text {
+    .logo-text {
       font-weight: 800;
-      font-size: 18px;
+      font-size: 20px;
       letter-spacing: -0.3px;
-      background: linear-gradient(135deg, #E9C0FF, #C084FC);
+      background: linear-gradient(125deg, #E2C6FF, #B77CFF);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
     }
 
-    .streak-badge {
-      background: rgba(255, 215, 0, 0.12);
-      backdrop-filter: blur(4px);
-      padding: 6px 14px;
+    .streak-pill {
+      background: rgba(255, 180, 40, 0.12);
+      padding: 6px 16px;
       border-radius: 60px;
-      font-size: 14px;
       font-weight: 700;
+      font-size: 14px;
       display: flex;
       align-items: center;
       gap: 6px;
-      color: #FFDF7E;
-      border: 0.5px solid rgba(255, 215, 0, 0.25);
+      border: 0.5px solid rgba(255, 200, 80, 0.3);
+      color: #FFD966;
     }
 
-    .streak-badge span {
-      font-size: 16px;
-    }
-
-    /* main title REAL vs AI */
-    .versus-title {
+    /* title real vs ai */
+    .hero-title {
       text-align: center;
-      margin: 8px 0 10px 0;
+      margin: 10px 0 8px;
     }
 
-    .versus-glow {
-      font-size: 42px;
+    .duel {
+      font-size: 46px;
       font-weight: 800;
       letter-spacing: -1px;
       display: flex;
       justify-content: center;
-      gap: 14px;
       align-items: baseline;
+      gap: 12px;
       flex-wrap: wrap;
     }
 
-    .real-glow {
-      background: linear-gradient(135deg, #4ade80, #22c55e);
+    .real-word {
+      background: linear-gradient(125deg, #4ade80, #16a34a);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      text-shadow: 0 0 8px rgba(74, 222, 128, 0.3);
+      text-shadow: 0 2px 8px rgba(74, 222, 128, 0.3);
     }
 
-    .vs-divider {
-      font-size: 36px;
+    .vs-mid {
+      font-size: 38px;
       font-weight: 800;
-      color: #6B6B8A;
-      letter-spacing: -1px;
+      color: #6F6F96;
     }
 
-    .ai-glow {
-      background: linear-gradient(135deg, #f97316, #ef4444);
+    .ai-word {
+      background: linear-gradient(125deg, #f97316, #dc2626);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      text-shadow: 0 0 6px rgba(239, 68, 68, 0.3);
+      text-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
     }
 
-    .sub-caption {
+    .badge-daily {
       text-align: center;
-      font-size: 15px;
-      color: #9F9FBB;
-      margin-top: 8px;
-      font-weight: 500;
+      font-size: 14px;
+      font-weight: 600;
+      color: #A5A5C3;
+      margin-top: 6px;
+      letter-spacing: 0.5px;
     }
 
-    /* stat pill — only 38% players got this right */
-    .stat-pill {
+    /* stats like only 38% players */
+    .stat-highlight {
       background: rgba(250, 204, 21, 0.1);
       border: 1px solid rgba(250, 204, 21, 0.25);
       border-radius: 100px;
-      padding: 10px 16px;
-      margin: 20px 0 18px;
+      padding: 10px 18px;
+      margin: 20px 0 20px;
       text-align: center;
       font-weight: 700;
       font-size: 14px;
@@ -158,53 +151,46 @@
       gap: 8px;
     }
 
-    .stat-pill:before {
-      content: "⚡";
-      font-size: 16px;
-    }
-
-    /* Image container — elegant frame */
-    .image-stage {
-      position: relative;
+    /* image container */
+    .image-frame {
       border-radius: 32px;
       overflow: hidden;
-      background: linear-gradient(145deg, #0F0F1E, #03030C);
-      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
-      transition: transform 0.2s;
+      background: #0A0A12;
+      box-shadow: 0 20px 30px -12px black, inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+      margin-bottom: 6px;
     }
 
     #gameImage {
       width: 100%;
-      height: auto;
       display: block;
       aspect-ratio: 4 / 3;
       object-fit: cover;
       transition: all 0.2s;
     }
 
-    .question-label {
-      margin-top: 24px;
+    /* question */
+    .question-prompt {
+      margin-top: 22px;
+      text-align: center;
       font-weight: 700;
       font-size: 18px;
-      text-align: center;
-      letter-spacing: -0.2px;
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(255, 255, 255, 0.02);
       width: fit-content;
       margin-left: auto;
       margin-right: auto;
-      padding: 4px 20px;
+      padding: 6px 24px;
       border-radius: 40px;
-      color: #D1D1EC;
+      color: #D1D1F0;
     }
 
-    /* BUTTONS — stylish neumorphic + aggressive gradient */
-    .game-actions {
+    /* buttons inspired by attached design: earthy green vs orange/red */
+    .action-row {
       display: flex;
       gap: 16px;
-      margin-top: 18px;
+      margin-top: 20px;
     }
 
-    .btn {
+    .game-btn {
       flex: 1;
       border: none;
       font-weight: 800;
@@ -214,18 +200,15 @@
       cursor: pointer;
       transition: all 0.25s ease;
       font-family: 'Inter', sans-serif;
-      letter-spacing: -0.2px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
-      position: relative;
-      overflow: hidden;
+      gap: 12px;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
     }
 
     .btn-real {
-      background: linear-gradient(105deg, #1C8B3C, #0F5C28);
+      background: linear-gradient(105deg, #1F8A3E, #0E5624);
       color: white;
       border-bottom: 2px solid #86EFAC;
     }
@@ -233,11 +216,11 @@
     .btn-real:hover {
       transform: translateY(-2px);
       filter: brightness(1.05);
-      box-shadow: 0 15px 25px -8px rgba(34, 197, 94, 0.5);
+      box-shadow: 0 12px 22px -6px rgba(34, 197, 94, 0.5);
     }
 
     .btn-ai {
-      background: linear-gradient(105deg, #C2410C, #9B2C1C);
+      background: linear-gradient(105deg, #DC4A1A, #A82F0F);
       color: white;
       border-bottom: 2px solid #FCA5A5;
     }
@@ -245,399 +228,536 @@
     .btn-ai:hover {
       transform: translateY(-2px);
       filter: brightness(1.05);
-      box-shadow: 0 15px 25px -8px rgba(239, 68, 68, 0.5);
+      box-shadow: 0 12px 22px -6px rgba(220, 74, 26, 0.5);
     }
 
-    /* result card — modern, matches "CORRECT!" style from image */
-    .result-panel {
-      margin-top: 20px;
-      background: rgba(20, 20, 40, 0.7);
-      backdrop-filter: blur(16px);
+    /* result panel (CORRECT / WRONG with explanation) */
+    .result-card {
+      margin-top: 24px;
+      background: rgba(18, 18, 35, 0.8);
+      backdrop-filter: blur(20px);
       border-radius: 32px;
-      padding: 20px 16px;
+      padding: 20px 18px;
       text-align: center;
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       display: none;
-      animation: smoothFade 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      animation: fadeSlideUp 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
     }
 
-    @keyframes smoothFade {
-      0% {
+    @keyframes fadeSlideUp {
+      from {
         opacity: 0;
         transform: translateY(12px);
       }
-      100% {
+      to {
         opacity: 1;
         transform: translateY(0);
       }
     }
 
-    .result-icon {
-      margin-bottom: 10px;
+    .result-icon-big {
+      margin-bottom: 12px;
     }
 
-    .success-icon-large {
+    .badge-circle {
       width: 70px;
       height: 70px;
-      background: radial-gradient(circle at 30% 20%, #2dd4bf, #0f766e);
-      margin: 0 auto 12px;
+      margin: 0 auto;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 30px rgba(45, 212, 191, 0.4);
-      animation: popScale 0.4s ease-out;
+      font-size: 40px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
     }
 
-    @keyframes popScale {
-      0% {
-        transform: scale(0.5);
-        opacity: 0;
-      }
-      80% {
-        transform: scale(1.1);
-      }
-      100% {
-        transform: scale(1);
-      }
+    .correct-bg {
+      background: radial-gradient(circle at 30% 30%, #22c55e, #15803d);
+      box-shadow: 0 0 28px #22c55e80;
     }
 
-    .result-text-main {
-      font-size: 26px;
+    .wrong-bg {
+      background: radial-gradient(circle at 30% 30%, #ef4444, #9b1f1f);
+      box-shadow: 0 0 28px #ef444480;
+    }
+
+    .result-title {
+      font-size: 28px;
       font-weight: 800;
       letter-spacing: -0.5px;
-      margin: 8px 0 4px;
+      margin: 10px 0 6px;
     }
 
-    .result-explanation {
+    .result-desc {
       font-size: 14px;
-      color: #B9B9E0;
-      max-width: 260px;
+      color: #c1c1ec;
+      max-width: 280px;
       margin: 8px auto 0;
-      line-height: 1.4;
+      line-height: 1.45;
     }
 
-    /* share row — exactly like attached design: copy + whatsapp */
-    .share-row {
-      margin-top: 24px;
+    /* Professional waiting overlay / timer for next image */
+    .waiting-overlay {
+      margin-top: 20px;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(12px);
+      border-radius: 60px;
+      padding: 14px 16px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: softGlow 1.2s infinite;
     }
 
-    .share-buttons {
+    @keyframes softGlow {
+      0% { border-color: rgba(255, 255, 255, 0.2); box-shadow: 0 0 0px rgba(125, 125, 255, 0);}
+      50% { border-color: rgba(160, 120, 255, 0.5); box-shadow: 0 0 12px rgba(100, 100, 255, 0.3);}
+      100% { border-color: rgba(255, 255, 255, 0.2); box-shadow: 0 0 0px rgba(125, 125, 255, 0);}
+    }
+
+    .waiting-text {
+      font-weight: 700;
+      font-size: 17px;
+      letter-spacing: 0.2px;
+      color: #E0E0FF;
+    }
+
+    .waiting-timer {
+      font-family: monospace;
+      font-weight: 800;
+      font-size: 22px;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 4px 14px;
+      border-radius: 60px;
+    }
+
+    /* share section */
+    .share-section {
+      margin-top: 26px;
+    }
+
+    .share-flex {
       display: flex;
       gap: 14px;
     }
 
-    .share-btn {
+    .share-action {
       flex: 1;
-      background: #1C1C2E;
+      background: #202035;
       border: none;
       padding: 12px 0;
       border-radius: 60px;
       font-weight: 700;
-      font-size: 15px;
-      color: #EDEDFF;
+      font-size: 14px;
+      color: #F0F0FF;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
       cursor: pointer;
-      transition: all 0.2s;
-      backdrop-filter: blur(8px);
-      font-family: 'Inter', sans-serif;
+      transition: 0.2s;
     }
 
-    .copy-btn {
-      background: #252540;
-      border: 0.5px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .whatsapp-btn {
+    .whatsapp-action {
       background: linear-gradient(115deg, #25D366, #128C7E);
-      border: none;
-      box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
     }
 
-    .share-btn:hover {
+    .share-action:hover {
       transform: translateY(-2px);
       filter: brightness(1.05);
     }
 
-    /* timer block mimicing 'Next challenge in 12h:22m:45s' */
-    .timer-block {
-      margin-top: 28px;
-      background: rgba(0, 0, 0, 0.4);
-      border-radius: 48px;
-      padding: 16px 10px;
+    /* hidden class */
+    .hidden {
+      display: none;
+    }
+
+    /* progress counter */
+    .image-counter {
       text-align: center;
-      border: 0.5px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .timer-label {
-      font-size: 14px;
-      font-weight: 500;
-      color: #ACACD0;
-      letter-spacing: 0.3px;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-
-    #countdown {
-      font-size: 28px;
-      font-weight: 800;
-      font-family: monospace;
-      letter-spacing: 2px;
-      background: linear-gradient(135deg, #F0F0FF, #C0C0F0);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    /* small polish */
-    .footer-note {
-      font-size: 10px;
-      text-align: center;
-      margin-top: 18px;
-      opacity: 0.5;
+      margin-top: 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #9F9FCD;
+      background: rgba(0,0,0,0.3);
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 4px 16px;
+      border-radius: 100px;
     }
 
     button:active {
-      transform: scale(0.98);
+      transform: scale(0.97);
     }
 
-    @media (max-width: 450px) {
-      .card-inner {
-        padding: 18px 16px 28px;
-      }
-      .versus-glow {
-        font-size: 34px;
-        gap: 8px;
-      }
-      .btn {
-        font-size: 16px;
-        padding: 14px 0;
-      }
-      #countdown {
-        font-size: 24px;
-      }
+    /* game over final result styling */
+    .final-score-big {
+      font-size: 32px;
+      font-weight: 800;
     }
   </style>
 </head>
 <body>
 
-<div class="challenge-card">
-  <div class="card-inner">
-
-    <!-- header: BrainPlay + Streak Challenge style -->
-    <div class="game-header">
-      <div class="brand">
-        <span class="brand-icon">🧠</span>
-        <span class="brand-text">BRAINPLAY</span>
+<div class="brain-card">
+  <div class="card-container">
+    
+    <!-- Header BRAINPLAY DAILY -->
+    <div class="top-bar">
+      <div class="logo-area">
+        <span class="brain-icon">🧠</span>
+        <span class="logo-text">BRAINPLAY DAILY</span>
       </div>
-      <div class="streak-badge">
-        🔥 <span>STREAK</span> &nbsp;7
+      <div class="streak-pill">
+        🔥 STREAK 7
       </div>
     </div>
 
-    <!-- title and daily challenge vibe: REAL vs AI -->
-    <div class="versus-title">
-      <div class="versus-glow">
-        <span class="real-glow">REAL</span>
-        <span class="vs-divider">vs</span>
-        <span class="ai-glow">AI</span>
+    <!-- Title: REAL vs AI looks like attached image -->
+    <div class="hero-title">
+      <div class="duel">
+        <span class="real-word">REAL</span>
+        <span class="vs-mid">vs</span>
+        <span class="ai-word">AI</span>
       </div>
-      <div class="sub-caption">CHALLENGE • DAILY #12</div>
+      <div class="badge-daily">⚡ CHALLENGE • DAILY #12</div>
     </div>
 
-    <!-- Only 38% players got this right today! (exactly as image) -->
-    <div class="stat-pill">
-      Only 38% players got this right today!
+    <!-- stat pill -->
+    <div class="stat-highlight">
+      🧩 Only 38% players got this right today!
     </div>
 
-    <!-- image area -->
-    <div class="image-stage">
-      <img id="gameImage" alt="Real or AI challenge">
+    <!-- image container -->
+    <div class="image-frame">
+      <img id="gameImage" alt="Real or AI">
     </div>
 
-    <!-- question prompt -->
-    <div class="question-label">
+    <!-- real / AI question prompt -->
+    <div class="question-prompt">
       🤔 Is this image Real or AI?
     </div>
 
-    <!-- action buttons REAL / AI -->
-    <div class="game-actions">
-      <button class="btn btn-real" onclick="check('Real')">🌿 REAL</button>
-      <button class="btn btn-ai" onclick="check('AI')">✨ AI</button>
+    <!-- green vs orange buttons like original design -->
+    <div class="action-row">
+      <button class="game-btn btn-real" id="realBtn" onclick="submitChoice('Real')">🌿 REAL</button>
+      <button class="game-btn btn-ai" id="aiBtn" onclick="submitChoice('AI')">✨ AI</button>
     </div>
 
-    <!-- result dynamic panel (hidden by default) matched with CORRECT! style -->
-    <div class="result-panel" id="resultBox">
-      <div id="icon"></div>
-      <h2 id="resultText" class="result-text-main"></h2>
-      <p id="explanation" class="result-explanation"></p>
+    <!-- result feedback card (correct/wrong and explanation) -->
+    <div class="result-card" id="resultPanel">
+      <div id="resultIconArea"></div>
+      <div id="resultTitle" class="result-title"></div>
+      <div id="resultExplanation" class="result-desc"></div>
     </div>
 
-    <!-- share row: copy link + whatsapp (matches attached design exactly) -->
-    <div class="share-row">
-      <div class="share-buttons">
-        <button class="share-btn copy-btn" onclick="copyResult()">📋 COPY LINK</button>
-        <button class="share-btn whatsapp-btn" onclick="shareWhatsApp()">💬 SHARE ON WHATSAPP</button>
+    <!-- dynamic waiting area (appears after answer) -->
+    <div id="waitingContainer" class="hidden"></div>
+
+    <!-- progress indicator -->
+    <div class="image-counter" id="progressCounter"></div>
+
+    <!-- share row -->
+    <div class="share-section">
+      <div class="share-flex">
+        <button class="share-action" onclick="copyResults()">📋 COPY LINK</button>
+        <button class="share-action whatsapp-action" onclick="shareToWhatsApp()">💬 SHARE ON WHATSAPP</button>
       </div>
     </div>
 
-    <!-- timer block exactly as "Next challenge in 12h:22m:45s" -->
-    <div class="timer-block">
-      <div class="timer-label">
-        ⏳ Next challenge in
-      </div>
-      <div>
-        <b id="countdown">--h:--m:--s</b>
-      </div>
-    </div>
-    <div class="footer-note">BrainPlay daily — spot the difference</div>
   </div>
 </div>
 
 <script>
-  // ---------- GAME LOGIC (KEPT COMPLETELY INTACT, no function changes) ----------
-  let totalRounds = 3;
-  let current = 0;
-  let score = 0;
-  let timerDuration = 5000;
-  let timer = null;
+  // ------------- GAME CONFIG -------------
+  const TOTAL_IMAGES = 5;   // 5 images one by one
+  let currentIndex = 0;
+  let userScore = 0;
+  let waitingTimeout = null;
+  let isWaiting = false;         // to avoid double clicks while waiting
+  let currentChoiceLock = false; // lock during result display & waiting
 
-  // SAFE RANDOM IMAGE (very reliable) - unchanged
-  function getRandomImage() {
-    return "https://picsum.photos/800/600?random=" + Math.floor(Math.random() * 100000);
+  // We'll store a set of random but consistent image URLs for each round?
+  // Actually we want dynamic random images for each round but consistent during playthrough.
+  let imageList = [];
+  
+  // Pre-fetch image URLs (so they change on each full game, but appear one by one)
+  function generateImageSet() {
+    const urls = [];
+    for (let i = 0; i < TOTAL_IMAGES; i++) {
+      urls.push("https://picsum.photos/800/600?random=" + Date.now() + i + Math.random() * 10000);
+    }
+    return urls;
   }
-
-  // LOAD IMAGE (unchanged except keeping UI consistent)
-  function load() {
-    const img = document.getElementById("gameImage");
-    const resultBox = document.getElementById("resultBox");
-
-    if (!img) return;
-    img.src = getRandomImage();
-
-    // fallback (avoid blank screen)
-    img.onerror = function () {
-      img.src = "https://picsum.photos/800/600";
-    };
-
-    if (resultBox) resultBox.style.display = "none";
-    startTimer();
-  }
-
-  // TIMER (unchanged)
-  function startTimer() {
-    if (timer) clearTimeout(timer);
-    timer = setTimeout(nextRound, timerDuration);
-  }
-
-  // CHECK - maintains original logic (score, result panel, animations)
-  function check(choice) {
-    if (timer) clearTimeout(timer);
-
-    const iconDiv = document.getElementById("icon");
-    const resultTextSpan = document.getElementById("resultText");
-    const explanationPara = document.getElementById("explanation");
-    const resultBox = document.getElementById("resultBox");
-
-    if (choice === "Real") {
-      score++;
-      if (iconDiv) {
-        iconDiv.innerHTML = `
-          <div class="result-icon">
-            <div class="success-icon-large">
-              <svg width="38" height="38" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M14 27 L22 35 L38 18" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-              </svg>
-            </div>
-          </div>`;
-      }
-      if (resultTextSpan) resultTextSpan.innerText = "CORRECT!";
+  
+  // We'll create explanations for wrong answers (dynamic like "shadows are inconsistent" etc)
+  // For authentic "REAL vs AI" we simulate plausible reasoning based on answer
+  function getWrongExplanation(selectedAnswer) {
+    const explanations = [
+      "🧐 The texture patterns show typical AI smoothing — look at the edges and lighting inconsistency.",
+      "📸 Real photo has natural grain and reflections. This one's artificially generated, notice the irregular shadow falloff.",
+      "⚡ AI-generated artifacts: distorted fingers / background blur is unnatural and too uniform.",
+      "🌿 This is a real photograph. The subtle noise and natural depth of field match organic camera capture.",
+      "🤖 Fake details: repeating patterns and unnatural highlights are common in diffusion models."
+    ];
+    // randomize to keep fresh but coherent
+    if (selectedAnswer === "Real") {
+      return explanations[Math.floor(Math.random() * 3)] + " The lighting suggests AI synthesis, look at the reflections.";
     } else {
-      if (iconDiv) {
-        iconDiv.innerHTML = `
-          <div class="result-icon">
-            <div style="width:70px;height:70px;background:radial-gradient(circle,#ef4444,#991b1b);margin:0 auto 12px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(239,68,68,0.5);">
-              <span style="font-size:34px;">✘</span>
-            </div>
-          </div>`;
+      return "✅ Actually this image is REAL. The tissue texture and lighting variations are authentic. AI often lacks such micro-details.";
+    }
+  }
+
+  // Function to get correct explanation (when user clicks Real and image is Real etc.)
+  // But note: in our game the "truth" is defined dynamically: we assign random but with pattern: we decide 50% real 50% AI?
+  // For *real* experience we pre-define truth for each image: but to match "Real vs AI" we will randomly assign status.
+  // However we want the game to be unpredictable: each image gets random truth (Real or AI) dynamically, but we store it.
+  let groundTruth = []; // true for REAL image, false for AI image
+  
+  function initGameSession() {
+    currentIndex = 0;
+    userScore = 0;
+    if (waitingTimeout) clearTimeout(waitingTimeout);
+    isWaiting = false;
+    currentChoiceLock = false;
+    
+    // generate new images and random ground truths (real/ai)
+    imageList = [];
+    groundTruth = [];
+    for (let i = 0; i < TOTAL_IMAGES; i++) {
+      imageList.push("https://picsum.photos/800/600?random=" + Date.now() + i + Math.random() * 999999);
+      // Randomize REAL / AI: true = REAL, false = AI
+      const isReal = Math.random() < 0.5;   // some images are real, some AI (for guessing fun)
+      groundTruth.push(isReal);
+    }
+    
+    // hide result panel, clear waiting container
+    const resultPanel = document.getElementById("resultPanel");
+    if (resultPanel) resultPanel.style.display = "none";
+    const waitingDiv = document.getElementById("waitingContainer");
+    if (waitingDiv) waitingDiv.innerHTML = "";
+    waitingDiv.classList.add("hidden");
+    
+    updateProgressText();
+    loadCurrentImage();
+  }
+  
+  function updateProgressText() {
+    const progElem = document.getElementById("progressCounter");
+    if (progElem) {
+      progElem.innerText = `📸 Image ${currentIndex+1} of ${TOTAL_IMAGES}`;
+    }
+  }
+  
+  function loadCurrentImage() {
+    if (currentIndex >= TOTAL_IMAGES) {
+      endGameSession();
+      return;
+    }
+    const imgElement = document.getElementById("gameImage");
+    if (imgElement && imageList[currentIndex]) {
+      imgElement.src = imageList[currentIndex];
+      imgElement.onerror = () => {
+        imgElement.src = "https://picsum.photos/800/600?fallback=1";
+      };
+    }
+    updateProgressText();
+    // enable buttons
+    const realBtn = document.getElementById("realBtn");
+    const aiBtn = document.getElementById("aiBtn");
+    if (realBtn) realBtn.disabled = false;
+    if (aiBtn) aiBtn.disabled = false;
+    // remove any waiting overlay visual
+    const waitingDiv = document.getElementById("waitingContainer");
+    if (waitingDiv) {
+      waitingDiv.classList.add("hidden");
+      waitingDiv.innerHTML = "";
+    }
+    const resultPanel = document.getElementById("resultPanel");
+    if (resultPanel) resultPanel.style.display = "none";
+    isWaiting = false;
+    currentChoiceLock = false;
+  }
+  
+  // when user selects an answer
+  function submitChoice(selected) {
+    if (isWaiting || currentChoiceLock) return;
+    if (currentIndex >= TOTAL_IMAGES) return;
+    
+    const isRealImage = groundTruth[currentIndex];
+    const isCorrect = (selected === "Real" && isRealImage === true) || (selected === "AI" && isRealImage === false);
+    
+    // lock UI
+    currentChoiceLock = true;
+    const realBtn = document.getElementById("realBtn");
+    const aiBtn = document.getElementById("aiBtn");
+    if (realBtn) realBtn.disabled = true;
+    if (aiBtn) aiBtn.disabled = true;
+    
+    // update score if correct
+    if (isCorrect) {
+      userScore++;
+    }
+    
+    // show result panel with icon, title and explanation
+    const resultPanel = document.getElementById("resultPanel");
+    const iconArea = document.getElementById("resultIconArea");
+    const resultTitle = document.getElementById("resultTitle");
+    const resultExplanation = document.getElementById("resultExplanation");
+    
+    if (isCorrect) {
+      // CORRECT case (from image style)
+      iconArea.innerHTML = `
+        <div class="result-icon-big">
+          <div class="badge-circle correct-bg">
+            <svg width="40" height="40" viewBox="0 0 52 52" fill="none">
+              <path d="M14 27 L22 35 L38 18" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      `;
+      resultTitle.innerHTML = "🎉 CORRECT! 🎉";
+      if (isRealImage) {
+        resultExplanation.innerHTML = "✔️ This image is REAL. Natural lighting, subtle grain and organic textures confirm authenticity.";
+      } else {
+        resultExplanation.innerHTML = "🤖 You nailed it! This is AI-generated. The smooth gradients and unnatural edge transitions are typical for synthetic images.";
       }
-      if (resultTextSpan) resultTextSpan.innerText = "WRONG!";
-    }
-
-    if (explanationPara) explanationPara.innerText = "This image is from random internet library — lighting & texture details match real photography.";
-    if (resultBox) resultBox.style.display = "block";
-
-    setTimeout(nextRound, 1200);
-  }
-
-  // NEXT ROUND (same progression)
-  function nextRound() {
-    current++;
-    if (current < totalRounds) {
-      load();
     } else {
-      endGame();
+      // WRONG case with professional wrong explanation
+      iconArea.innerHTML = `
+        <div class="result-icon-big">
+          <div class="badge-circle wrong-bg">
+            <span style="font-size:42px; font-weight:800;">✘</span>
+          </div>
+        </div>
+      `;
+      resultTitle.innerHTML = "❌ WRONG";
+      // detailed explanation based on what the correct answer was
+      const correctAnswer = isRealImage ? "REAL" : "AI";
+      let detailMsg = "";
+      if (isRealImage) {
+        detailMsg = "This image is actually REAL. Look at the organic reflections, subtle chromatic aberration and natural depth — AI can't perfectly replicate these. Shadows also follow realistic physics.";
+      } else {
+        detailMsg = "The image is AI-GENERATED. Artifacts like inconsistent hair textures, surreal lighting, and weird pattern repetitions give it away. Generative models often struggle with fine details.";
+      }
+      resultExplanation.innerHTML = `💡 Oops! The correct answer is ${correctAnswer}. ${detailMsg}`;
+    }
+    
+    resultPanel.style.display = "block";
+    
+    // after showing result, start 5 sec waiting timer before loading next image
+    startWaitingForNextImage();
+  }
+  
+  function startWaitingForNextImage() {
+    let secondsLeft = 5;
+    const waitingDiv = document.getElementById("waitingContainer");
+    waitingDiv.classList.remove("hidden");
+    waitingDiv.innerHTML = `
+      <div class="waiting-overlay">
+        <span class="waiting-text">⏳ Next image in</span>
+        <span class="waiting-timer" id="waitTimerSeconds">5s</span>
+        <span class="waiting-text">🎯 get ready</span>
+      </div>
+    `;
+    isWaiting = true;
+    
+    const timerSpan = document.getElementById("waitTimerSeconds");
+    const interval = setInterval(() => {
+      if (!isWaiting) {
+        clearInterval(interval);
+        return;
+      }
+      secondsLeft--;
+      if (timerSpan) timerSpan.innerText = secondsLeft + "s";
+      if (secondsLeft <= 0) {
+        clearInterval(interval);
+        // move to next image
+        moveToNextImage();
+      }
+    }, 1000);
+    
+    // store interval to clear if needed
+    waitingDiv._countInterval = interval;
+  }
+  
+  function moveToNextImage() {
+    // clean waiting container
+    const waitingDiv = document.getElementById("waitingContainer");
+    if (waitingDiv._countInterval) clearInterval(waitingDiv._countInterval);
+    waitingDiv.classList.add("hidden");
+    waitingDiv.innerHTML = "";
+    isWaiting = false;
+    
+    // move index
+    currentIndex++;
+    updateProgressText();
+    
+    if (currentIndex < TOTAL_IMAGES) {
+      loadCurrentImage();
+    } else {
+      // game finished
+      endGameSession();
     }
   }
-
-  // END GAME — final score display but with nicer "BRAINPLAY" style
-  function endGame() {
-    const resultBox = document.getElementById("resultBox");
-    const iconDiv = document.getElementById("icon");
-    const resultTextSpan = document.getElementById("resultText");
-    const explanationPara = document.getElementById("explanation");
-
-    if (resultBox) resultBox.style.display = "block";
-    if (iconDiv) {
-      iconDiv.innerHTML = `<div class="result-icon"><div style="font-size:48px;">🏆</div></div>`;
-    }
-    if (resultTextSpan) resultTextSpan.innerText = `🔥 Final Score: ${score}/${totalRounds}`;
-    if (explanationPara) explanationPara.innerText = `Game Over — amazing observation! Share your result with friends.`;
+  
+  function endGameSession() {
+    const resultPanel = document.getElementById("resultPanel");
+    const iconArea = document.getElementById("resultIconArea");
+    const resultTitle = document.getElementById("resultTitle");
+    const resultExplanation = document.getElementById("resultExplanation");
+    const waitingDiv = document.getElementById("waitingContainer");
+    waitingDiv.classList.add("hidden");
+    if (waitingDiv._countInterval) clearInterval(waitingDiv._countInterval);
+    
+    // disable buttons
+    const realBtn = document.getElementById("realBtn");
+    const aiBtn = document.getElementById("aiBtn");
+    if (realBtn) realBtn.disabled = true;
+    if (aiBtn) aiBtn.disabled = true;
+    
+    // Show final score
+    iconArea.innerHTML = `<div style="font-size:52px;">🏆</div>`;
+    resultTitle.innerHTML = `🔥 FINAL SCORE: ${userScore}/${TOTAL_IMAGES}`;
+    let message = "";
+    if (userScore === TOTAL_IMAGES) message = "Perfect! You're a pro at spotting Real vs AI! 🔥";
+    else if (userScore >= 3) message = "Good eye! Train more to beat the AI challenge.";
+    else message = "Keep practicing! Every image sharpens your intuition.";
+    resultExplanation.innerHTML = `${message} Share your result with friends.`;
+    resultPanel.style.display = "block";
+    
+    // Show progress final
+    const progElem = document.getElementById("progressCounter");
+    if (progElem) progElem.innerText = `🎮 Game Over · Score ${userScore}/${TOTAL_IMAGES}`;
+    currentChoiceLock = true;
+    isWaiting = false;
   }
-
-  // SHARE (unchanged exactly as original but text matches)
-  function copyResult() {
-    const text = `I scored ${score}/${totalRounds} 🔥 in REAL vs AI ⚡ ${location.href}`;
-    navigator.clipboard.writeText(text);
-    alert("✅ Result copied to clipboard!");
+  
+  // share functions (non-intrusive)
+  function copyResults() {
+    const textToCopy = `🧠 BRAINPLAY DAILY | REAL vs AI Challenge 🎯 My score: ${userScore}/${TOTAL_IMAGES}! Can you beat me? ${location.href}`;
+    navigator.clipboard.writeText(textToCopy);
+    alert("✅ Score copied! Share with friends.");
   }
-
-  function shareWhatsApp() {
-    const text = `I scored ${score}/${totalRounds} 🔥 in REAL vs AI challenge! Can you beat me? ${location.href}`;
+  
+  function shareToWhatsApp() {
+    const text = `🔥 BRAINPLAY DAILY — REAL vs AI 🔥 I scored ${userScore}/${TOTAL_IMAGES} points! Test your observation: ${location.href}`;
     window.open("https://wa.me/?text=" + encodeURIComponent(text));
   }
-
-  // CLOCK (unchanged) — next challenge countdown (midnight style original was 24h)
-  function updateTimerDisplay() {
-    const now = new Date();
-    const next = new Date();
-    next.setHours(24, 0, 0, 0);
-    const diff = next - now;
-    const h = Math.floor(diff / 1000 / 60 / 60);
-    const m = Math.floor((diff / 1000 / 60) % 60);
-    const s = Math.floor((diff / 1000) % 60);
-    const countdownEl = document.getElementById("countdown");
-    if (countdownEl) {
-      countdownEl.innerText = `${h}h : ${m}m : ${s}s`;
-    }
-  }
-
-  setInterval(updateTimerDisplay, 1000);
-  updateTimerDisplay();
-
-  // SAFE START
+  
+  // Re-initialize the entire game when page loads
   window.addEventListener("load", () => {
-    // reset game state for fresh start (optional but keeps original logic)
-    current = 0;
-    score = 0;
-    load();
+    initGameSession();
   });
+  
+  // Global functions for inline buttons
+  window.submitChoice = submitChoice;
+  window.copyResults = copyResults;
+  window.shareToWhatsApp = shareToWhatsApp;
 </script>
 </body>
 </html>
