@@ -303,7 +303,7 @@ function renderCategories(){
 }
 
 function selectCat(cat,el){
-  selectedCategory=cat;
+  selectedCategory=cat.toLowerCase();
   document.querySelectorAll(".cat").forEach(e=>e.classList.remove("active"));
   el.classList.add("active");
 }
@@ -313,10 +313,9 @@ function startGame(){
   restart();
 }
 
-/* 🔥 FIXED IMAGE FUNCTION */
+/* ✅ FIXED CATEGORY IMAGE (strict query) */
 function getRandomImage(){
-  let seed = selectedCategory + "-" + Math.floor(Math.random()*10000);
-  return "https://picsum.photos/seed/" + seed + "/800/600";
+  return "https://source.unsplash.com/800x600/?"+selectedCategory+"&sig="+Math.random();
 }
 
 function load(){
@@ -382,7 +381,9 @@ function shareWA(){
 
 document.getElementById("percent").innerText=Math.floor(Math.random()*50+30)+"%";
 
-openPopup();
+/* ❌ REMOVED openPopup() AUTO CALL */
+/* ✅ GAME LOADS NORMALLY NOW */
+load();
 
 </script>
 
