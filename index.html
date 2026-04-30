@@ -1,373 +1,622 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BrainPlay Daily</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BrainPlay Daily</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Anton&display=swap" rel="stylesheet">
+    <!-- Minimal PWA manifest (triggers install prompt) -->
+    <link rel="manifest" href="data:application/json,{
+        %22name%22: %22Brainplay Daily%22,
+        %22short_name%22: %22Brainplay%22,
+        %22description%22: %22Real vs AI image game%22,
+        %22start_url%22: %22.%22,
+        %22display%22: %22standalone%22,
+        %22background_color%22: %22#050510%22,
+        %22theme_color%22: %22#050510%22,
+        %22icons%22: [{
+            %22src%22: %22data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🧠%3C/text%3E%3C/svg%3E%22,
+            %22sizes%22: %22any%22,
+            %22type%22: %22image/svg+xml%22
+        }]
+    }" />
 
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Anton&display=swap" rel="stylesheet">
 
-body{
-  background:#050510;
-  font-family:'Inter',sans-serif;
-  color:#fff;
-  display:flex;
-  justify-content:center;
-  padding:20px;
-}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-.container{max-width:520px;width:100%}
+        body {
+            background: #050510;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
 
-/* HEADER */
-.header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:14px 18px;
-  border-radius:22px;
-  background:#0c0c18;
-  border:1px solid rgba(255,255,255,0.08);
-}
+        .container {
+            max-width: 520px;
+            width: 100%;
+        }
 
-.logo{display:flex;gap:10px;font-weight:900}
+        /* HEADER */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 18px;
+            border-radius: 22px;
+            background: #0c0c18;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
 
-.logo-text{
-  background:linear-gradient(90deg,#e879f9,#9333ea);
-  -webkit-background-clip:text;
-  color:transparent;
-}
+        .logo {
+            display: flex;
+            gap: 10px;
+            font-weight: 900;
+        }
 
-.pill{
-  padding:8px 12px;
-  border-radius:12px;
-  background:#121226;
-  font-size:13px;
-  font-weight:700;
-}
+        .logo-text {
+            background: linear-gradient(90deg, #e879f9, #9333ea);
+            -webkit-background-clip: text;
+            color: transparent;
+        }
 
-/* TITLE */
-.title{text-align:center;margin-top:20px}
+        .pill {
+            padding: 8px 12px;
+            border-radius: 12px;
+            background: #121226;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-block;
+            margin-left: 6px;
+        }
 
-.title h1{
-  font-family:'Anton',sans-serif;
-  font-size:42px;
-  letter-spacing:2px;
-}
+        /* TITLE */
+        .title {
+            text-align: center;
+            margin-top: 20px;
+        }
 
-.real{color:#fff;text-shadow:0 0 12px cyan}
-.ai{color:#ff3b3b;text-shadow:0 0 12px red}
+        .title h1 {
+            font-family: 'Anton', sans-serif;
+            font-size: 42px;
+            letter-spacing: 2px;
+        }
 
-.subtitle{color:#9ca3af}
+        .real {
+            color: #fff;
+            text-shadow: 0 0 12px cyan;
+        }
 
-/* STAT */
-.stat{
-  margin:20px auto;
-  padding:12px;
-  border-radius:30px;
-  text-align:center;
-  background:#121226;
-}
+        .ai {
+            color: #ff3b3b;
+            text-shadow: 0 0 12px red;
+        }
 
-.highlight{color:#facc15;font-weight:800}
+        .subtitle {
+            color: #9ca3af;
+        }
 
-/* IMAGE */
-.image-box{
-  border-radius:24px;
-  overflow:hidden;
-  margin-top:20px;
-  position:relative;
-}
+        /* STAT */
+        .stat {
+            margin: 20px auto;
+            padding: 12px;
+            border-radius: 30px;
+            text-align: center;
+            background: #121226;
+        }
 
-.image-box img{
-  width:100%;
-  height:320px;
-  object-fit:cover;
-}
+        .highlight {
+            color: #facc15;
+            font-weight: 800;
+        }
 
-/* FINAL OVERLAY */
-.final-overlay{
-  position:absolute;
-  inset:0;
-  background:#050510;
-  display:none;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  text-align:center;
-}
+        /* IMAGE */
+        .image-box {
+            border-radius: 24px;
+            overflow: hidden;
+            margin-top: 20px;
+            position: relative;
+        }
 
-.start-btn{
-  margin-top:14px;
-  background:orange;
-  color:#fff;
-  padding:12px 18px;
-  border:none;
-  border-radius:12px;
-  font-weight:700;
-  cursor:pointer;
-}
+        .image-box img {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+        }
 
-/* QUESTION */
-.question{
-  text-align:center;
-  margin-top:18px;
-  font-weight:700;
-}
+        /* FINAL OVERLAY */
+        .final-overlay {
+            position: absolute;
+            inset: 0;
+            background: #050510;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            z-index: 5;
+        }
 
-/* BUTTONS */
-.buttons{display:flex;gap:12px;margin-top:16px}
+        .start-btn {
+            margin-top: 14px;
+            background: orange;
+            color: #fff;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
 
-.btn{
-  flex:1;
-  padding:16px;
-  border-radius:18px;
-  font-weight:800;
-  border:none;
-  cursor:pointer;
-  color:#fff;
-}
+        /* QUESTION */
+        .question {
+            text-align: center;
+            margin-top: 18px;
+            font-weight: 700;
+        }
 
-.btn-real{background:linear-gradient(#16a34a,#065f46)}
-.btn-ai{background:linear-gradient(#ef4444,#7f1d1d)}
+        /* BUTTONS */
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
 
-.btn small{display:block;font-size:12px;opacity:0.7}
+        .btn {
+            flex: 1;
+            padding: 16px;
+            border-radius: 18px;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+            color: #fff;
+            transition: opacity 0.2s;
+        }
 
-/* RESULT */
-.result{
-  margin-top:20px;
-  padding:20px;
-  border-radius:20px;
-  background:#121226;
-  display:none;
-}
+        .btn:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
 
-.result-row{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
+        .btn-real {
+            background: linear-gradient(#16a34a, #065f46);
+        }
 
-.circle{
-  width:60px;
-  height:60px;
-  border-radius:50%;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:28px;
-}
+        .btn-ai {
+            background: linear-gradient(#ef4444, #7f1d1d);
+        }
 
-.correct{background:#22c55e;box-shadow:0 0 20px #22c55e}
-.wrong{background:#ef4444;box-shadow:0 0 20px #ef4444}
+        .btn small {
+            display: block;
+            font-size: 12px;
+            opacity: 0.7;
+        }
 
-.next{
-  margin-left:auto;
-  background:#1f2937;
-  padding:10px 14px;
-  border-radius:10px;
-  color:#facc15;
-  cursor:pointer;
-  border:none;
-  font-weight:700;
-}
+        /* RESULT */
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 20px;
+            background: #121226;
+            display: none;
+        }
 
-/* SHARE */
-.share{margin-top:20px}
+        .result-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-.share-title{
-  text-align:center;
-  color:#9ca3af;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:6px;
-}
+        .circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
 
-.share-buttons{
-  display:flex;
-  gap:10px;
-  margin-top:10px;
-}
+        .correct {
+            background: #22c55e;
+            box-shadow: 0 0 20px #22c55e;
+        }
 
-.share-btn{
-  flex:1;
-  padding:12px;
-  border-radius:12px;
-  border:none;
-  font-weight:700;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:6px;
-  cursor:pointer;
-}
+        .wrong {
+            background: #ef4444;
+            box-shadow: 0 0 20px #ef4444;
+        }
 
-.copy{background:#1f2937;color:#fff}
-.whatsapp{background:#25D366;color:#fff}
+        .next {
+            margin-left: auto;
+            background: #1f2937;
+            padding: 10px 14px;
+            border-radius: 10px;
+            color: #facc15;
+            cursor: pointer;
+            border: none;
+            font-weight: 700;
+        }
 
-/* FOOTER */
-.footer{
-  margin-top:20px;
-  text-align:center;
-  color:#9ca3af;
-  font-size:13px;
-}
-</style>
+        /* Description text */
+        .desc-text {
+            margin-top: 12px;
+            color: #d1d5db;
+            font-size: 14px;
+            text-align: left;
+            padding-left: 8px;
+        }
+
+        /* SHARE */
+        .share {
+            margin-top: 20px;
+        }
+
+        .share-title {
+            text-align: center;
+            color: #9ca3af;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .share-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .copy {
+            background: #1f2937;
+            color: #fff;
+        }
+
+        .whatsapp {
+            background: #25D366;
+            color: #fff;
+        }
+
+        /* FOOTER */
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 13px;
+        }
+
+        .install-arrow {
+            color: #facc15;
+            font-size: 20px;
+            vertical-align: middle;
+            cursor: pointer;
+            margin-left: 6px;
+            display: none;
+            /* hidden until install prompt available */
+            transition: transform 0.2s;
+        }
+
+        .install-arrow:hover {
+            transform: scale(1.2);
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="container">
+    <div class="container">
 
-<div class="header">
-  <div class="logo">🧠 <span class="logo-text">BRAINPLAY DAILY</span></div>
-  <div>
-    <span class="pill">🔥 7</span>
-    <span class="pill">#12</span>
-  </div>
-</div>
+        <div class="header">
+            <div class="logo">🧠 <span class="logo-text">BRAINPLAY DAILY</span></div>
+            <div>
+                <span class="pill">🔥 7</span>
+                <span class="pill">#12</span>
+            </div>
+        </div>
 
-<div class="title">
-  <h1><span class="real">REAL</span> vs <span class="ai">AI</span></h1>
-  <div class="subtitle">Can you spot the difference?</div>
-</div>
+        <div class="title">
+            <h1><span class="real">REAL</span> vs <span class="ai">AI</span></h1>
+            <div class="subtitle">Can you spot the difference?</div>
+        </div>
 
-<div class="stat">
-  🧩 Only <span class="highlight" id="percent">38%</span> players got this right today!
-</div>
+        <div class="stat">
+            🧩 Only <span class="highlight" id="percent">38%</span> players got this right today!
+        </div>
 
-<div class="image-box">
-  <img id="img">
+        <div class="image-box">
+            <img id="img" alt="Challenge Image">
 
-  <div class="final-overlay" id="finalOverlay">
-    <h2 id="finalText"></h2>
-    <button class="start-btn" onclick="restart()">Start New</button>
-  </div>
-</div>
+            <div class="final-overlay" id="finalOverlay">
+                <h2 id="finalText"></h2>
+                <button class="start-btn" onclick="restart()">Start New</button>
+            </div>
+        </div>
 
-<div class="question">🤔 Is this image Real or AI?</div>
+        <div class="question">🤔 Is this image Real or AI?</div>
 
-<div class="buttons">
-  <button class="btn btn-real" onclick="answer('real')">
-    REAL <small>Looks authentic?</small>
-  </button>
-  <button class="btn btn-ai" onclick="answer('ai')">
-    AI <small>Looks generated?</small>
-  </button>
-</div>
+        <div class="buttons" id="buttons">
+            <button class="btn btn-real" id="btnReal" onclick="answer('real')">
+                REAL <small>Looks authentic?</small>
+            </button>
+            <button class="btn btn-ai" id="btnAi" onclick="answer('ai')">
+                AI <small>Looks generated?</small>
+            </button>
+        </div>
 
-<div class="result" id="result">
-  <div class="result-row">
-    <div id="circle" class="circle">✔</div>
-    <h3 id="title"></h3>
-    <button class="next" onclick="next()">>> NEXT</button>
-  </div>
-  <p id="desc"></p>
-</div>
+        <div class="result" id="result">
+            <div class="result-row">
+                <div id="circle" class="circle">✔</div>
+                <h3 id="title"></h3>
+                <button class="next" onclick="next()">>> NEXT</button>
+            </div>
+            <p id="desc" class="desc-text"></p>
+        </div>
 
-<!-- SHARE SECTION BACK -->
-<div class="share">
-  <div class="share-title">
-    <svg width="16" fill="#9ca3af" viewBox="0 0 24 24">
-      <path d="M18 8a3 3 0 10-2.83-4H15a3 3 0 003 3zM6 14a3 3 0 10-2.83-4H3a3 3 0 003 3zm12 6a3 3 0 10-2.83-4H15a3 3 0 003 3zM8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/>
-    </svg>
-    Share your result with friends!
-  </div>
+        <!-- SHARE SECTION -->
+        <div class="share">
+            <div class="share-title">
+                <svg width="16" fill="#9ca3af" viewBox="0 0 24 24">
+                    <path
+                    d="M18 8a3 3 0 10-2.83-4H15a3 3 0 003 3zM6 14a3 3 0 10-2.83-4H3a3 3 0 003 3zm12 6a3 3 0 10-2.83-4H15a3 3 0 003 3zM8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98" />
+                </svg>
+                Share your result with friends!
+            </div>
 
-  <div class="share-buttons">
-    <button class="share-btn copy" onclick="copyLink()">📋 Copy Link</button>
-    <button class="share-btn whatsapp" onclick="shareWA()">WhatsApp</button>
-  </div>
-</div>
+            <div class="share-buttons">
+                <button class="share-btn copy" onclick="copyLink()">📋 Copy Link</button>
+                <button class="share-btn whatsapp" onclick="shareWA()">💬 WhatsApp</button>
+            </div>
+        </div>
 
-<div class="footer">
-  🧠 Save to phone for daily challenge
-</div>
+        <div class="footer">
+            🧠 Save to phone for daily challenge
+            <span id="installArrow" class="install-arrow" title="Install this game">▼</span>
+        </div>
 
-</div>
+    </div>
 
-<script>
+    <script>
+        // ──────────────────────────────────
+        //  WEB AUDIO SOUNDS (generated, no files)
+        // ──────────────────────────────────
+        function playCorrectSound() {
+            try {
+                const ctx = new(window.AudioContext || window.webkitAudioContext)();
+                const now = ctx.currentTime;
+                const osc1 = ctx.createOscillator();
+                const gain1 = ctx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.value = 880;
+                gain1.gain.setValueAtTime(0.3, now);
+                gain1.gain.exponentialRampToValueAtTime(0.00001, now + 0.3);
+                osc1.connect(gain1).connect(ctx.destination);
+                osc1.start(now);
+                osc1.stop(now + 0.3);
 
-let index = 0;
-let score = 0;
-let isReal;
+                const osc2 = ctx.createOscillator();
+                const gain2 = ctx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.value = 1100;
+                gain2.gain.setValueAtTime(0.3, now + 0.12);
+                gain2.gain.exponentialRampToValueAtTime(0.00001, now + 0.45);
+                osc2.connect(gain2).connect(ctx.destination);
+                osc2.start(now + 0.12);
+                osc2.stop(now + 0.45);
+            } catch (e) {}
+        }
 
-function getRandomImage(){
-  return "https://picsum.photos/800/600?random=" + Math.random();
-}
+        function playWrongSound() {
+            try {
+                const ctx = new(window.AudioContext || window.webkitAudioContext)();
+                const now = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'square';
+                osc.frequency.value = 200;
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0.00001, now + 0.15);
+                osc.connect(gain).connect(ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.15);
 
-function load(){
-  document.getElementById("img").src = getRandomImage();
-  isReal = Math.random()>0.5;
-  document.getElementById("result").style.display="none";
-}
+                const osc2 = ctx.createOscillator();
+                const gain2 = ctx.createGain();
+                osc2.type = 'square';
+                osc2.frequency.value = 180;
+                gain2.gain.setValueAtTime(0.2, now + 0.2);
+                gain2.gain.linearRampToValueAtTime(0.00001, now + 0.35);
+                osc2.connect(gain2).connect(ctx.destination);
+                osc2.start(now + 0.2);
+                osc2.stop(now + 0.35);
+            } catch (e) {}
+        }
 
-function answer(choice){
-  let correct = (choice==="real" && isReal) || (choice==="ai" && !isReal);
+        // ──────────────────────────────────
+        //  GAME LOGIC
+        // ──────────────────────────────────
+        let index = 0;
+        let score = 0;
+        let isReal;
+        let answered = false; // lock buttons
 
-  let circle = document.getElementById("circle");
-  let title = document.getElementById("title");
-  let desc = document.getElementById("desc");
+        const btnReal = document.getElementById('btnReal');
+        const btnAi = document.getElementById('btnAi');
 
-  if(correct){
-    score++;
-    circle.className="circle correct";
-    circle.innerHTML="✔";
-    title.innerHTML="CORRECT";
-    desc.innerHTML="This image is REAL. Natural lighting and textures match real-world physics.";
-  }else{
-    circle.className="circle wrong";
-    circle.innerHTML="✖";
-    title.innerHTML="WRONG";
-    desc.innerHTML="This image is AI-generated. Look for unnatural textures and repeating patterns.";
-  }
+        function disableButtons() {
+            answered = true;
+            btnReal.disabled = true;
+            btnAi.disabled = true;
+        }
 
-  document.getElementById("result").style.display="block";
-}
+        function enableButtons() {
+            answered = false;
+            btnReal.disabled = false;
+            btnAi.disabled = false;
+        }
 
-function next(){
-  index++;
-  if(index>=5){
-    showFinal();
-  }else{
-    load();
-  }
-}
+        function getRandomImage() {
+            return "https://picsum.photos/800/600?random=" + Math.random();
+        }
 
-function showFinal(){
-  let text="";
-  if(score<=2) text="😐 Poor ("+score+"/5)";
-  else if(score<=4) text="👍 Good ("+score+"/5)";
-  else text="🏆 Excellent ("+score+"/5) 🥇";
+        function load() {
+            document.getElementById("img").src = getRandomImage();
+            isReal = Math.random() > 0.5;
+            document.getElementById("result").style.display = "none";
+            enableButtons();
+        }
 
-  document.getElementById("finalText").innerHTML=text;
-  document.getElementById("finalOverlay").style.display="flex";
-}
+        function answer(choice) {
+            if (answered) return; // buttons locked
+            disableButtons();
 
-function restart(){
-  index=0;
-  score=0;
-  document.getElementById("finalOverlay").style.display="none";
-  load();
-}
+            let correct = (choice === "real" && isReal) || (choice === "ai" && !isReal);
 
-function copyLink(){
-  navigator.clipboard.writeText(location.href);
-  alert("Copied!");
-}
+            let circle = document.getElementById("circle");
+            let title = document.getElementById("title");
+            let desc = document.getElementById("desc");
 
-function shareWA(){
-  window.open("https://wa.me/?text=Play this game: "+location.href);
-}
+            if (correct) {
+                playCorrectSound();
+                score++;
+                circle.className = "circle correct";
+                circle.innerHTML = "✔";
+                title.innerHTML = "CORRECT";
+                // New text based on actual image type
+                if (isReal) {
+                    desc.innerHTML = "Good catch! This image is REAL.";
+                } else {
+                    desc.innerHTML = "Good catch! This image is AI generated.";
+                }
+            } else {
+                playWrongSound();
+                circle.className = "circle wrong";
+                circle.innerHTML = "✖";
+                title.innerHTML = "WRONG";
+                // Original wrong descriptions
+                desc.innerHTML =
+                    "This image is AI-generated. Look for unnatural textures and repeating patterns.";
+            }
 
-document.getElementById("percent").innerText = Math.floor(Math.random()*50+30) + "%";
+            document.getElementById("result").style.display = "block";
+        }
 
-load();
+        function next() {
+            index++;
+            if (index >= 5) {
+                showFinal();
+            } else {
+                load();
+            }
+        }
 
-</script>
+        function showFinal() {
+            let text = "";
+            if (score <= 2) text = "😐 Poor (" + score + "/5)";
+            else if (score <= 4) text = "👍 Good (" + score + "/5)";
+            else text = "🏆 Excellent (" + score + "/5) 🥇";
+
+            document.getElementById("finalText").innerHTML = text;
+            document.getElementById("finalOverlay").style.display = "flex";
+            disableButtons(); // keep locked
+        }
+
+        function restart() {
+            index = 0;
+            score = 0;
+            document.getElementById("finalOverlay").style.display = "none";
+            load();
+        }
+
+        function copyLink() {
+            navigator.clipboard.writeText(location.href);
+            alert("Copied!");
+        }
+
+        function shareWA() {
+            window.open("https://wa.me/?text=Play this game: " + location.href);
+        }
+
+        // Random percentage
+        document.getElementById("percent").innerText = Math.floor(Math.random() * 50 + 30) + "%";
+
+        // ──────────────────────────────────
+        //  PWA INSTALL PROMPT
+        // ──────────────────────────────────
+        let deferredPrompt;
+        const installArrow = document.getElementById('installArrow');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault();
+            // Stash the event so it can be triggered later
+            deferredPrompt = e;
+            // Show the install arrow
+            installArrow.style.display = 'inline-block';
+        });
+
+        installArrow.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                // Show the install prompt
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response to the install prompt: ${outcome}`);
+                deferredPrompt = null;
+                // Hide the arrow after interaction
+                installArrow.style.display = 'none';
+            } else {
+                // Fallback for browsers that don't support the prompt
+                alert(
+                    "To install this game on your home screen, use your browser's menu and select 'Add to Home Screen'."
+                );
+            }
+        });
+
+        // If the app is already installed (standalone mode), hide the arrow
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            installArrow.style.display = 'none';
+        }
+
+        // Register a minimal service worker (required for PWA criteria)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register(
+                    URL.createObjectURL(
+                        new Blob(
+                            [
+                                `self.addEventListener('install', e => { self.skipWaiting(); });
+                 self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
+                 self.addEventListener('fetch', e => { e.respondWith(fetch(e.request)); });`
+                            ], { type: 'application/javascript' }
+                        )
+                    )
+                ).catch((err) => console.log('SW registration failed:', err));
+            });
+        }
+
+        // Start the game
+        load();
+    </script>
 
 </body>
 </html>
