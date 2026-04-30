@@ -48,6 +48,17 @@ body{
   font-weight:700;
 }
 
+/* CATEGORY BUTTON */
+.category-btn{
+  background:#7c3aed;
+  color:#fff;
+  padding:8px 12px;
+  border-radius:10px;
+  border:none;
+  font-weight:700;
+  cursor:pointer;
+}
+
 /* TITLE */
 .title{text-align:center;margin-top:20px}
 
@@ -174,41 +185,69 @@ body{
   font-weight:700;
 }
 
-/* SHARE */
-.share{margin-top:20px}
-
-.share-title{
-  text-align:center;
-  color:#9ca3af;
-  display:flex;
+/* POPUP */
+.popup{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.8);
+  display:none;
   justify-content:center;
   align-items:center;
-  gap:6px;
 }
 
-.share-buttons{
-  display:flex;
+.popup-content{
+  background:#121226;
+  padding:20px;
+  border-radius:16px;
+  width:90%;
+  max-width:400px;
+}
+
+.categories{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
   gap:10px;
   margin-top:10px;
 }
 
+.cat{
+  background:#1f2937;
+  padding:10px;
+  border-radius:10px;
+  text-align:center;
+  cursor:pointer;
+}
+
+.cat.active{
+  border:2px solid #7c3aed;
+}
+
+.popup-start{
+  margin-top:15px;
+  width:100%;
+  padding:10px;
+  background:#7c3aed;
+  border:none;
+  border-radius:10px;
+  color:#fff;
+  font-weight:700;
+}
+
+/* SHARE */
+.share{margin-top:20px}
+.share-buttons{display:flex;gap:10px;margin-top:10px}
 .share-btn{
   flex:1;
   padding:12px;
   border-radius:12px;
   border:none;
   font-weight:700;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:6px;
   cursor:pointer;
 }
 
 .copy{background:#1f2937;color:#fff}
 .whatsapp{background:#25D366;color:#fff}
 
-/* FOOTER */
 .footer{
   margin-top:20px;
   text-align:center;
@@ -224,10 +263,7 @@ body{
 
 <div class="header">
   <div class="logo">🧠 <span class="logo-text">BRAINPLAY DAILY</span></div>
-  <div>
-    <span class="pill">🔥 7</span>
-    <span class="pill">#12</span>
-  </div>
+  <button class="category-btn" onclick="openPopup()">Category</button>
 </div>
 
 <div class="title">
@@ -251,12 +287,8 @@ body{
 <div class="question">🤔 Is this image Real or AI?</div>
 
 <div class="buttons">
-  <button class="btn btn-real" onclick="answer('real')">
-    REAL <small>Looks authentic?</small>
-  </button>
-  <button class="btn btn-ai" onclick="answer('ai')">
-    AI <small>Looks generated?</small>
-  </button>
+  <button class="btn btn-real" onclick="answer('real')">REAL</button>
+  <button class="btn btn-ai" onclick="answer('ai')">AI</button>
 </div>
 
 <div class="result" id="result">
@@ -268,61 +300,90 @@ body{
   <p id="desc"></p>
 </div>
 
-<!-- SHARE SECTION BACK -->
 <div class="share">
-  <div class="share-title">
-    <svg width="16" fill="#9ca3af" viewBox="0 0 24 24">
-      <path d="M18 8a3 3 0 10-2.83-4H15a3 3 0 003 3zM6 14a3 3 0 10-2.83-4H3a3 3 0 003 3zm12 6a3 3 0 10-2.83-4H15a3 3 0 003 3zM8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/>
-    </svg>
-    Share your result with friends!
-  </div>
-
   <div class="share-buttons">
     <button class="share-btn copy" onclick="copyLink()">📋 Copy Link</button>
     <button class="share-btn whatsapp" onclick="shareWA()">WhatsApp</button>
   </div>
 </div>
 
-<div class="footer">
-  🧠 Save to phone for daily challenge
+<div class="footer">🧠 Save to phone for daily challenge</div>
+
 </div>
 
+<!-- POPUP -->
+<div class="popup" id="popup">
+  <div class="popup-content">
+    <h3>Select Category</h3>
+    <div class="categories" id="categories"></div>
+    <button class="popup-start" onclick="startGame()">Start</button>
+  </div>
 </div>
 
 <script>
 
-let index = 0;
-let score = 0;
-let isReal;
+let index=0,score=0,isReal;
+let selectedCategory="nature";
+
+let categories=["Plant","Flowers","Animal","Figure","Anatomy","Nature","Auto","Structure","Galaxy"];
+
+let correctSound=new Audio("https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3");
+let wrongSound=new Audio("https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3");
+
+function openPopup(){
+  document.getElementById("popup").style.display="flex";
+  renderCategories();
+}
+
+function renderCategories(){
+  let html="";
+  categories.forEach(c=>{
+    html+=`<div class="cat" onclick="selectCat('${c}',this)">${c}</div>`;
+  });
+  document.getElementById("categories").innerHTML=html;
+}
+
+function selectCat(cat,el){
+  selectedCategory=cat;
+  document.querySelectorAll(".cat").forEach(e=>e.classList.remove("active"));
+  el.classList.add("active");
+}
+
+function startGame(){
+  document.getElementById("popup").style.display="none";
+  restart();
+}
 
 function getRandomImage(){
-  return "https://picsum.photos/800/600?random=" + Math.random();
+  return "https://source.unsplash.com/800x600/?"+selectedCategory+"&"+Math.random();
 }
 
 function load(){
-  document.getElementById("img").src = getRandomImage();
-  isReal = Math.random()>0.5;
+  document.getElementById("img").src=getRandomImage();
+  isReal=Math.random()>0.5;
   document.getElementById("result").style.display="none";
 }
 
 function answer(choice){
-  let correct = (choice==="real" && isReal) || (choice==="ai" && !isReal);
+  let correct=(choice==="real"&&isReal)||(choice==="ai"&&!isReal);
 
-  let circle = document.getElementById("circle");
-  let title = document.getElementById("title");
-  let desc = document.getElementById("desc");
+  let circle=document.getElementById("circle");
+  let title=document.getElementById("title");
+  let desc=document.getElementById("desc");
 
   if(correct){
+    correctSound.play();
     score++;
     circle.className="circle correct";
     circle.innerHTML="✔";
     title.innerHTML="CORRECT";
-    desc.innerHTML="This image is REAL. Natural lighting and textures match real-world physics.";
+    desc.innerHTML="This image is REAL.";
   }else{
+    wrongSound.play();
     circle.className="circle wrong";
     circle.innerHTML="✖";
     title.innerHTML="WRONG";
-    desc.innerHTML="This image is AI-generated. Look for unnatural textures and repeating patterns.";
+    desc.innerHTML="This image is AI-generated.";
   }
 
   document.getElementById("result").style.display="block";
@@ -330,26 +391,21 @@ function answer(choice){
 
 function next(){
   index++;
-  if(index>=5){
-    showFinal();
-  }else{
-    load();
-  }
+  if(index>=5){showFinal()} else load();
 }
 
 function showFinal(){
   let text="";
   if(score<=2) text="😐 Poor ("+score+"/5)";
   else if(score<=4) text="👍 Good ("+score+"/5)";
-  else text="🏆 Excellent ("+score+"/5) 🥇";
+  else text="🏆 Excellent ("+score+"/5)";
 
   document.getElementById("finalText").innerHTML=text;
   document.getElementById("finalOverlay").style.display="flex";
 }
 
 function restart(){
-  index=0;
-  score=0;
+  index=0;score=0;
   document.getElementById("finalOverlay").style.display="none";
   load();
 }
@@ -363,9 +419,9 @@ function shareWA(){
   window.open("https://wa.me/?text=Play this game: "+location.href);
 }
 
-document.getElementById("percent").innerText = Math.floor(Math.random()*50+30) + "%";
+document.getElementById("percent").innerText=Math.floor(Math.random()*50+30)+"%";
 
-load();
+openPopup();
 
 </script>
 
