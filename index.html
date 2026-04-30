@@ -40,6 +40,14 @@ body{
   color:transparent;
 }
 
+.pill{
+  padding:8px 12px;
+  border-radius:12px;
+  background:#121226;
+  font-size:13px;
+  font-weight:700;
+}
+
 /* TITLE */
 .title{text-align:center;margin-top:20px}
 
@@ -216,6 +224,10 @@ body{
 
 <div class="header">
   <div class="logo">🧠 <span class="logo-text">BRAINPLAY DAILY</span></div>
+  <div>
+    <span class="pill">🔥 7</span>
+    <span class="pill">#12</span>
+  </div>
 </div>
 
 <div class="title">
@@ -256,6 +268,7 @@ body{
   <p id="desc"></p>
 </div>
 
+<!-- SHARE SECTION BACK -->
 <div class="share">
   <div class="share-title">
     <svg width="16" fill="#9ca3af" viewBox="0 0 24 24">
@@ -282,9 +295,6 @@ let index = 0;
 let score = 0;
 let isReal;
 
-let correctSound=new Audio("https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3");
-let wrongSound=new Audio("https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3");
-
 function getRandomImage(){
   return "https://picsum.photos/800/600?random=" + Math.random();
 }
@@ -303,23 +313,16 @@ function answer(choice){
   let desc = document.getElementById("desc");
 
   if(correct){
-    correctSound.play();
     score++;
     circle.className="circle correct";
     circle.innerHTML="✔";
     title.innerHTML="CORRECT";
+    desc.innerHTML="This image is REAL. Natural lighting and textures match real-world physics.";
   }else{
-    wrongSound.play();
     circle.className="circle wrong";
     circle.innerHTML="✖";
     title.innerHTML="WRONG";
-  }
-
-  /* ✅ FIXED TEXT LOGIC */
-  if(isReal){
-    desc.innerHTML="This image is REAL.";
-  }else{
-    desc.innerHTML="This image is AI-generated.";
+    desc.innerHTML="This image is AI-generated. Look for unnatural textures and repeating patterns.";
   }
 
   document.getElementById("result").style.display="block";
@@ -338,7 +341,7 @@ function showFinal(){
   let text="";
   if(score<=2) text="😐 Poor ("+score+"/5)";
   else if(score<=4) text="👍 Good ("+score+"/5)";
-  else text="🏆 Excellent ("+score+"/5)";
+  else text="🏆 Excellent ("+score+"/5) 🥇";
 
   document.getElementById("finalText").innerHTML=text;
   document.getElementById("finalOverlay").style.display="flex";
