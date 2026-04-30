@@ -21,7 +21,6 @@ body{
 
 .container{max-width:520px;width:100%}
 
-/* HEADER */
 .header{
   display:flex;
   justify-content:space-between;
@@ -40,15 +39,6 @@ body{
   color:transparent;
 }
 
-.pill{
-  padding:8px 12px;
-  border-radius:12px;
-  background:#121226;
-  font-size:13px;
-  font-weight:700;
-}
-
-/* CATEGORY BUTTON */
 .category-btn{
   background:#7c3aed;
   color:#fff;
@@ -59,13 +49,11 @@ body{
   cursor:pointer;
 }
 
-/* TITLE */
 .title{text-align:center;margin-top:20px}
 
 .title h1{
   font-family:'Anton',sans-serif;
   font-size:42px;
-  letter-spacing:2px;
 }
 
 .real{color:#fff;text-shadow:0 0 12px cyan}
@@ -73,7 +61,6 @@ body{
 
 .subtitle{color:#9ca3af}
 
-/* STAT */
 .stat{
   margin:20px auto;
   padding:12px;
@@ -82,9 +69,6 @@ body{
   background:#121226;
 }
 
-.highlight{color:#facc15;font-weight:800}
-
-/* IMAGE */
 .image-box{
   border-radius:24px;
   overflow:hidden;
@@ -98,7 +82,6 @@ body{
   object-fit:cover;
 }
 
-/* FINAL OVERLAY */
 .final-overlay{
   position:absolute;
   inset:0;
@@ -121,14 +104,8 @@ body{
   cursor:pointer;
 }
 
-/* QUESTION */
-.question{
-  text-align:center;
-  margin-top:18px;
-  font-weight:700;
-}
+.question{text-align:center;margin-top:18px;font-weight:700}
 
-/* BUTTONS */
 .buttons{display:flex;gap:12px;margin-top:16px}
 
 .btn{
@@ -144,9 +121,6 @@ body{
 .btn-real{background:linear-gradient(#16a34a,#065f46)}
 .btn-ai{background:linear-gradient(#ef4444,#7f1d1d)}
 
-.btn small{display:block;font-size:12px;opacity:0.7}
-
-/* RESULT */
 .result{
   margin-top:20px;
   padding:20px;
@@ -162,17 +136,12 @@ body{
 }
 
 .circle{
-  width:60px;
-  height:60px;
-  border-radius:50%;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:28px;
+  width:60px;height:60px;border-radius:50%;
+  display:flex;justify-content:center;align-items:center;font-size:28px;
 }
 
-.correct{background:#22c55e;box-shadow:0 0 20px #22c55e}
-.wrong{background:#ef4444;box-shadow:0 0 20px #ef4444}
+.correct{background:#22c55e}
+.wrong{background:#ef4444}
 
 .next{
   margin-left:auto;
@@ -180,12 +149,10 @@ body{
   padding:10px 14px;
   border-radius:10px;
   color:#facc15;
-  cursor:pointer;
   border:none;
-  font-weight:700;
+  cursor:pointer;
 }
 
-/* POPUP */
 .popup{
   position:fixed;
   inset:0;
@@ -218,9 +185,7 @@ body{
   cursor:pointer;
 }
 
-.cat.active{
-  border:2px solid #7c3aed;
-}
+.cat.active{border:2px solid #7c3aed}
 
 .popup-start{
   margin-top:15px;
@@ -233,16 +198,11 @@ body{
   font-weight:700;
 }
 
-/* SHARE */
 .share{margin-top:20px}
 .share-buttons{display:flex;gap:10px;margin-top:10px}
 .share-btn{
-  flex:1;
-  padding:12px;
-  border-radius:12px;
-  border:none;
-  font-weight:700;
-  cursor:pointer;
+  flex:1;padding:12px;border-radius:12px;border:none;
+  font-weight:700;cursor:pointer;
 }
 
 .copy{background:#1f2937;color:#fff}
@@ -252,7 +212,6 @@ body{
   margin-top:20px;
   text-align:center;
   color:#9ca3af;
-  font-size:13px;
 }
 </style>
 </head>
@@ -272,7 +231,7 @@ body{
 </div>
 
 <div class="stat">
-  🧩 Only <span class="highlight" id="percent">38%</span> players got this right today!
+  🧩 Only <span id="percent">38%</span> players got this right today!
 </div>
 
 <div class="image-box">
@@ -323,7 +282,7 @@ body{
 <script>
 
 let index=0,score=0,isReal;
-let selectedCategory="nature";
+let selectedCategory="Nature";
 
 let categories=["Plant","Flowers","Animal","Figure","Anatomy","Nature","Auto","Structure","Galaxy"];
 
@@ -354,8 +313,10 @@ function startGame(){
   restart();
 }
 
+/* 🔥 FIXED IMAGE FUNCTION */
 function getRandomImage(){
-  return "https://source.unsplash.com/800x600/?"+selectedCategory+"&"+Math.random();
+  let seed = selectedCategory + "-" + Math.floor(Math.random()*10000);
+  return "https://picsum.photos/seed/" + seed + "/800/600";
 }
 
 function load(){
