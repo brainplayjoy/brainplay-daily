@@ -127,9 +127,16 @@
 
         .image-box img {
             width: 100%;
-            height: 300px; /* not greater than 350px */
+            height: 300px;
             object-fit: cover;
             display: block;
+        }
+
+        /* Allow easy height adjustment on mobile */
+        @media (max-width: 600px) {
+            .image-box img {
+                height: 250px;
+            }
         }
 
         /* FINAL OVERLAY */
@@ -156,12 +163,50 @@
             cursor: pointer;
         }
 
-        /* QUESTION */
-        .question {
-            text-align: center;
-            margin-top: 18px;
-            font-weight: 700;
+        /* IMAGE FOOTER: counter (left) + question (center) + next button (right) */
+        .image-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding: 0 4px;
+            gap: 8px;
         }
+
+        .counter {
+            font-weight: 700;
+            font-size: 15px;
+            color: #d1d5db;
+            white-space: nowrap;
+        }
+
+        .question-inline {
+            flex: 1;
+            text-align: center;
+            font-weight: 700;
+            font-size: 15px;
+            color: #fff;
+            white-space: nowrap;
+        }
+
+        /* NEXT button – yellow text, no background */
+        .next-btn {
+            background: none;
+            border: none;
+            color: #facc15;
+            font-weight: 800;
+            font-size: 15px;
+            cursor: pointer;
+            display: none; /* hidden until answered */
+            white-space: nowrap;
+            padding: 0;
+        }
+
+        .next-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* QUESTION (removed separate block, now inside image-footer) */
 
         /* BUTTONS */
         .buttons {
@@ -236,24 +281,22 @@
             box-shadow: 0 0 20px #ef4444;
         }
 
-        .next {
-            margin-left: auto;
-            background: #1f2937;
-            padding: 10px 14px;
-            border-radius: 10px;
-            color: #facc15;
-            cursor: pointer;
-            border: none;
+        /* Description text – left aligned, white, starts directly under the circle */
+        .desc-text {
+            margin-top: 12px;
+            color: #ffffff;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        .desc-text .real-word {
+            color: #22c55e;
             font-weight: 700;
         }
 
-        /* Description text – left aligned, slightly smaller */
-        .desc-text {
-            margin-top: 12px;
-            color: #d1d5db;
-            font-size: 14px;
-            text-align: left;
-            padding-left: 8px;
+        .desc-text .ai-word {
+            color: #ef4444;
+            font-weight: 700;
         }
 
         /* SHARE */
@@ -313,7 +356,6 @@
             vertical-align: middle;
             cursor: pointer;
             margin-left: 6px;
-            /* Always visible now */
             display: inline-block;
             transition: transform 0.2s;
         }
@@ -354,8 +396,14 @@
             </div>
         </div>
 
-        <div class="question">🤔 Is this image Real or AI?</div>
+        <!-- Unified line: counter, question, NEXT button -->
+        <div class="image-footer" id="imageFooter">
+            <span class="counter" id="counter">1/5</span>
+            <span class="question-inline">🤔 Is this image Real or AI?</span>
+            <button class="next-btn" id="nextBtn" onclick="next()">>> NEXT</button>
+        </div>
 
+        <!-- REAL / AI buttons -->
         <div class="buttons" id="buttons">
             <button class="btn btn-real" id="btnReal" onclick="answer('real')">
                 REAL <small>Looks authentic?</small>
@@ -369,7 +417,6 @@
             <div class="result-row">
                 <div id="circle" class="circle">✔</div>
                 <h3 id="title"></h3>
-                <button class="next" onclick="next()">>> NEXT</button>
             </div>
             <p id="desc" class="desc-text"></p>
         </div>
@@ -405,11 +452,10 @@
                 const ctx = new(window.AudioContext || window.webkitAudioContext)();
                 const now = ctx.currentTime;
 
-                // Bell-like tone: two overtones, sharp attack, quick decay
                 const osc1 = ctx.createOscillator();
                 const gain1 = ctx.createGain();
                 osc1.type = 'sine';
-                osc1.frequency.value = 1175; // D6 (bright)
+                osc1.frequency.value = 1175;
                 gain1.gain.setValueAtTime(0.4, now);
                 gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
                 osc1.connect(gain1).connect(ctx.destination);
@@ -419,18 +465,17 @@
                 const osc2 = ctx.createOscillator();
                 const gain2 = ctx.createGain();
                 osc2.type = 'sine';
-                osc2.frequency.value = 1480; // F#6 (harmonic)
+                osc2.frequency.value = 1480;
                 gain2.gain.setValueAtTime(0.25, now + 0.05);
                 gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
                 osc2.connect(gain2).connect(ctx.destination);
                 osc2.start(now + 0.05);
                 osc2.stop(now + 0.4);
 
-                // Add a subtle "tink" high overtone
                 const osc3 = ctx.createOscillator();
                 const gain3 = ctx.createGain();
                 osc3.type = 'sine';
-                osc3.frequency.value = 2349; // D7
+                osc3.frequency.value = 2349;
                 gain3.gain.setValueAtTime(0.15, now + 0.1);
                 gain3.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
                 osc3.connect(gain3).connect(ctx.destination);
@@ -444,7 +489,6 @@
                 const ctx = new(window.AudioContext || window.webkitAudioContext)();
                 const now = ctx.currentTime;
 
-                // Sharp buzz: distorted square wave, quick double pulse
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
                 osc.type = 'square';
@@ -473,10 +517,13 @@
         let index = 0;
         let score = 0;
         let isReal;
-        let answered = false; // lock buttons
+        let answered = false;
 
         const btnReal = document.getElementById('btnReal');
         const btnAi = document.getElementById('btnAi');
+        const nextBtn = document.getElementById('nextBtn');
+        const counterEl = document.getElementById('counter');
+        const imageFooter = document.getElementById('imageFooter');
 
         function disableButtons() {
             answered = true;
@@ -498,11 +545,13 @@
             document.getElementById("img").src = getRandomImage();
             isReal = Math.random() > 0.5;
             document.getElementById("result").style.display = "none";
+            counterEl.innerText = (index + 1) + "/5";
+            nextBtn.style.display = "none";
             enableButtons();
         }
 
         function answer(choice) {
-            if (answered) return; // buttons locked
+            if (answered) return;
             disableButtons();
 
             let correct = (choice === "real" && isReal) || (choice === "ai" && !isReal);
@@ -511,33 +560,39 @@
             let titleElement = document.getElementById("title");
             let desc = document.getElementById("desc");
 
+            // Helper to wrap REAL/AI with colored spans
+            function highlightKeywords(text) {
+                return text
+                    .replace(/\bREAL\b/g, '<span class="real-word">REAL</span>')
+                    .replace(/\bAI\b/g, '<span class="ai-word">AI</span>')
+                    .replace(/\bAI-generated\b/gi, '<span class="ai-word">AI-generated</span>');
+            }
+
             if (correct) {
                 playCorrectSound();
                 score++;
                 circle.className = "circle correct";
                 circle.innerHTML = "✔";
                 titleElement.innerHTML = "CORRECT";
-                // Dynamic correct text based on actual image type
                 if (isReal) {
-                    desc.innerHTML = "Good catch! This image is REAL.";
+                    desc.innerHTML = highlightKeywords("Good catch! This image is REAL.");
                 } else {
-                    desc.innerHTML = "Good catch! This image is AI generated.";
+                    desc.innerHTML = highlightKeywords("Good catch! This image is AI generated.");
                 }
             } else {
                 playWrongSound();
                 circle.className = "circle wrong";
                 circle.innerHTML = "✖";
                 titleElement.innerHTML = "WRONG";
-                // Fixed wrong message: state what the image ACTUALLY is
                 if (isReal) {
-                    desc.innerHTML = "This image is REAL. The lighting, textures and details match natural patterns.";
+                    desc.innerHTML = highlightKeywords("This image is REAL. The lighting, textures and details match natural patterns.");
                 } else {
-                    desc.innerHTML =
-                        "This image is AI-generated. Look for unnatural textures and repeating patterns.";
+                    desc.innerHTML = highlightKeywords("This image is AI-generated. Look for unnatural textures and repeating patterns.");
                 }
             }
 
             document.getElementById("result").style.display = "block";
+            nextBtn.style.display = "inline-block";
         }
 
         function next() {
@@ -557,13 +612,17 @@
 
             document.getElementById("finalText").innerHTML = text;
             document.getElementById("finalOverlay").style.display = "flex";
-            disableButtons(); // keep locked
+            disableButtons();
+            nextBtn.style.display = "none";
+            imageFooter.style.display = "none";
         }
 
         function restart() {
             index = 0;
             score = 0;
             document.getElementById("finalOverlay").style.display = "none";
+            imageFooter.style.display = "flex";
+            nextBtn.style.display = "none";
             load();
         }
 
@@ -576,32 +635,24 @@
             window.open("https://wa.me/?text=Play this game: " + location.href);
         }
 
-        // Random percentage
         document.getElementById("percent").innerText = Math.floor(Math.random() * 50 + 30) + "%";
 
-        // ──────────────────────────────────
-        //  PWA INSTALL (arrow always works)
-        // ──────────────────────────────────
+        // PWA install logic
         let deferredPrompt;
         const installArrow = document.getElementById('installArrow');
 
         window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevent the mini-infobar from appearing on mobile
             e.preventDefault();
-            // Save the event for later
             deferredPrompt = e;
-            // Arrow is already visible, so no need to show it again
         });
 
         installArrow.addEventListener('click', async () => {
             if (deferredPrompt) {
-                // Show the install prompt
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 console.log(`Install prompt outcome: ${outcome}`);
                 deferredPrompt = null;
             } else {
-                // Fallback for browsers that don't support beforeinstallprompt (many mobiles)
                 alert(
                     "To install this game on your home screen:\n\n" +
                     "• iPhone/iPad: Tap the Share button and then 'Add to Home Screen'.\n" +
@@ -610,7 +661,6 @@
             }
         });
 
-        // Register a minimal service worker (required for PWA)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register(
@@ -627,7 +677,6 @@
             });
         }
 
-        // Start the game
         load();
     </script>
 
