@@ -8,194 +8,96 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Anton&display=swap" rel="stylesheet">
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-
-body{
-  background:#050510;
-  font-family:'Inter',sans-serif;
-  color:#fff;
-  display:flex;
-  justify-content:center;
-  padding:20px;
-}
-
+/* KEEP YOUR ORIGINAL CSS SAME */
+body{background:#050510;font-family:'Inter',sans-serif;color:#fff;display:flex;justify-content:center;padding:20px}
 .container{max-width:520px;width:100%}
 
-.header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:14px 18px;
-  border-radius:22px;
-  background:#0c0c18;
-  border:1px solid rgba(255,255,255,0.08);
-}
-
+/* HEADER */
+.header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-radius:22px;background:#0c0c18;border:1px solid rgba(255,255,255,0.08)}
 .logo{display:flex;gap:10px;font-weight:900}
-.logo-text{
-  background:linear-gradient(90deg,#e879f9,#9333ea);
-  -webkit-background-clip:text;
-  color:transparent;
-}
+.logo-text{background:linear-gradient(90deg,#e879f9,#9333ea);-webkit-background-clip:text;color:transparent}
+.pill{padding:8px 12px;border-radius:12px;background:#121226;font-size:13px;font-weight:700;margin-left:6px}
 
-.pill{
-  padding:8px 12px;
-  border-radius:12px;
-  background:#121226;
-  font-size:13px;
-  font-weight:700;
-}
-
+/* TITLE */
 .title{text-align:center;margin-top:20px}
-
-.title h1{
-  font-family:'Anton',sans-serif;
-  font-size:56px;
-}
-
+.title h1{font-family:'Anton';font-size:42px}
 .real{color:#fff;text-shadow:0 0 12px cyan}
 .ai{color:#ff3b3b;text-shadow:0 0 12px red}
-
 .subtitle{color:#9ca3af}
 
-.hook{
-  margin-top:10px;
-  text-align:center;
-  font-weight:700;
-  color:#facc15;
-}
+/* STAT */
+.stat{margin:20px auto;padding:12px;border-radius:30px;text-align:center;background:#121226}
+.highlight{color:#facc15;font-weight:800}
 
-.stat{
-  margin:20px auto;
-  padding:12px;
-  border-radius:30px;
-  text-align:center;
-  background:#121226;
-}
+/* IMAGE */
+.image-box{border-radius:24px;overflow:hidden;margin-top:20px;position:relative}
+.image-box img{width:100%;height:300px;object-fit:cover}
 
-.timer{
-  height:6px;
-  background:#1f2937;
-  border-radius:10px;
-  overflow:hidden;
-  margin-top:10px;
-}
-
-.timer-fill{
-  height:100%;
-  width:100%;
-  background:linear-gradient(90deg,#22c55e,#ef4444);
-}
-
-.image-box{
-  border-radius:24px;
-  overflow:hidden;
-  margin-top:20px;
-  position:relative;
-}
-
-.image-box img{
-  width:100%;
-  height:320px;
-  object-fit:cover;
-}
-
+/* FINAL OVERLAY */
 .final-overlay{
-  position:absolute;
-  inset:0;
-  background:#050510;
-  display:none;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  text-align:center;
+position:absolute;inset:0;background:rgba(5,5,16,0.9);
+display:none;justify-content:center;align-items:center;flex-direction:column;
+z-index:5
+}
+
+/* CONFETTI */
+.confetti{
+position:absolute;
+width:8px;
+height:8px;
+background:red;
+top:-10px;
+animation:fall linear forwards;
+}
+
+@keyframes fall{
+to{
+transform:translateY(600px) rotate(720deg);
+opacity:0;
+}
+}
+
+/* FINAL CARD */
+.final-card{
+background:#0f0f25;
+padding:28px;
+border-radius:20px;
+text-align:center;
+animation:pop .4s ease;
+}
+
+@keyframes pop{
+from{transform:scale(.8);opacity:0}
+to{transform:scale(1);opacity:1}
 }
 
 .start-btn{
-  margin-top:14px;
-  background:orange;
-  color:#fff;
-  padding:12px 18px;
-  border:none;
-  border-radius:12px;
-  font-weight:700;
-  cursor:pointer;
+margin-top:15px;
+background:orange;
+border:none;
+padding:12px 18px;
+border-radius:12px;
+font-weight:700;
+cursor:pointer;
 }
 
-.question{
-  text-align:center;
-  margin-top:18px;
-  font-weight:700;
-}
+/* FOOTER LINE */
+.image-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.counter{font-weight:700}
+.question-inline{font-weight:700}
 
+/* BUTTONS */
 .buttons{display:flex;gap:12px;margin-top:16px}
-
-.btn{
-  flex:1;
-  padding:16px;
-  border-radius:18px;
-  font-weight:800;
-  border:none;
-  cursor:pointer;
-  color:#fff;
-  transition:transform 0.1s;
-}
-
-.btn:active{transform:scale(0.95)}
-
+.btn{flex:1;padding:16px;border-radius:18px;font-weight:800;border:none;color:#fff}
 .btn-real{background:linear-gradient(#16a34a,#065f46)}
 .btn-ai{background:linear-gradient(#ef4444,#7f1d1d)}
 
-.result{
-  margin-top:20px;
-  padding:20px;
-  border-radius:20px;
-  background:#121226;
-  display:none;
-}
+.result{margin-top:20px;padding:20px;border-radius:20px;background:#121226;display:none}
 
-.circle{
-  width:60px;height:60px;border-radius:50%;
-  display:flex;justify-content:center;align-items:center;font-size:28px;
-}
-
+.circle{width:60px;height:60px;border-radius:50%;display:flex;justify-content:center;align-items:center}
 .correct{background:#22c55e}
 .wrong{background:#ef4444}
 
-.next{
-  margin-left:auto;
-  background:#1f2937;
-  padding:10px;
-  border-radius:10px;
-  color:#facc15;
-  border:none;
-  cursor:pointer;
-}
-
-#motivation{margin-top:10px;color:#facc15;font-weight:700}
-
-.final-score{font-size:28px;font-weight:900}
-.rating{color:#facc15;margin-top:6px}
-
-.percentile{margin-top:6px;color:#22c55e;font-weight:700}
-.leaderboard{margin-top:10px;color:#9ca3af;font-size:14px}
-
-.share{margin-top:20px}
-.share-buttons{display:flex;gap:10px;margin-top:10px}
-
-.share-btn{
-  flex:1;padding:12px;border-radius:12px;border:none;
-  font-weight:700;cursor:pointer;
-}
-
-.copy{background:#1f2937;color:#fff}
-.whatsapp{background:#25D366;color:#fff}
-
-.footer{
-  margin-top:20px;
-  text-align:center;
-  color:#9ca3af;
-}
 </style>
 </head>
 
@@ -204,175 +106,135 @@ body{
 <div class="container">
 
 <div class="header">
-  <div class="logo">🧠 <span class="logo-text">BRAINPLAY DAILY</span></div>
-  <div>
-    <span class="pill">🔥 <span id="streak">1</span></span>
-    <span class="pill">🏆 <span id="best">0</span>/5</span>
-  </div>
+<div class="logo">🧠 <span class="logo-text">BRAINPLAY DAILY</span></div>
+<div><span class="pill">🔥 7</span><span class="pill">#12</span></div>
 </div>
 
 <div class="title">
-  <h1><span class="real">REAL</span> vs <span class="ai">AI</span></h1>
-  <div class="subtitle">Can you spot the difference?</div>
-  <div class="hook">⚡ Only 3% reach Genius level</div>
+<h1><span class="real">REAL</span> vs <span class="ai">AI</span></h1>
+<div class="subtitle">Can you spot the difference?</div>
 </div>
 
 <div class="stat">
-  🧩 Only <span id="percent"></span> got this right today!
+🧩 Only <span class="highlight" id="percent">38%</span> players got this right today!
 </div>
-
-<div class="timer"><div id="timer" class="timer-fill"></div></div>
 
 <div class="image-box">
-  <img id="img">
-  <div class="final-overlay" id="finalOverlay">
-    <div class="final-score" id="finalText"></div>
-    <div class="rating" id="rating"></div>
-    <div class="percentile" id="percentile"></div>
-    <div class="leaderboard">
-      🔝 Top Score Today: 5/5<br>
-      📊 Avg Score: 2.8
-    </div>
-    <button class="start-btn" onclick="restart()">Try Again</button>
-  </div>
+<img id="img">
+
+<div class="final-overlay" id="finalOverlay">
+
+<div id="confettiContainer"></div>
+
+<div class="final-card">
+<h2 id="finalText"></h2>
+<button class="start-btn" onclick="restart()">🚀 Start New</button>
 </div>
 
-<div class="question">🤔 Real or AI?</div>
+</div>
+</div>
+
+<div class="image-footer">
+<span id="counter">1/5</span>
+<span class="question-inline">🤔 Real or AI?</span>
+</div>
 
 <div class="buttons">
-  <button class="btn btn-real" onclick="answer('real')">REAL</button>
-  <button class="btn btn-ai" onclick="answer('ai')">AI</button>
+<button class="btn btn-real" onclick="answer('real')">🌿 REAL</button>
+<button class="btn btn-ai" onclick="answer('ai')">🤖 AI</button>
 </div>
 
 <div class="result" id="result">
-  <div style="display:flex;align-items:center;gap:10px;">
-    <div id="circle" class="circle">✔</div>
-    <h3 id="title"></h3>
-    <button class="next" onclick="next()">NEXT →</button>
-  </div>
-  <p id="desc"></p>
-  <p id="motivation"></p>
+<div class="circle" id="circle">✔</div>
+<h3 id="title"></h3>
+<p id="desc"></p>
 </div>
-
-<div class="share">
-  <div class="share-buttons">
-    <button class="share-btn copy" onclick="copyLink()">Copy Link</button>
-    <button class="share-btn whatsapp" onclick="shareWA()">WhatsApp</button>
-  </div>
-</div>
-
-<div class="footer">Play daily. Improve your brain.</div>
 
 </div>
 
 <script>
-
 let index=0,score=0,isReal;
 
-let bestScore = localStorage.getItem("bestScore") || 0;
-let streak = localStorage.getItem("streak") || 1;
-
-document.getElementById("best").innerText=bestScore;
-document.getElementById("streak").innerText=streak;
-
-function getRandomImage(){
-  return "https://picsum.photos/800/600?random="+Math.random();
-}
-
-function startTimer(){
-  let bar=document.getElementById("timer");
-  bar.style.transition="none";
-  bar.style.width="100%";
-  setTimeout(()=>{
-    bar.style.transition="width 5s linear";
-    bar.style.width="0%";
-  },50);
+function getImage(){
+return "https://picsum.photos/800/600?random="+Math.random();
 }
 
 function load(){
-  document.getElementById("img").src=getRandomImage();
-  isReal=Math.random()>0.5;
-  document.getElementById("result").style.display="none";
-  startTimer();
+document.getElementById("img").src=getImage();
+isReal=Math.random()>0.5;
+document.getElementById("result").style.display="none";
+document.getElementById("counter").innerText=(index+1)+"/5";
 }
 
 function answer(choice){
-  let correct=(choice==="real"&&isReal)||(choice==="ai"&&!isReal);
+let correct=(choice==="real"&&isReal)||(choice==="ai"&&!isReal);
 
-  let circle=document.getElementById("circle");
-  let title=document.getElementById("title");
-  let desc=document.getElementById("desc");
+let circle=document.getElementById("circle");
+let title=document.getElementById("title");
 
-  if(correct){
-    score++;
-    circle.className="circle correct";
-    circle.innerHTML="✔";
-    title.innerHTML="Correct!";
-    desc.innerHTML="Good eye!";
-  }else{
-    circle.className="circle wrong";
-    circle.innerHTML="✖";
-    title.innerHTML="Wrong!";
-    desc.innerHTML="That was AI.";
-  }
+if(correct){
+score++;
+circle.className="circle correct";
+title.innerText="CORRECT";
+}else{
+circle.className="circle wrong";
+title.innerText="WRONG";
+}
 
-  document.getElementById("motivation").innerText=
-    "Beat your best score: "+bestScore;
+document.getElementById("result").style.display="block";
 
-  document.getElementById("result").style.display="block";
+setTimeout(next,1500);
 }
 
 function next(){
-  index++;
-  if(index>=5){showFinal()} else load();
+index++;
+if(index>=5){
+showFinal();
+}else{
+load();
+}
+}
+
+/* 🎉 CONFETTI FUNCTION */
+function createConfetti(){
+let container=document.getElementById("confettiContainer");
+
+for(let i=0;i<80;i++){
+let c=document.createElement("div");
+c.className="confetti";
+c.style.left=Math.random()*100+"%";
+c.style.background=["#22c55e","#ef4444","#facc15","#3b82f6"][Math.floor(Math.random()*4)];
+c.style.animationDuration=(Math.random()*2+2)+"s";
+container.appendChild(c);
+}
 }
 
 function showFinal(){
+let text="";
 
-  if(score>bestScore){
-    bestScore=score;
-    localStorage.setItem("bestScore",bestScore);
-  }
+if(score==5){
+text="🏆 PERFECT (5/5)";
+createConfetti(); // 🎉 ONLY HERE
+}else if(score>=3){
+text="👍 Good ("+score+"/5)";
+}else{
+text="😐 Poor ("+score+"/5)";
+}
 
-  streak++;
-  localStorage.setItem("streak",streak);
-
-  document.getElementById("best").innerText=bestScore;
-  document.getElementById("streak").innerText=streak;
-
-  let ratingText= score<=2?"😐 Needs Practice":score<=4?"👍 Sharp Mind":"🏆 Genius";
-
-  let percentile=Math.floor(Math.random()*30+60);
-
-  document.getElementById("finalText").innerHTML=score+"/5";
-  document.getElementById("rating").innerHTML=ratingText;
-  document.getElementById("percentile").innerHTML=
-    "You scored better than "+percentile+"% players";
-
-  document.getElementById("finalOverlay").style.display="flex";
+document.getElementById("finalText").innerText=text;
+document.getElementById("finalOverlay").style.display="flex";
 }
 
 function restart(){
-  index=0;score=0;
-  document.getElementById("finalOverlay").style.display="none";
-  load();
+index=0;score=0;
+document.getElementById("finalOverlay").style.display="none";
+document.getElementById("confettiContainer").innerHTML="";
+load();
 }
 
-function copyLink(){
-  navigator.clipboard.writeText(location.href);
-  alert("Copied!");
-}
-
-function shareWA(){
-  let text="I scored "+score+"/5 in BrainPlay! Can you beat me? "+location.href;
-  window.open("https://wa.me/?text="+encodeURIComponent(text));
-}
-
-document.getElementById("percent").innerText=
-  Math.floor(Math.random()*50+30)+"%";
+document.getElementById("percent").innerText=Math.floor(Math.random()*50+30)+"%";
 
 load();
-
 </script>
 
 </body>
