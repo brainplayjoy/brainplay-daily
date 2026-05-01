@@ -132,6 +132,13 @@
             display: block;
         }
 
+        /* Allow easy height adjustment on mobile */
+        @media (max-width: 600px) {
+            .image-box img {
+                height: 250px; /* Change this value to resize on mobile */
+            }
+        }
+
         /* FINAL OVERLAY */
         .final-overlay {
             position: absolute;
@@ -154,6 +161,38 @@
             border-radius: 12px;
             font-weight: 700;
             cursor: pointer;
+        }
+
+        /* IMAGE FOOTER: counter + next button */
+        .image-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            padding: 0 4px;
+        }
+
+        .counter {
+            font-weight: 700;
+            font-size: 15px;
+            color: #d1d5db;
+        }
+
+        .next-btn {
+            background: #facc15;
+            color: #050510;
+            padding: 8px 18px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 15px;
+            border: none;
+            cursor: pointer;
+            display: none; /* hidden until answered */
+            transition: opacity 0.2s;
+        }
+
+        .next-btn:hover {
+            opacity: 0.9;
         }
 
         /* QUESTION */
@@ -236,24 +275,12 @@
             box-shadow: 0 0 20px #ef4444;
         }
 
-        .next {
-            margin-left: auto;
-            background: #1f2937;
-            padding: 10px 14px;
-            border-radius: 10px;
-            color: #facc15;
-            cursor: pointer;
-            border: none;
-            font-weight: 700;
-        }
-
-        /* Description text – left aligned, slightly smaller */
+        /* Description text – left aligned, no extra padding */
         .desc-text {
             margin-top: 12px;
             color: #d1d5db;
             font-size: 14px;
             text-align: left;
-            padding-left: 8px;
         }
 
         /* SHARE */
@@ -313,7 +340,6 @@
             vertical-align: middle;
             cursor: pointer;
             margin-left: 6px;
-            /* Always visible now */
             display: inline-block;
             transition: transform 0.2s;
         }
@@ -354,6 +380,12 @@
             </div>
         </div>
 
+        <!-- NEW: counter + next button placed below the image -->
+        <div class="image-footer" id="imageFooter">
+            <span class="counter" id="counter">1/5</span>
+            <button class="next-btn" id="nextBtn" onclick="next()">>> NEXT</button>
+        </div>
+
         <div class="question">🤔 Is this image Real or AI?</div>
 
         <div class="buttons" id="buttons">
@@ -369,7 +401,6 @@
             <div class="result-row">
                 <div id="circle" class="circle">✔</div>
                 <h3 id="title"></h3>
-                <button class="next" onclick="next()">>> NEXT</button>
             </div>
             <p id="desc" class="desc-text"></p>
         </div>
@@ -477,6 +508,9 @@
 
         const btnReal = document.getElementById('btnReal');
         const btnAi = document.getElementById('btnAi');
+        const nextBtn = document.getElementById('nextBtn');
+        const counterEl = document.getElementById('counter');
+        const imageFooter = document.getElementById('imageFooter');
 
         function disableButtons() {
             answered = true;
@@ -498,6 +532,10 @@
             document.getElementById("img").src = getRandomImage();
             isReal = Math.random() > 0.5;
             document.getElementById("result").style.display = "none";
+            // Update counter
+            counterEl.innerText = (index + 1) + "/5";
+            // Hide next button until answered
+            nextBtn.style.display = "none";
             enableButtons();
         }
 
@@ -517,7 +555,6 @@
                 circle.className = "circle correct";
                 circle.innerHTML = "✔";
                 titleElement.innerHTML = "CORRECT";
-                // Dynamic correct text based on actual image type
                 if (isReal) {
                     desc.innerHTML = "Good catch! This image is REAL.";
                 } else {
@@ -528,7 +565,6 @@
                 circle.className = "circle wrong";
                 circle.innerHTML = "✖";
                 titleElement.innerHTML = "WRONG";
-                // Fixed wrong message: state what the image ACTUALLY is
                 if (isReal) {
                     desc.innerHTML = "This image is REAL. The lighting, textures and details match natural patterns.";
                 } else {
@@ -538,6 +574,8 @@
             }
 
             document.getElementById("result").style.display = "block";
+            // Show the >> NEXT button below the image
+            nextBtn.style.display = "inline-block";
         }
 
         function next() {
@@ -558,12 +596,17 @@
             document.getElementById("finalText").innerHTML = text;
             document.getElementById("finalOverlay").style.display = "flex";
             disableButtons(); // keep locked
+            // Hide next button and counter footer when game is over
+            nextBtn.style.display = "none";
+            imageFooter.style.display = "none";
         }
 
         function restart() {
             index = 0;
             score = 0;
             document.getElementById("finalOverlay").style.display = "none";
+            imageFooter.style.display = "flex"; // show counter again
+            nextBtn.style.display = "none";
             load();
         }
 
@@ -590,7 +633,6 @@
             e.preventDefault();
             // Save the event for later
             deferredPrompt = e;
-            // Arrow is already visible, so no need to show it again
         });
 
         installArrow.addEventListener('click', async () => {
