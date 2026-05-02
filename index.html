@@ -1,193 +1,819 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>BrainPlay Daily | Real vs AI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>BrainPlay Daily | Real vs AI</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Anton&display=swap" rel="stylesheet">
+    <!-- Minimal PWA manifest -->
+    <link rel="manifest" href="data:application/json,{
+        %22name%22: %22Brainplay Daily%22,
+        %22short_name%22: %22Brainplay%22,
+        %22description%22: %22Real vs AI image game%22,
+        %22start_url%22: %22.%22,
+        %22display%22: %22standalone%22,
+        %22background_color%22: %22#050510%22,
+        %22theme_color%22: %22#050510%22,
+        %22icons%22: [{
+            %22src%22: %22data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🧠%3C/text%3E%3C/svg%3E%22,
+            %22sizes%22: %22any%22,
+            %22type%22: %22image/svg+xml%22
+        }]
+    }" />
 
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Anton&display=swap" rel="stylesheet">
 
-body{
-background:#050510;
-font-family:'Inter',sans-serif;
-color:#fff;
-display:flex;
-justify-content:center;
-padding:20px;
-}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-.container{max-width:520px;width:100%;}
+        body {
+            background: #050510;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
 
-/* HEADER */
-.header{
-display:flex;justify-content:space-between;align-items:center;
-padding:14px 18px;border-radius:22px;background:#0c0c18;
-border:1px solid rgba(255,255,255,0.08);
-}
+        .container {
+            max-width: 520px;
+            width: 100%;
+        }
 
-.logo{display:flex;gap:10px;font-weight:900;}
-.logo-text{
-background:linear-gradient(90deg,#e879f9,#9333ea);
--webkit-background-clip:text;color:transparent;
-}
+        /* HEADER */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 18px;
+            border-radius: 22px;
+            background: #0c0c18;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
 
-.pill{
-padding:8px 12px;border-radius:12px;background:#121226;
-font-size:13px;font-weight:700;margin-left:6px;
-}
+        .logo {
+            display: flex;
+            gap: 10px;
+            font-weight: 900;
+        }
 
-/* TITLE */
-.title{text-align:center;margin-top:20px;}
-.title h1{font-family:'Anton';font-size:42px;letter-spacing:2px;}
-.real{color:#fff;text-shadow:0 0 12px cyan;}
-.ai{color:#ff3b3b;text-shadow:0 0 12px red;}
-.subtitle{color:#9ca3af;}
+        .logo-text {
+            background: linear-gradient(90deg, #e879f9, #9333ea);
+            -webkit-background-clip: text;
+            color: transparent;
+        }
 
-/* STAT */
-.stat{
-margin:20px auto;padding:12px;border-radius:30px;
-text-align:center;background:#121226;
-}
-.highlight{color:#facc15;font-weight:800;}
+        .pill {
+            padding: 8px 12px;
+            border-radius: 12px;
+            background: #121226;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-block;
+            margin-left: 6px;
+        }
 
-/* IMAGE */
-.image-box{
-border-radius:24px;overflow:hidden;margin-top:20px;position:relative;
-}
-.image-box img{
-width:100%;height:300px;object-fit:cover;display:block;
-}
+        /* TITLE */
+        .title {
+            text-align: center;
+            margin-top: 20px;
+        }
 
-/* GAME OVER */
-.game-over-msg{
-position:absolute;inset:0;background:rgba(0,0,0,0.85);
-display:flex;justify-content:center;align-items:center;
-font-family:'Anton';font-size:3rem;color:#ffd966;
-z-index:15;border-radius:24px;
-}
+        .title h1 {
+            font-family: 'Anton', sans-serif;
+            font-size: 42px;
+            letter-spacing: 2px;
+        }
 
-/* ===== NEW PROFESSIONAL SCORE CARD ===== */
-.final-overlay{
-position:absolute;inset:0;
-background:rgba(5,5,16,0.92);
-backdrop-filter:blur(20px);
-display:none;
-justify-content:center;
-align-items:center;
-z-index:20;
-border-radius:24px;
-}
+        .real {
+            color: #fff;
+            text-shadow: 0 0 12px cyan;
+        }
 
-/* CARD */
-.score-card-panel{
-width:85%;
-max-width:320px;
-background:#0f1022;
-border-radius:18px;
-padding:28px 20px;
-text-align:center;
+        .ai {
+            color: #ff3b3b;
+            text-shadow: 0 0 12px red;
+        }
 
-border:1px solid rgba(255,255,255,0.08);
-box-shadow:0 20px 40px rgba(0,0,0,0.6);
-}
+        .subtitle {
+            color: #9ca3af;
+        }
 
-/* Heading */
-.score-card-heading{
-font-size:14px;
-letter-spacing:2px;
-color:#9ca3af;
-margin-bottom:12px;
-}
+        /* STAT */
+        .stat {
+            margin: 20px auto;
+            padding: 12px;
+            border-radius: 30px;
+            text-align: center;
+            background: #121226;
+        }
 
-/* Score */
-.score-badge{
-font-size:52px;
-font-weight:900;
-color:#facc15;
-margin:10px 0;
-text-shadow:0 0 18px rgba(250,204,21,0.5);
-}
+        .highlight {
+            color: #facc15;
+            font-weight: 800;
+        }
 
-/* Message */
-.score-message{
-font-size:16px;
-font-weight:600;
-color:#e5e7eb;
-margin-top:8px;
-}
+        /* IMAGE BOX */
+        .image-box {
+            border-radius: 24px;
+            overflow: hidden;
+            margin-top: 20px;
+            position: relative;
+        }
 
-/* Button */
-.play-again-btn{
-margin-top:20px;
-width:100%;
-padding:14px;
-border-radius:12px;
-border:none;
-font-weight:800;
-background:linear-gradient(90deg,#f59e0b,#ef4444);
-color:#fff;
-cursor:pointer;
-transition:0.2s;
-}
+        .image-box img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            display: block;
+        }
 
-.play-again-btn:hover{
-transform:scale(1.03);
-}
+        @media (max-width: 600px) {
+            .image-box img {
+                height: 250px;
+            }
+        }
 
-/* FOOTER */
-.image-footer{display:flex;justify-content:space-between;margin-top:10px;}
-.buttons{display:flex;gap:12px;margin-top:16px;}
-.btn{flex:1;padding:16px;border-radius:18px;border:none;color:#fff;font-weight:800;}
-.btn-real{background:linear-gradient(#16a34a,#065f46);}
-.btn-ai{background:linear-gradient(#ef4444,#7f1d1d);}
-</style>
+        /* GAME OVER MESSAGE (temporary overlay) */
+        .game-over-msg {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle, rgba(0,0,0,0.85), #0a0a1f);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Anton', sans-serif;
+            font-size: 3rem;
+            letter-spacing: 4px;
+            color: #ffd966;
+            text-shadow: 0 0 20px #ff9900, 0 0 5px #ff5500;
+            z-index: 15;
+            border-radius: 24px;
+            flex-direction: column;
+            gap: 8px;
+            animation: pulseGlow 0.4s ease-out;
+        }
+        @keyframes pulseGlow {
+            0% { opacity: 0; transform: scale(0.96);}
+            100% { opacity: 1; transform: scale(1);}
+        }
+
+        /* ========== PROFESSIONAL SCORE CARD ========== */
+        .final-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(5, 5, 16, 0.96);
+            backdrop-filter: blur(20px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            z-index: 20;
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 25px 40px -12px rgba(0,0,0,0.6);
+        }
+
+        /* Score card inner panel with glass effect */
+        .score-card-panel {
+            background: rgba(18, 18, 38, 0.7);
+            backdrop-filter: blur(4px);
+            border-radius: 48px;
+            padding: 28px 20px;
+            width: 90%;
+            max-width: 280px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        .score-card-heading {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #FFD966, #FFA559, #FF6E6E);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .score-badge {
+            background: rgba(0,0,0,0.5);
+            border-radius: 60px;
+            padding: 12px 16px;
+            font-size: 3rem;
+            font-weight: 900;
+            font-family: monospace;
+            letter-spacing: 6px;
+            color: #FFD966;
+            text-shadow: 0 0 12px #FFA500;
+            margin: 16px 0;
+            display: inline-block;
+            width: auto;
+            border: 1px solid rgba(255,215,0,0.4);
+        }
+
+        .score-message {
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(120deg, #fff, #cbd5e6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin: 12px 0 8px;
+            line-height: 1.4;
+            padding: 0 8px;
+        }
+
+        .play-again-btn {
+            margin-top: 24px;
+            background: linear-gradient(95deg, #f97316, #dc2626);
+            color: white;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 60px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .play-again-btn:hover {
+            transform: scale(1.02);
+            filter: brightness(1.05);
+            box-shadow: 0 10px 25px rgba(220,38,38,0.4);
+        }
+
+        /* IMAGE FOOTER */
+        .image-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding: 0 4px;
+            gap: 8px;
+        }
+
+        .counter {
+            font-weight: 700;
+            font-size: 15px;
+            color: #d1d5db;
+            white-space: nowrap;
+        }
+
+        .question-inline {
+            flex: 1;
+            text-align: center;
+            font-weight: 700;
+            font-size: 15px;
+            color: #fff;
+            white-space: nowrap;
+        }
+
+        .next-btn {
+            background: none;
+            border: none;
+            color: #facc15;
+            font-weight: 800;
+            font-size: 15px;
+            cursor: pointer;
+            display: none;
+            white-space: nowrap;
+            padding: 0;
+        }
+
+        /* BUTTONS */
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px;
+            border-radius: 18px;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+            color: #fff;
+            transition: opacity 0.2s;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .btn-real {
+            background: linear-gradient(#16a34a, #065f46);
+        }
+
+        .btn-ai {
+            background: linear-gradient(#ef4444, #7f1d1d);
+        }
+
+        .btn small {
+            display: block;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        /* RESULT PANEL (Correct/Wrong) */
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 20px;
+            background: #121226;
+            display: none;
+        }
+
+        .result-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .correct {
+            background: #22c55e;
+            box-shadow: 0 0 20px #22c55e;
+        }
+
+        .wrong {
+            background: #ef4444;
+            box-shadow: 0 0 20px #ef4444;
+        }
+
+        .desc-text {
+            margin-top: 12px;
+            color: #ffffff;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        .desc-text .real-word {
+            color: #22c55e;
+            font-weight: 700;
+        }
+
+        .desc-text .ai-word {
+            color: #ef4444;
+            font-weight: 700;
+        }
+
+        /* SHARE */
+        .share {
+            margin-top: 20px;
+        }
+
+        .share-title {
+            text-align: center;
+            color: #9ca3af;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .share-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .copy {
+            background: #1f2937;
+            color: #fff;
+        }
+
+        .whatsapp {
+            background: #25D366;
+            color: #fff;
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 13px;
+        }
+
+        .install-arrow {
+            color: #facc15;
+            font-size: 20px;
+            vertical-align: middle;
+            cursor: pointer;
+            margin-left: 6px;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+        .install-arrow:hover {
+            transform: scale(1.3);
+        }
+    </style>
 </head>
-
 <body>
 
 <div class="container">
 
-<div class="header">
-<div class="logo">🧠 <span class="logo-text">BRAINPLAY DAILY</span></div>
-</div>
+    <div class="header">
+        <div class="logo">🧠 <span class="logo-text">BRAINPLAY DAILY</span></div>
+        <div>
+            <span class="pill">🔥 7</span>
+            <span class="pill">#12</span>
+        </div>
+    </div>
 
-<div class="title">
-<h1><span class="real">REAL</span> vs <span class="ai">AI</span></h1>
-</div>
+    <div class="title">
+        <h1><span class="real">REAL</span> vs <span class="ai">AI</span></h1>
+        <div class="subtitle">Can you spot the difference?</div>
+    </div>
 
-<div class="image-box">
-<img id="img">
+    <div class="stat">
+        🧩 Only <span class="highlight" id="percent">38%</span> players got this right today!
+    </div>
 
-<div id="gameOverMsg" class="game-over-msg" style="display:none;">GAME OVER</div>
+    <div class="image-box" id="imageBox">
+        <img id="img" alt="Challenge Image">
+        <!-- Game Over message overlay -->
+        <div id="gameOverMsg" class="game-over-msg" style="display: none;">GAME OVER</div>
+        <!-- Professional Score Card -->
+        <div class="final-overlay" id="finalOverlay">
+            <div class="score-card-panel">
+                <div class="score-card-heading">🏆 SCORE CARD 🏆</div>
+                <div class="score-badge" id="scoreBadge">0/5</div>
+                <div class="score-message" id="finalMessage"></div>
+                <button class="play-again-btn" id="playAgainBtn">🚀 PLAY AGAIN</button>
+            </div>
+        </div>
+    </div>
 
-<!-- ===== UPDATED SCORE CARD ONLY ===== -->
-<div class="final-overlay" id="finalOverlay">
-<div class="score-card-panel">
+    <!-- footer: counter + question + next button -->
+    <div class="image-footer" id="imageFooter">
+        <span class="counter" id="counter">1/5</span>
+        <span class="question-inline">🤔 Is this image Real or AI?</span>
+        <button class="next-btn" id="nextBtn" onclick="next()">>> NEXT</button>
+    </div>
 
-<div class="score-card-heading">SCORE CARD</div>
+    <!-- REAL / AI buttons -->
+    <div class="buttons" id="buttons">
+        <button class="btn btn-real" id="btnReal" onclick="answer('real')">
+            REAL <small>Looks authentic?</small>
+        </button>
+        <button class="btn btn-ai" id="btnAi" onclick="answer('ai')">
+            AI <small>Looks generated?</small>
+        </button>
+    </div>
 
-<div class="score-badge" id="scoreBadge">0/5</div>
+    <div class="result" id="result">
+        <div class="result-row">
+            <div id="circle" class="circle">✔</div>
+            <h3 id="title"></h3>
+        </div>
+        <p id="desc" class="desc-text"></p>
+    </div>
 
-<div class="score-message" id="finalMessage"></div>
+    <!-- SHARE SECTION -->
+    <div class="share">
+        <div class="share-title">
+            <svg width="16" fill="#9ca3af" viewBox="0 0 24 24">
+                <path d="M18 8a3 3 0 10-2.83-4H15a3 3 0 003 3zM6 14a3 3 0 10-2.83-4H3a3 3 0 003 3zm12 6a3 3 0 10-2.83-4H15a3 3 0 003 3zM8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98" />
+            </svg>
+            Share your result with friends!
+        </div>
+        <div class="share-buttons">
+            <button class="share-btn copy" onclick="copyLink()">📋 Copy Link</button>
+            <button class="share-btn whatsapp" onclick="shareWA()">💬 WhatsApp</button>
+        </div>
+    </div>
 
-<button class="play-again-btn" id="playAgainBtn">PLAY AGAIN</button>
-
-</div>
-</div>
-
-</div>
-
+    <div class="footer">
+        🧠 Save to phone for daily challenge
+        <span id="installArrow" class="install-arrow" title="Tap to install this game on your home screen">▼</span>
+    </div>
 </div>
 
 <script>
-let score=2;
-document.getElementById('finalOverlay').style.display="flex";
-document.getElementById('scoreBadge').innerText=score+"/5";
-document.getElementById('finalMessage').innerText="😐 Poor performance";
-</script>
+    // ---------- SOUNDS (high quality) ----------
+    function playCorrectSound() {
+        try {
+            const ctx = new(window.AudioContext || window.webkitAudioContext)();
+            const now = ctx.currentTime;
+            const osc1 = ctx.createOscillator();
+            const gain1 = ctx.createGain();
+            osc1.type = 'sine';
+            osc1.frequency.value = 1175;
+            gain1.gain.setValueAtTime(0.4, now);
+            gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+            osc1.connect(gain1).connect(ctx.destination);
+            osc1.start(now);
+            osc1.stop(now + 0.35);
+            const osc2 = ctx.createOscillator();
+            const gain2 = ctx.createGain();
+            osc2.type = 'sine';
+            osc2.frequency.value = 1480;
+            gain2.gain.setValueAtTime(0.25, now + 0.05);
+            gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
+            osc2.connect(gain2).connect(ctx.destination);
+            osc2.start(now + 0.05);
+            osc2.stop(now + 0.4);
+            const osc3 = ctx.createOscillator();
+            const gain3 = ctx.createGain();
+            osc3.type = 'sine';
+            osc3.frequency.value = 2349;
+            gain3.gain.setValueAtTime(0.15, now + 0.1);
+            gain3.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
+            osc3.connect(gain3).connect(ctx.destination);
+            osc3.start(now + 0.1);
+            osc3.stop(now + 0.3);
+        } catch (e) {}
+    }
 
+    function playWrongSound() {
+        try {
+            const ctx = new(window.AudioContext || window.webkitAudioContext)();
+            const now = ctx.currentTime;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'square';
+            osc.frequency.value = 220;
+            gain.gain.setValueAtTime(0.25, now);
+            gain.gain.linearRampToValueAtTime(0.0001, now + 0.12);
+            osc.connect(gain).connect(ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.12);
+            const osc2 = ctx.createOscillator();
+            const gain2 = ctx.createGain();
+            osc2.type = 'square';
+            osc2.frequency.value = 200;
+            gain2.gain.setValueAtTime(0.25, now + 0.15);
+            gain2.gain.linearRampToValueAtTime(0.0001, now + 0.28);
+            osc2.connect(gain2).connect(ctx.destination);
+            osc2.start(now + 0.15);
+            osc2.stop(now + 0.28);
+        } catch (e) {}
+    }
+
+    // ---------- GAME STATE ----------
+    let index = 0;
+    let score = 0;
+    let isReal;
+    let answered = false;
+    let gameEnded = false;
+    let finishTimeouts = [];
+
+    function clearFinishTimeouts() {
+        for (let t of finishTimeouts) clearTimeout(t);
+        finishTimeouts = [];
+    }
+
+    const btnReal = document.getElementById('btnReal');
+    const btnAi = document.getElementById('btnAi');
+    const nextBtn = document.getElementById('nextBtn');
+    const counterEl = document.getElementById('counter');
+    const imageFooter = document.getElementById('imageFooter');
+    const finalOverlay = document.getElementById('finalOverlay');
+    const gameOverMsgDiv = document.getElementById('gameOverMsg');
+    const resultDiv = document.getElementById('result');
+    const imgElement = document.getElementById('img');
+
+    function disableButtons() {
+        answered = true;
+        btnReal.disabled = true;
+        btnAi.disabled = true;
+    }
+
+    function enableButtons() {
+        answered = false;
+        btnReal.disabled = false;
+        btnAi.disabled = false;
+    }
+
+    // Force unique image each call – cache breaker
+    function getRandomImage() {
+        return "https://picsum.photos/800/600?random=" + Math.random() + "&nocache=" + Date.now();
+    }
+
+    function load() {
+        // Set fresh image (never previous)
+        imgElement.src = getRandomImage();
+        isReal = Math.random() > 0.5;
+        resultDiv.style.display = "none";
+        counterEl.innerText = (index + 1) + "/5";
+        nextBtn.style.display = "none";
+        enableButtons();
+        gameEnded = false;
+        clearFinishTimeouts();
+        gameOverMsgDiv.style.display = "none";
+        finalOverlay.style.display = "none";
+        imageFooter.style.display = "flex";
+    }
+
+    // Dynamic emotional message based on final score
+    function getEmotionalMessage(scoreVal) {
+        if (scoreVal === 5) return "🧠 GENIUS! You beat 95% players";
+        if (scoreVal === 4) return "🔥 Sharp Eyes! Almost perfect";
+        if (scoreVal === 3) return "👍 Good, but you missed some";
+        if (scoreVal === 2) return "😅 Tricky, try again";
+        return "🤖 AI fooled you badly";
+    }
+
+    // Show professional score card
+    function showScoreCard() {
+        const msg = getEmotionalMessage(score);
+        document.getElementById('finalMessage').innerHTML = msg;
+        document.getElementById('scoreBadge').innerHTML = `${score}/5`;
+        finalOverlay.style.display = "flex";
+        imageFooter.style.display = "none";
+        gameOverMsgDiv.style.display = "none";
+        resultDiv.style.display = "none";
+    }
+
+    // finish sequence: after NEXT on last question -> immediately show "GAME OVER" -> after 2 sec score card
+    function finishGameSequence() {
+        if (gameEnded) return;
+        gameEnded = true;
+        disableButtons();
+        answered = true;
+        resultDiv.style.display = "none";
+        nextBtn.style.display = "none";
+        // Show game over overlay instantly
+        gameOverMsgDiv.style.display = "flex";
+        
+        // After 2 seconds, remove game over & show score card
+        const timeout = setTimeout(() => {
+            gameOverMsgDiv.style.display = "none";
+            showScoreCard();
+        }, 2000);
+        finishTimeouts.push(timeout);
+    }
+
+    // Answer handler
+    function answer(choice) {
+        if (answered || gameEnded) return;
+        disableButtons();
+
+        let correct = (choice === "real" && isReal) || (choice === "ai" && !isReal);
+        let circle = document.getElementById("circle");
+        let titleElement = document.getElementById("title");
+        let desc = document.getElementById("desc");
+
+        function highlightKeywords(text) {
+            return text
+                .replace(/\bREAL\b/g, '<span class="real-word">REAL</span>')
+                .replace(/\bAI\b/g, '<span class="ai-word">AI</span>')
+                .replace(/\bAI-generated\b/gi, '<span class="ai-word">AI-generated</span>');
+        }
+
+        if (correct) {
+            playCorrectSound();
+            score++;
+            circle.className = "circle correct";
+            circle.innerHTML = "✔";
+            titleElement.innerHTML = "CORRECT";
+            if (isReal) {
+                desc.innerHTML = highlightKeywords("Good catch! This image is REAL.");
+            } else {
+                desc.innerHTML = highlightKeywords("Good catch! This image is AI generated.");
+            }
+        } else {
+            playWrongSound();
+            circle.className = "circle wrong";
+            circle.innerHTML = "✖";
+            titleElement.innerHTML = "WRONG";
+            if (isReal) {
+                desc.innerHTML = highlightKeywords("This image is REAL. The lighting, textures and details match natural patterns.");
+            } else {
+                desc.innerHTML = highlightKeywords("This image is AI-generated. Look for unnatural textures and repeating patterns.");
+            }
+        }
+        resultDiv.style.display = "block";
+        nextBtn.style.display = "inline-block";
+    }
+
+    // Next function
+    function next() {
+        if (!answered && !gameEnded) return;
+        if (gameEnded) return;
+        index++;
+        if (index >= 5) {
+            finishGameSequence();
+        } else {
+            load();
+        }
+    }
+
+    // RESTART – fresh random image, no leftover
+    function restart() {
+        clearFinishTimeouts();
+        gameEnded = false;
+        index = 0;
+        score = 0;
+        answered = false;
+        finalOverlay.style.display = "none";
+        gameOverMsgDiv.style.display = "none";
+        resultDiv.style.display = "none";
+        imageFooter.style.display = "flex";
+        enableButtons();
+        // Force a completely new image (bypasses any caching)
+        imgElement.src = getRandomImage();
+        // Reset game variables and reload state
+        load();
+    }
+
+    // Event listener for Play Again button
+    document.getElementById('playAgainBtn').addEventListener('click', () => {
+        restart();
+    });
+
+    // Share functions
+    function copyLink() {
+        navigator.clipboard.writeText(location.href);
+        alert("Game link copied! Share with friends.");
+    }
+    function shareWA() {
+        window.open("https://wa.me/?text=🧠 Can you spot the REAL vs AI? Play BrainPlay Daily: " + location.href);
+    }
+
+    // Random stat percentage
+    document.getElementById("percent").innerText = Math.floor(Math.random() * 50 + 30) + "%";
+
+    // PWA install logic
+    let deferredPrompt;
+    const installArrow = document.getElementById('installArrow');
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+    });
+    installArrow.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`Install prompt: ${outcome}`);
+            deferredPrompt = null;
+        } else {
+            alert(
+                "To install this game on your home screen:\n\n" +
+                "• iPhone/iPad: Tap Share button → 'Add to Home Screen'.\n" +
+                "• Android: Open browser menu → 'Add to Home screen' or 'Install'."
+            );
+        }
+    });
+
+    // Service worker for PWA
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register(
+                URL.createObjectURL(
+                    new Blob(
+                        [
+                            `self.addEventListener('install', e => { self.skipWaiting(); });
+                             self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
+                             self.addEventListener('fetch', e => { e.respondWith(fetch(e.request)); });`
+                        ], { type: 'application/javascript' }
+                    )
+                )
+            ).catch(err => console.log("SW registration err:", err));
+        });
+    }
+
+    // start game
+    load();
+</script>
 </body>
 </html>
