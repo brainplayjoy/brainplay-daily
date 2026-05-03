@@ -20,7 +20,7 @@
         }]
     }" />
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Anton&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Anton&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
 
     <style>
         * {
@@ -116,35 +116,34 @@
             font-weight: 800;
         }
 
-        /* IMAGE BOX - position relative for absolute positioning of score card */
+        /* IMAGE BOX */
         .image-box {
             border-radius: 24px;
             overflow: hidden;
             margin-top: 20px;
             position: relative;
-            min-height: 300px;
+            min-height: 320px; /* slightly increased to fit all content nicely */
             background: #000000;
         }
 
         .image-box img {
             width: 100%;
-            height: 300px;
+            height: 320px;
             object-fit: cover;
             display: block;
         }
 
-        /* Allow easy height adjustment on mobile */
         @media (max-width: 600px) {
             .image-box img {
-                height: 250px;
+                height: 300px;
             }
             .image-box {
-                min-height: 250px;
+                min-height: 300px;
             }
         }
 
         /* ========================================================
-           UPDATED PROFESSIONAL SCORE CARD OVERLAY
+           UPDATED SCORE CARD OVERLAY
            ======================================================== */
         .image-box .score-card-overlay {
             position: absolute;
@@ -152,51 +151,62 @@
             left: 0;
             width: 100%;
             height: 100%;
-            /* Sleek premium gradient background */
             background: linear-gradient(145deg, rgba(15, 16, 32, 0.95) 0%, rgba(5, 5, 16, 0.98) 100%);
             backdrop-filter: blur(5px);
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start; /* Changed to let top margin work perfectly */
             align-items: center;
             text-align: center;
-            padding: 20px;
+            padding: 0 20px;
             z-index: 10;
         }
 
         .score-card-title {
-            font-size: 13px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 20px;
             font-weight: 800;
-            color: #9ca3af;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-bottom: 5px;
+            color: #ffffff;
+            margin-top: 50px; /* Requested Top Margin */
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        .score-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .score-emoji {
+            font-size: 40px; /* Match text height */
         }
 
         .score-value {
             font-family: 'Anton', sans-serif;
-            font-size: 46px;
+            font-size: 40px; /* Requested 40px height */
             letter-spacing: 1px;
             background: linear-gradient(135deg, #fde047, #f59e0b);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            margin: 0 0 20px 0;
             text-shadow: 0px 4px 20px rgba(245, 158, 11, 0.2);
+            line-height: 1;
         }
 
         .start-new-btn {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 12px 30px;
+            background: #f97316; /* Requested Orange */
+            border: none;
+            padding: 10px 24px; /* Reduced for mobile */
             border-radius: 50px;
-            color: white;
+            color: #000000; /* Requested Black */
             font-weight: 800;
-            font-size: 16px;
+            font-size: 15px; /* Reduced for mobile */
             cursor: pointer;
             font-family: 'Inter', sans-serif;
-            margin: 0 0 20px 0;
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
@@ -205,7 +215,7 @@
 
         .start-new-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
         }
 
         .start-new-btn:active {
@@ -213,43 +223,41 @@
         }
 
         .challenge-text {
-            color: #d1d5db;
+            color: #a855f7; /* Requested Purple */
             font-size: 14px;
-            font-weight: 600;
-            margin: 10px 0 12px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding-top: 20px;
-            width: 80%;
+            font-weight: 700;
+            margin: 5px 0 10px 0;
+            /* Removed border-top line as requested */
+            width: 90%;
         }
 
         .final-whatsapp-btn {
-            background: #25D366;
+            background: #16a34a; /* Slightly dark green */
             border: none;
-            padding: 12px 24px;
+            padding: 10px 20px; /* Reduced button size */
             border-radius: 50px;
             color: white;
             font-weight: 800;
-            font-size: 15px;
+            font-size: 14px; /* Reduced text size */
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.2);
+            box-shadow: 0 4px 15px rgba(22, 163, 74, 0.2);
             transition: all 0.2s ease;
         }
 
         .final-whatsapp-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.3);
+            box-shadow: 0 6px 20px rgba(22, 163, 74, 0.3);
         }
         /* ======================================================== */
 
-        /* FINAL OVERLAY - disabled */
         .final-overlay {
             display: none;
         }
 
-        /* IMAGE FOOTER: counter (left) + question (center) + next button (right) */
+        /* IMAGE FOOTER */
         .image-footer {
             display: flex;
             justify-content: space-between;
@@ -275,7 +283,6 @@
             white-space: nowrap;
         }
 
-        /* NEXT button – yellow text, no background */
         .next-btn {
             background: none;
             border: none;
@@ -329,7 +336,7 @@
             opacity: 0.7;
         }
 
-        /* RESULT CARD - Original style for CORRECT/WRONG feedback (unchanged) */
+        /* RESULT CARD */
         .result {
             margin-top: 20px;
             padding: 20px;
@@ -382,7 +389,7 @@
             font-weight: 700;
         }
 
-        /* SHARE SECTION - Original stays */
+        /* SHARE SECTION */
         .share {
             margin-top: 20px;
         }
@@ -474,14 +481,19 @@
             <img id="img" alt="Challenge Image">
             
             <div class="score-card-overlay" id="scoreCardOverlay" style="display: none;">
-                <div class="score-card-title">FINAL SCORE</div>
-                <div class="score-value" id="finalScoreValue">Good (3/5)</div>
+                
+                <div class="score-card-title">🏅 SCORE CARD</div>
+                
+                <div class="score-row">
+                    <span class="score-emoji" id="scoreEmoji">🤯</span>
+                    <span class="score-value" id="finalScoreValue">Brilliant (5/5)</span>
+                </div>
                 
                 <button class="start-new-btn" id="startNewFinalBtn">
                     <span>↻</span> Play Again
                 </button>
                 
-                <div class="challenge-text">Challenge a friend to beat your score!</div>
+                <div class="challenge-text">Would you like to give challenge to your friend?</div>
                 
                 <button class="final-whatsapp-btn" id="finalWhatsappBtn">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
@@ -540,7 +552,7 @@
 
     <script>
         // ──────────────────────────────────
-        //  HIGH-QUALITY BELL & BUZZ SOUNDS (unchanged)
+        //  HIGH-QUALITY BELL & BUZZ SOUNDS
         // ──────────────────────────────────
         function playCorrectSound() {
             try {
@@ -607,7 +619,7 @@
         }
 
         // ──────────────────────────────────
-        //  GAME LOGIC (completely unchanged except score card appears inside image box)
+        //  GAME LOGIC
         // ──────────────────────────────────
         let index = 0;
         let score = 0;
@@ -694,34 +706,34 @@
             nextBtn.style.display = "inline-block";
         }
 
-        function getScoreLabel(scoreValue) {
-            if (scoreValue === 5) return "Brilliant";
-            if (scoreValue === 4) return "Excellent";
-            if (scoreValue === 3) return "Good";
-            if (scoreValue === 2) return "Average";
-            if (scoreValue === 1) return "Poor";
-            return "Very Bad";
+        // Updated function to return both label and dynamic emoji
+        function getScoreData(scoreValue) {
+            if (scoreValue === 5) return { label: "Brilliant", emoji: "🤯" };
+            if (scoreValue === 4) return { label: "Excellent", emoji: "🔥" };
+            if (scoreValue === 3) return { label: "Good", emoji: "👍" };
+            if (scoreValue === 2) return { label: "Average", emoji: "😐" };
+            if (scoreValue === 1) return { label: "Poor", emoji: "😬" };
+            return { label: "Very Bad", emoji: "😭" };
         }
 
         function next() {
             index++;
             if (index >= 5) {
-                // Game complete - Show SCORE CARD INSIDE the image box
-                // Hide the image
+                // Game complete - Show SCORE CARD
                 imgElement.style.display = "none";
                 
-                // Get score label and display inside the overlay
-                const scoreLabel = getScoreLabel(score);
-                const scoreValueElem = document.getElementById('finalScoreValue');
-                scoreValueElem.innerHTML = `${scoreLabel} (${score}/5)`;
+                // Set the specific emoji and text based on score
+                const scoreData = getScoreData(score);
+                document.getElementById('scoreEmoji').innerText = scoreData.emoji;
+                document.getElementById('finalScoreValue').innerHTML = `${scoreData.label} (${score}/5)`;
                 
                 // Show score card overlay
                 scoreCardOverlay.style.display = "flex";
                 
-                // Hide the CORRECT/WRONG result card if visible
+                // Hide the CORRECT/WRONG result card
                 resultCard.style.display = "none";
                 
-                // Disable REAL/AI buttons and hide NEXT button
+                // Disable real/ai buttons and hide NEXT button
                 btnReal.disabled = true;
                 btnAi.disabled = true;
                 nextBtn.style.display = "none";
@@ -731,18 +743,13 @@
         }
 
         function restartGame() {
-            // Reset all game state
             index = 0;
             score = 0;
             answered = false;
             
-            // Hide score card overlay
             scoreCardOverlay.style.display = "none";
-            
-            // Show image again
             imgElement.style.display = "block";
             
-            // Restore original result card HTML (clean state)
             resultCard.innerHTML = `
                 <div class="result-row">
                     <div id="circle" class="circle">✔</div>
@@ -752,11 +759,9 @@
             `;
             resultCard.style.display = "none";
             
-            // Reset buttons
             enableButtons();
             nextBtn.style.display = "none";
             
-            // Reload first image
             load();
         }
 
@@ -766,16 +771,15 @@
         }
         
         function shareOnWhatsApp() {
-            const scoreLabel = getScoreLabel(score);
-            const message = `🎮 BrainPlay Daily - Real vs AI Game!\n\nMy final score: ${scoreLabel} (${score}/5)\n\nCan you beat my score? Play here: ${location.href}`;
+            const scoreData = getScoreData(score);
+            const message = `🎮 BrainPlay Daily - Real vs AI Game!\n\nMy final score: ${scoreData.label} (${score}/5)\n\nWould you like to give challenge to your friend? Play here: ${location.href}`;
             window.open(`https://wa.me/?text=${encodeURIComponent(message)}`);
         }
 
-        // Attach event listeners for final card buttons
         document.getElementById('startNewFinalBtn').addEventListener('click', startNewGame);
         document.getElementById('finalWhatsappBtn').addEventListener('click', shareOnWhatsApp);
 
-        // Copy & share functions (original)
+        // Copy & share functions
         function copyLink() {
             navigator.clipboard.writeText(location.href);
             alert("Copied!");
@@ -788,7 +792,7 @@
         // Random percentage stat
         document.getElementById("percent").innerText = Math.floor(Math.random() * 50 + 30) + "%";
 
-        // PWA install logic (unchanged)
+        // PWA install logic
         let deferredPrompt;
         const installArrow = document.getElementById('installArrow');
 
@@ -812,7 +816,6 @@
             }
         });
 
-        // Service worker registration (unchanged)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register(
