@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BrainPlay Daily</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>BrainPlay Daily | Real vs AI Game</title>
 
     <!-- Minimal PWA manifest (triggers install prompt) -->
     <link rel="manifest" href="data:application/json,{
@@ -139,28 +139,9 @@
             }
         }
 
-        /* FINAL OVERLAY */
+        /* FINAL OVERLAY - disabled */
         .final-overlay {
-            position: absolute;
-            inset: 0;
-            background: #050510;
             display: none;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            text-align: center;
-            z-index: 5;
-        }
-
-        .start-btn {
-            margin-top: 14px;
-            background: orange;
-            color: #fff;
-            padding: 12px 18px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 700;
-            cursor: pointer;
         }
 
         /* IMAGE FOOTER: counter (left) + question (center) + next button (right) */
@@ -197,7 +178,7 @@
             font-weight: 800;
             font-size: 15px;
             cursor: pointer;
-            display: none; /* hidden until answered */
+            display: none;
             white-space: nowrap;
             padding: 0;
         }
@@ -205,8 +186,6 @@
         .next-btn:hover {
             opacity: 0.8;
         }
-
-        /* QUESTION (removed separate block, now inside image-footer) */
 
         /* BUTTONS */
         .buttons {
@@ -245,7 +224,7 @@
             opacity: 0.7;
         }
 
-        /* RESULT */
+        /* RESULT CARD - Original style for CORRECT/WRONG feedback */
         .result {
             margin-top: 20px;
             padding: 20px;
@@ -281,7 +260,6 @@
             box-shadow: 0 0 20px #ef4444;
         }
 
-        /* Description text – left aligned, white, starts directly under the circle */
         .desc-text {
             margin-top: 12px;
             color: #ffffff;
@@ -299,7 +277,81 @@
             font-weight: 700;
         }
 
-        /* SHARE */
+        /* FINAL SCORE CARD STYLES - Shows after NEXT click on 5th question */
+        .final-score-container {
+            margin-top: 20px;
+            padding: 24px 20px;
+            border-radius: 20px;
+            background: #121226;
+            text-align: center;
+            display: none;
+        }
+
+        .score-card-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #facc15;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        .score-value {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #facc15);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin: 15px 0;
+        }
+
+        .start-new-btn {
+            background: linear-gradient(95deg, #f97316, #ea580c);
+            border: none;
+            padding: 14px 32px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 800;
+            font-size: 18px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            margin: 15px 0 20px 0;
+            transition: transform 0.1s;
+            width: 80%;
+            max-width: 220px;
+        }
+
+        .start-new-btn:active {
+            transform: scale(0.97);
+        }
+
+        .challenge-text {
+            color: #9ca3af;
+            font-size: 14px;
+            margin: 15px 0 10px 0;
+        }
+
+        .final-whatsapp-btn {
+            background: #25D366;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 5px;
+            transition: opacity 0.2s;
+        }
+
+        .final-whatsapp-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* SHARE SECTION - Original stays */
         .share {
             margin-top: 20px;
         }
@@ -389,21 +441,15 @@
 
         <div class="image-box">
             <img id="img" alt="Challenge Image">
-
-            <div class="final-overlay" id="finalOverlay">
-                <h2 id="finalText"></h2>
-                <button class="start-btn" onclick="restart()">Start New</button>
-            </div>
+            <div class="final-overlay" id="finalOverlay"></div>
         </div>
 
-        <!-- Unified line: counter, question, NEXT button -->
         <div class="image-footer" id="imageFooter">
             <span class="counter" id="counter">1/5</span>
             <span class="question-inline">🤔 Is this image Real or AI?</span>
             <button class="next-btn" id="nextBtn" onclick="next()">>> NEXT</button>
         </div>
 
-        <!-- REAL / AI buttons -->
         <div class="buttons" id="buttons">
             <button class="btn btn-real" id="btnReal" onclick="answer('real')">
                 REAL <small>Looks authentic?</small>
@@ -413,6 +459,7 @@
             </button>
         </div>
 
+        <!-- RESULT CARD - Shows CORRECT/WRONG feedback after each answer -->
         <div class="result" id="result">
             <div class="result-row">
                 <div id="circle" class="circle">✔</div>
@@ -421,7 +468,16 @@
             <p id="desc" class="desc-text"></p>
         </div>
 
-        <!-- SHARE SECTION -->
+        <!-- FINAL SCORE CARD - Shows after NEXT click on 5th question (NO GAME OVER) -->
+        <div class="final-score-container" id="finalScoreContainer">
+            <div class="score-card-title">🏆 SCORE CARD 🏆</div>
+            <div class="score-value" id="finalScoreValue">Good (3/5)</div>
+            <button class="start-new-btn" id="startNewFinalBtn">✨ Start New ✨</button>
+            <div class="challenge-text">🤝 Would you like to challenge your friend?</div>
+            <button class="final-whatsapp-btn" id="finalWhatsappBtn">💬 Share on WhatsApp</button>
+        </div>
+
+        <!-- ORIGINAL SHARE SECTION - Kept untouched -->
         <div class="share">
             <div class="share-title">
                 <svg width="16" fill="#9ca3af" viewBox="0 0 24 24">
@@ -524,6 +580,8 @@
         const nextBtn = document.getElementById('nextBtn');
         const counterEl = document.getElementById('counter');
         const imageFooter = document.getElementById('imageFooter');
+        const resultCard = document.getElementById('result');
+        const finalScoreContainer = document.getElementById('finalScoreContainer');
 
         function disableButtons() {
             answered = true;
@@ -544,7 +602,7 @@
         function load() {
             document.getElementById("img").src = getRandomImage();
             isReal = Math.random() > 0.5;
-            document.getElementById("result").style.display = "none";
+            resultCard.style.display = "none";
             counterEl.innerText = (index + 1) + "/5";
             nextBtn.style.display = "none";
             enableButtons();
@@ -560,7 +618,6 @@
             let titleElement = document.getElementById("title");
             let desc = document.getElementById("desc");
 
-            // Helper to wrap REAL/AI with colored spans
             function highlightKeywords(text) {
                 return text
                     .replace(/\bREAL\b/g, '<span class="real-word">REAL</span>')
@@ -591,41 +648,88 @@
                 }
             }
 
-            document.getElementById("result").style.display = "block";
+            resultCard.style.display = "block";
             nextBtn.style.display = "inline-block";
+        }
+
+        function getScoreLabel(scoreValue) {
+            if (scoreValue === 5) return "Brilliant";
+            if (scoreValue === 4) return "Excellent";
+            if (scoreValue === 3) return "Good";
+            if (scoreValue === 2) return "Average";
+            if (scoreValue === 1) return "Poor";
+            return "Very Bad";
         }
 
         function next() {
             index++;
             if (index >= 5) {
-                showFinal();
+                // 5th question completed, user clicked NEXT
+                // Hide the CORRECT/WRONG result card completely
+                resultCard.style.display = "none";
+                
+                // Show FINAL SCORE CARD (NO GAME OVER, NO "Play Again")
+                const scoreLabel = getScoreLabel(score);
+                const scoreValueElem = document.getElementById('finalScoreValue');
+                scoreValueElem.innerHTML = `${scoreLabel} (${score}/5)`;
+                
+                finalScoreContainer.style.display = "block";
+                
+                // Disable REAL/AI buttons permanently
+                btnReal.disabled = true;
+                btnAi.disabled = true;
+                nextBtn.style.display = "none";
+                
+                // Hide the original share section's WhatsApp button? NO, keep as is.
+                // But we have separate final whatsapp button inside final score container.
             } else {
                 load();
             }
         }
 
-        function showFinal() {
-            let text = "";
-            if (score <= 2) text = "😐 Poor (" + score + "/5)";
-            else if (score <= 4) text = "👍 Good (" + score + "/5)";
-            else text = "🏆 Excellent (" + score + "/5) 🥇";
-
-            document.getElementById("finalText").innerHTML = text;
-            document.getElementById("finalOverlay").style.display = "flex";
-            disableButtons();
-            nextBtn.style.display = "none";
-            imageFooter.style.display = "none";
-        }
-
-        function restart() {
+        function restartGame() {
+            // Reset all game state
             index = 0;
             score = 0;
-            document.getElementById("finalOverlay").style.display = "none";
-            imageFooter.style.display = "flex";
+            answered = false;
+            
+            // Hide final score container
+            finalScoreContainer.style.display = "none";
+            
+            // Restore original result card HTML (clean state)
+            resultCard.innerHTML = `
+                <div class="result-row">
+                    <div id="circle" class="circle">✔</div>
+                    <h3 id="title"></h3>
+                </div>
+                <p id="desc" class="desc-text"></p>
+            `;
+            resultCard.style.display = "none";
+            
+            // Reset buttons
+            enableButtons();
             nextBtn.style.display = "none";
+            
+            // Reload first image
             load();
         }
 
+        // Final Score Card Button Handlers
+        function startNewGame() {
+            restartGame();
+        }
+        
+        function shareOnWhatsApp() {
+            const scoreLabel = getScoreLabel(score);
+            const message = `🎮 BrainPlay Daily - Real vs AI Game!\n\nMy final score: ${scoreLabel} (${score}/5)\n\nCan you beat my score? Play here: ${location.href}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(message)}`);
+        }
+
+        // Attach event listeners for final card buttons
+        document.getElementById('startNewFinalBtn').addEventListener('click', startNewGame);
+        document.getElementById('finalWhatsappBtn').addEventListener('click', shareOnWhatsApp);
+
+        // Copy & share functions (original)
         function copyLink() {
             navigator.clipboard.writeText(location.href);
             alert("Copied!");
@@ -635,6 +739,7 @@
             window.open("https://wa.me/?text=Play this game: " + location.href);
         }
 
+        // Random percentage stat
         document.getElementById("percent").innerText = Math.floor(Math.random() * 50 + 30) + "%";
 
         // PWA install logic
@@ -661,6 +766,7 @@
             }
         });
 
+        // Service worker registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register(
@@ -677,6 +783,7 @@
             });
         }
 
+        // Start the game
         load();
     </script>
 
