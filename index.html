@@ -1,109 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BrainPlay Daily</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BrainPlay Daily</title>
 
-<!-- PWA -->
-<link rel="manifest" href="data:application/json,{
-%22name%22:%22Brainplay Daily%22,
-%22short_name%22:%22Brainplay%22,
-%22description%22:%22Real vs AI image game%22,
-%22display%22:%22standalone%22
-}"/>
+    <!-- Minimal PWA manifest -->
+    <link rel="manifest" href="data:application/json,{
+        %22name%22: %22Brainplay Daily%22,
+        %22short_name%22: %22Brainplay%22,
+        %22description%22: %22Real vs AI image game%22,
+        %22start_url%22: %22.%22,
+        %22display%22: %22standalone%22,
+        %22background_color%22: %22#050510%22,
+        %22theme_color%22: %22#050510%22
+    }" />
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Anton&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Anton&display=swap" rel="stylesheet">
 
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:#050510;font-family:'Inter',sans-serif;color:#fff;display:flex;justify-content:center;padding:20px;}
-.container{max-width:520px;width:100%;}
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
 
-/* HEADER */
-.header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-radius:22px;background:#0c0c18;border:1px solid rgba(255,255,255,0.08);}
-.logo{display:flex;gap:10px;font-weight:900;}
-.logo-text{background:linear-gradient(90deg,#e879f9,#9333ea);-webkit-background-clip:text;color:transparent;}
-.pill{padding:8px 12px;border-radius:12px;background:#121226;font-size:13px;font-weight:700;margin-left:6px;}
+        body {
+            background:#050510;
+            font-family:'Inter',sans-serif;
+            color:#fff;
+            display:flex;
+            justify-content:center;
+            padding:20px;
+        }
 
-/* TITLE */
-.title{text-align:center;margin-top:20px;}
-.title h1{font-family:'Anton';font-size:42px;}
-.real{color:#fff;text-shadow:0 0 12px cyan;}
-.ai{color:#ff3b3b;text-shadow:0 0 12px red;}
-.subtitle{color:#9ca3af;}
+        .container { max-width:520px; width:100%; }
 
-/* STAT */
-.stat{margin:20px auto;padding:12px;border-radius:30px;text-align:center;background:#121226;}
-.highlight{color:#facc15;font-weight:800;}
+        .header {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:14px 18px;
+            border-radius:22px;
+            background:#0c0c18;
+        }
 
-/* IMAGE */
-.image-box{border-radius:24px;overflow:hidden;margin-top:20px;position:relative;}
-.image-box img{width:100%;height:300px;object-fit:cover;}
+        .logo { display:flex; gap:10px; font-weight:900; }
 
-@media(max-width:600px){
-.image-box img{height:250px;}
-}
+        .logo-text {
+            background:linear-gradient(90deg,#e879f9,#9333ea);
+            -webkit-background-clip:text;
+            color:transparent;
+        }
 
-/* FINAL OVERLAY */
-.final-overlay{
-position:absolute;inset:0;background:#050510;
-display:none;justify-content:center;align-items:center;
-flex-direction:column;text-align:center;z-index:5;
-}
-.start-btn{
-margin-top:14px;background:orange;color:#fff;
-padding:12px 18px;border:none;border-radius:12px;
-font-weight:700;cursor:pointer;
-}
+        .pill {
+            padding:8px 12px;
+            border-radius:12px;
+            background:#121226;
+            font-size:13px;
+            font-weight:700;
+            margin-left:6px;
+        }
 
-/* FOOTER LINE */
-.image-footer{
-display:flex;justify-content:space-between;
-align-items:center;margin-top:10px;gap:8px;
-}
-.counter{font-weight:700;color:#d1d5db;}
-.question-inline{flex:1;text-align:center;font-weight:700;}
-.next-btn{
-background:none;border:none;color:#facc15;
-font-weight:800;cursor:pointer;display:none;
-}
+        .title { text-align:center; margin-top:20px; }
 
-/* BUTTONS */
-.buttons{display:flex;gap:12px;margin-top:16px;}
-.btn{
-flex:1;padding:16px;border-radius:18px;
-font-weight:800;border:none;color:#fff;cursor:pointer;
-}
-.btn:disabled{opacity:.5;}
-.btn-real{background:linear-gradient(#16a34a,#065f46);}
-.btn-ai{background:linear-gradient(#ef4444,#7f1d1d);}
-.btn small{display:block;font-size:12px;opacity:.7;}
+        .title h1 { font-family:'Anton'; font-size:42px; }
 
-/* SHARE */
-.share{margin-top:20px;}
-.share-title{
-text-align:center;color:#9ca3af;
-display:flex;justify-content:center;align-items:center;gap:6px;
-}
-.share-buttons{display:flex;gap:10px;margin-top:10px;}
-.share-btn{
-flex:1;padding:12px;border-radius:12px;border:none;
-font-weight:700;display:flex;justify-content:center;
-align-items:center;gap:6px;cursor:pointer;
-}
-.copy{background:#1f2937;color:#fff;}
-.whatsapp{background:#25D366;color:#fff;}
+        .real { color:#fff; text-shadow:0 0 12px cyan; }
+        .ai { color:#ff3b3b; text-shadow:0 0 12px red; }
 
-/* FOOTER */
-.footer{margin-top:20px;text-align:center;color:#9ca3af;font-size:13px;}
-.install-arrow{
-color:#facc15;font-size:20px;cursor:pointer;margin-left:6px;
-}
-</style>
+        .subtitle { color:#9ca3af; }
+
+        .stat {
+            margin:20px auto;
+            padding:12px;
+            border-radius:30px;
+            text-align:center;
+            background:#121226;
+        }
+
+        .highlight { color:#facc15; font-weight:800; }
+
+        .image-box {
+            border-radius:24px;
+            overflow:hidden;
+            margin-top:20px;
+            position:relative;
+        }
+
+        .image-box img {
+            width:100%;
+            height:300px;
+            object-fit:cover;
+        }
+
+        .final-overlay {
+            position:absolute;
+            inset:0;
+            background:#050510;
+            display:none;
+            justify-content:center;
+            align-items:center;
+            flex-direction:column;
+        }
+
+        .start-btn {
+            margin-top:14px;
+            background:orange;
+            color:#fff;
+            padding:12px 18px;
+            border:none;
+            border-radius:12px;
+            font-weight:700;
+        }
+
+        .image-footer {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-top:10px;
+        }
+
+        .counter { font-weight:700; color:#d1d5db; }
+        .question-inline { flex:1; text-align:center; }
+
+        .next-btn {
+            background:none;
+            border:none;
+            color:#facc15;
+            font-weight:800;
+            cursor:pointer;
+            display:none;
+        }
+
+        .buttons { display:flex; gap:12px; margin-top:16px; }
+
+        .btn {
+            flex:1;
+            padding:16px;
+            border-radius:18px;
+            font-weight:800;
+            border:none;
+            color:#fff;
+            cursor:pointer;
+        }
+
+        .btn:disabled { opacity:.5; }
+
+        .btn-real { background:linear-gradient(#16a34a,#065f46); }
+        .btn-ai { background:linear-gradient(#ef4444,#7f1d1d); }
+
+        .footer {
+            margin-top:20px;
+            text-align:center;
+            color:#9ca3af;
+        }
+    </style>
 </head>
 
 <body>
+
 <div class="container">
 
 <div class="header">
@@ -139,37 +191,28 @@ color:#facc15;font-size:20px;cursor:pointer;margin-left:6px;
 </div>
 
 <div class="buttons">
-<button class="btn btn-real" id="btnReal" onclick="answer('real')">
-REAL <small>Looks authentic?</small>
-</button>
-
-<button class="btn btn-ai" id="btnAi" onclick="answer('ai')">
-AI <small>Looks generated?</small>
-</button>
+<button class="btn btn-real" id="btnReal" onclick="answer('real')">REAL</button>
+<button class="btn btn-ai" id="btnAi" onclick="answer('ai')">AI</button>
 </div>
 
-<!-- SHARE -->
-<div class="share">
-<div class="share-title">🔗 Share your result with friends!</div>
-<div class="share-buttons">
-<button class="share-btn copy" onclick="copyLink()">📋 Copy Link</button>
-<button class="share-btn whatsapp" onclick="shareWA()">💬 WhatsApp</button>
-</div>
-</div>
+<!-- RESULT CARD REMOVED -->
 
 <div class="footer">
 🧠 Save to phone for daily challenge
-<span id="installArrow" class="install-arrow">▼</span>
 </div>
 
 </div>
 
 <script>
-let index=0,score=0,isReal,answered=false;
+let index=0;
+let score=0;
+let isReal;
+let answered=false;
 
 const btnReal=document.getElementById('btnReal');
 const btnAi=document.getElementById('btnAi');
 const nextBtn=document.getElementById('nextBtn');
+const counterEl=document.getElementById('counter');
 
 function disableButtons(){
 answered=true;
@@ -190,18 +233,17 @@ return "https://picsum.photos/800/600?random="+Math.random();
 function load(){
 document.getElementById("img").src=getRandomImage();
 isReal=Math.random()>0.5;
-document.getElementById("counter").innerText=(index+1)+"/5";
+counterEl.innerText=(index+1)+"/5";
 nextBtn.style.display="none";
 enableButtons();
 }
 
 function answer(choice){
-if(answered) return;
-
+if(answered)return;
 disableButtons();
 
 let correct=(choice==="real"&&isReal)||(choice==="ai"&&!isReal);
-if(correct) score++;
+if(correct)score++;
 
 nextBtn.style.display="inline-block";
 }
@@ -214,8 +256,8 @@ else{load();}
 
 function showFinal(){
 let text="";
-if(score<=2) text="😐 Poor ("+score+"/5)";
-else if(score<=4) text="👍 Good ("+score+"/5)";
+if(score<=2)text="😐 Poor ("+score+"/5)";
+else if(score<=4)text="👍 Good ("+score+"/5)";
 else text="🏆 Excellent ("+score+"/5)";
 
 document.getElementById("finalText").innerHTML=text;
@@ -231,35 +273,7 @@ document.getElementById("finalOverlay").style.display="none";
 load();
 }
 
-function copyLink(){
-navigator.clipboard.writeText(location.href);
-alert("Copied!");
-}
-
-function shareWA(){
-window.open("https://wa.me/?text=Play this game: "+location.href);
-}
-
 document.getElementById("percent").innerText=Math.floor(Math.random()*50+30)+"%";
-
-/* INSTALL */
-let deferredPrompt;
-const installArrow=document.getElementById('installArrow');
-
-window.addEventListener('beforeinstallprompt',(e)=>{
-e.preventDefault();
-deferredPrompt=e;
-});
-
-installArrow.addEventListener('click',async()=>{
-if(deferredPrompt){
-deferredPrompt.prompt();
-await deferredPrompt.userChoice;
-deferredPrompt=null;
-}else{
-alert("Use browser menu → Add to Home Screen");
-}
-});
 
 load();
 </script>
