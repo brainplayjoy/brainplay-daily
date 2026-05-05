@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>BrainPlay Daily | Real vs AI Game</title>
 
+    <!-- Open Graph / Social Media Sharing -->
+    <meta property="og:title" content="BrainPlay Daily – Real vs AI Game">
+    <meta property="og:description" content="Looks real… but is it really? Test your skills and share your score!">
+    <meta property="og:image" content="https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/poster.jpg">
+    <meta property="og:url" content="YOUR_GITHUB_PAGES_URL">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+
     <link rel="manifest" href="data:application/json,{
         %22name%22: %22Brainplay Daily%22,
         %22short_name%22: %22Brainplay%22,
@@ -100,6 +109,14 @@
 
         .subtitle {
             color: #9ca3af;
+        }
+
+        .looks-real {
+            color: #facc15;
+        }
+
+        .but-is-it {
+            color: #a855f7;
         }
 
         /* STAT */
@@ -223,11 +240,10 @@
         }
 
         .challenge-text {
-            color: #a855f7; /* Requested Purple */
+            color: #ffffff; /* Changed to white as requested */
             font-size: 14px;
             font-weight: 700;
             margin: 5px 0 10px 0;
-            /* Removed border-top line as requested */
             width: 90%;
         }
 
@@ -433,11 +449,16 @@
             color: #fff;
         }
 
+        .facebook {
+            background: #1877F2;
+            color: #fff;
+        }
+
         /* FOOTER */
         .footer {
             margin-top: 20px;
             text-align: center;
-            color: #9ca3af;
+            color: #facc15;
             font-size: 13px;
         }
 
@@ -471,7 +492,7 @@
 
         <div class="title">
             <h1><span class="real">REAL</span> vs <span class="ai">AI</span></h1>
-            <div class="subtitle">Can you spot the difference?</div>
+            <div class="subtitle"><span class="looks-real">Looks real…</span> <span class="but-is-it">but is it really?</span></div>
         </div>
 
         <div class="stat">
@@ -494,7 +515,7 @@
                     <span>↻</span> Play Again
                 </button>
                 
-                <div class="challenge-text">Would you like to give challenge to your friend?</div>
+                <div class="challenge-text">🤔 Can your friends beat your score?</div>
                 
                 <button class="final-whatsapp-btn" id="finalWhatsappBtn">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
@@ -540,13 +561,13 @@
 
             <div class="share-buttons">
                 <button class="share-btn copy" onclick="copyLink()">📋 Copy Link</button>
+                <button class="share-btn facebook" onclick="shareFB()">📘 Facebook</button>
                 <button class="share-btn whatsapp" onclick="shareWA()">💬 WhatsApp</button>
             </div>
         </div>
 
         <div class="footer">
-            🧠 Save to phone for daily challenge
-            <span id="installArrow" class="install-arrow" title="Tap to install this game on your home screen">▼</span>
+            🧠 Play directly for daily challenge without install App <span id="installArrow" class="install-arrow" title="Tap to install this game on your home screen">▼</span>
         </div>
 
     </div>
@@ -788,6 +809,10 @@
 
         function shareWA() {
             window.open("https://wa.me/?text=Play this game: " + location.href);
+        }
+
+        function shareFB() {
+            window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(location.href));
         }
 
         // Random percentage stat
