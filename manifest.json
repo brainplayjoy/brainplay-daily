@@ -1,0 +1,17 @@
+{
+  "name": "Brainplay",
+  "short_name": "Brainplay",
+  "description": "Real vs AI image game",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#050510",
+  "theme_color": "#050510",
+  "icons": [
+    {
+      "src": "brainplay-logo.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    }
+  ]
+}
