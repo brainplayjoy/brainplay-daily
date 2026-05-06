@@ -7,8 +7,8 @@
 
     <!-- Open Graph / Social Media Sharing -->
     <meta property="og:title" content="BrainPlay Daily – Real vs AI Game">
-    <meta property="og:description" content="Looks real… but is it really? Test your skills and share your score!">
-    <meta property="og:image" content="https://raw.githubusercontent.com/brainplayjoy/brainplay-daily/main/brainplaydaily-poster.png">
+    <meta property="og:description" content="Can you beat this AI test? Test your skills and share your score!">
+    <meta property="og:image" content="https://raw.githubusercontent.com/brainplayjoy/brainplay-daily/main/brainplaydaily-poster-square.webp">
     <meta property="og:url" content="https://brainplayjoy.github.io/brainplay-daily/">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="en_US">
@@ -75,6 +75,12 @@
             color: transparent;
         }
 
+        .header-logo-img {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+        }
+
         .pill {
             padding: 8px 12px;
             border-radius: 12px;
@@ -111,12 +117,12 @@
             color: #9ca3af;
         }
 
-        .looks-real {
-            color: #facc15;
+        .can-you-beat {
+            color: #ffffff;
         }
 
-        .but-is-it {
-            color: #a855f7;
+        .ai-test {
+            color: #facc15;
         }
 
         /* STAT */
@@ -474,6 +480,27 @@
         .install-arrow:hover {
             transform: scale(1.3);
         }
+
+        /* HOW TO PLAY BUTTON */
+        .how-to-play-btn {
+            display: inline-block;
+            margin-top: 14px;
+            padding: 10px 24px;
+            border: 2px solid #facc15;
+            border-radius: 12px;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 18px;
+            text-decoration: none;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .how-to-play-btn:hover {
+            background: rgba(250, 204, 21, 0.1);
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 
@@ -482,7 +509,10 @@
     <div class="container">
 
         <div class="header">
-            <div class="logo">🧠 <span class="logo-text">BRAINPLAY DAILY</span></div>
+            <div class="logo">
+                <img class="header-logo-img" src="brainplay-logo.webp" alt="BrainPlay Logo">
+                <span class="logo-text">BRAINPLAY DAILY</span>
+            </div>
             <div>
                 <span class="pill">🔥 7</span>
                 <span class="pill">#12</span>
@@ -491,7 +521,7 @@
 
         <div class="title">
             <h1><span class="real">REAL</span> vs <span class="ai">AI</span></h1>
-            <div class="subtitle"><span class="looks-real">Looks real…</span> <span class="but-is-it">but is it really?</span></div>
+            <div class="subtitle"><span class="can-you-beat">👉 Can you beat this </span><span class="ai-test">AI test</span><span class="can-you-beat">?</span></div>
         </div>
 
         <div class="stat">
@@ -576,6 +606,8 @@
 
         <div class="footer">
             🧠 Play directly on mobile without install App <span id="installArrow" class="install-arrow" title="Tap to install this game on your home screen">▼</span>
+            <br>
+            <a href="https://brainplayjoy.github.io/brainplay-daily/how-to-play.html" class="how-to-play-btn">How to play</a>
         </div>
 
     </div>
