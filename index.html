@@ -1,9 +1,906 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Test</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>BrainPlay Daily | Real vs AI Game</title>
+
+    <!-- Open Graph / Social Media Sharing -->
+    <meta property="og:title" content="BrainPlay Daily – Real vs AI Game">
+    <meta property="og:description" content="Can you beat this AI test? Test your skills and share your score!">
+    <meta property="og:image" content="https://raw.githubusercontent.com/brainplayjoy/brainplay-daily/main/brainplaydaily-poster-square.webp">
+    <meta property="og:url" content="https://brainplayjoy.github.io/brainplay-daily/">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <link rel="manifest" href="data:application/json,{
+        %22name%22: %22Brainplay Daily%22,
+        %22short_name%22: %22Brainplay%22,
+        %22description%22: %22Real vs AI image game%22,
+        %22start_url%22: %22.%22,
+        %22display%22: %22standalone%22,
+        %22background_color%22: %22#050510%22,
+        %22theme_color%22: %22#050510%22,
+        %22icons%22: [{
+            %22src%22: %22data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🧠%3C/text%3E%3C/svg%3E%22,
+            %22sizes%22: %22any%22,
+            %22type%22: %22image/svg+xml%22
+        }]
+    }" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Anton&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #050510;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 520px;
+            width: 100%;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 18px;
+            border-radius: 22px;
+            background: #0c0c18;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .logo {
+            display: flex;
+            gap: 10px;
+            font-weight: 900;
+        }
+
+        .logo-text {
+            background: linear-gradient(90deg, #e879f9, #9333ea);
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .header-logo-img {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+        }
+
+        .pill {
+            padding: 8px 12px;
+            border-radius: 12px;
+            background: #121226;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-block;
+            margin-left: 6px;
+        }
+
+        /* TITLE */
+        .title {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .title h1 {
+            font-family: 'Anton', sans-serif;
+            font-size: 42px;
+            letter-spacing: 2px;
+        }
+
+        .real {
+            color: #fff;
+            text-shadow: 0 0 12px cyan;
+        }
+
+        .ai {
+            color: #ff3b3b;
+            text-shadow: 0 0 12px red;
+        }
+
+        .subtitle {
+            color: #9ca3af;
+        }
+
+        .can-you-beat {
+            color: #ffffff;
+        }
+
+        .ai-test {
+            color: #facc15;
+        }
+
+        /* STAT */
+        .stat {
+            margin: 20px auto;
+            padding: 12px;
+            border-radius: 30px;
+            text-align: center;
+            background: #121226;
+        }
+
+        .highlight {
+            color: #facc15;
+            font-weight: 800;
+        }
+
+        /* IMAGE BOX */
+        .image-box {
+            border-radius: 24px;
+            overflow: hidden;
+            margin-top: 20px;
+            position: relative;
+            min-height: 320px;
+            background: #000000;
+        }
+
+        .image-box img {
+            width: 100%;
+            height: 310px;
+            object-fit: cover;
+            display: block;
+            border-radius: 24px;
+        }
+
+        @media (max-width: 600px) {
+            .image-box img {
+                height: 260px;
+            }
+            .image-box {
+                min-height: 260px;
+            }
+        }
+
+        /* SCORE CARD OVERLAY */
+        .image-box .score-card-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, rgba(15, 16, 32, 0.95) 0%, rgba(5, 5, 16, 0.98) 100%);
+            backdrop-filter: blur(5px);
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+            z-index: 10;
+        }
+
+        .score-card-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        .score-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .score-emoji {
+            font-size: 28px;
+        }
+
+        .score-value {
+            font-family: 'Anton', sans-serif;
+            font-size: 30px;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #fde047, #f59e0b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0px 4px 20px rgba(245, 158, 11, 0.2);
+            line-height: 1;
+        }
+
+        .start-new-btn {
+            background: #FDDA0D;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            color: #000000;
+            font-weight: 800;
+            font-size: 15px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .start-new-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
+        }
+
+        .start-new-btn:active {
+            transform: scale(0.97);
+        }
+
+        .challenge-text {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+            margin: 5px 0 10px 0;
+            width: 90%;
+        }
+
+        .final-whatsapp-btn {
+            background: #16a34a;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(22, 163, 74, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .final-whatsapp-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(22, 163, 74, 0.3);
+        }
+
+        .final-overlay {
+            display: none;
+        }
+
+        /* IMAGE FOOTER */
+        .image-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding: 0 4px;
+            gap: 8px;
+        }
+
+        .counter {
+            font-weight: 700;
+            font-size: 15px;
+            color: #d1d5db;
+            white-space: nowrap;
+        }
+
+        .question-inline {
+            flex: 1;
+            text-align: center;
+            font-weight: 700;
+            font-size: 15px;
+            color: #fff;
+            white-space: nowrap;
+        }
+
+        .next-btn {
+            background: none;
+            border: none;
+            color: #facc15;
+            font-weight: 800;
+            font-size: 15px;
+            cursor: pointer;
+            display: none;
+            white-space: nowrap;
+            padding: 0;
+        }
+
+        .next-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* BUTTONS */
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px;
+            border-radius: 18px;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+            color: #fff;
+            transition: opacity 0.2s;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .btn-real {
+            background: linear-gradient(#16a34a, #065f46);
+        }
+
+        .btn-ai {
+            background: linear-gradient(#ef4444, #7f1d1d);
+        }
+
+        .btn small {
+            display: block;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        /* RESULT CARD */
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 20px;
+            background: #121226;
+            display: none;
+        }
+
+        .result-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .correct {
+            background: #22c55e;
+            box-shadow: 0 0 20px #22c55e;
+        }
+
+        .wrong {
+            background: #ef4444;
+            box-shadow: 0 0 20px #ef4444;
+        }
+
+        .desc-text {
+            margin-top: 12px;
+            color: #ffffff;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        .desc-text .real-word {
+            color: #22c55e;
+            font-weight: 700;
+        }
+
+        .desc-text .ai-word {
+            color: #ef4444;
+            font-weight: 700;
+        }
+
+        /* SHARE SECTION */
+        .share {
+            margin-top: 20px;
+        }
+
+        .share-title {
+            text-align: center;
+            color: #9ca3af;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+        }
+
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .share-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .copy {
+            background: #1f2937;
+            color: #fff;
+        }
+
+        .whatsapp {
+            background: #25D366;
+            color: #000;
+        }
+
+        .facebook {
+            background: #1877F2;
+            color: #fff;
+        }
+
+        /* FOOTER */
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #fff;
+            font-size: 13px;
+        }
+
+        .install-arrow {
+            color: #facc15;
+            font-size: 20px;
+            vertical-align: middle;
+            cursor: pointer;
+            margin-left: 6px;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+
+        .install-arrow:hover {
+            transform: scale(1.3);
+        }
+
+        /* HOW TO PLAY BUTTON */
+        .how-to-play-btn {
+            display: inline-block;
+            margin-top: 14px;
+            padding: 10px 24px;
+            border: 2px solid #facc15;
+            border-radius: 12px;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 18px;
+            text-decoration: none;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .how-to-play-btn:hover {
+            background: rgba(250, 204, 21, 0.1);
+            transform: translateY(-2px);
+        }
+    </style>
 </head>
-<body style="background:black; color:white; text-align:center; margin-top:100px;">
-  <h1>NEW SITE WORKING ✅</h1>
+
+<body>
+
+    <div class="container">
+
+        <div class="header">
+            <div class="logo">
+                <img class="header-logo-img" src="brainplay-logo.webp" alt="BrainPlay Logo">
+                <span class="logo-text">BRAINPLAY DAILY</span>
+            </div>
+            <div>
+                <span class="pill">🔥 7</span>
+                <span class="pill">#12</span>
+            </div>
+        </div>
+
+        <div class="title">
+            <h1><span class="real">REAL</span> vs <span class="ai">AI</span></h1>
+            <div class="subtitle"><span class="can-you-beat">👉 Can you beat this </span><span class="ai-test">AI test</span><span class="can-you-beat">?</span></div>
+        </div>
+
+        <div class="stat">
+            🧩 Only <span class="highlight" id="percent">38%</span> players got this right today!
+        </div>
+
+        <div class="image-box" id="imageBox">
+            <img id="img" alt="Challenge Image">
+            
+            <div class="score-card-overlay" id="scoreCardOverlay" style="display: none;">
+                
+                <div class="score-card-title">🏅 SCORE CARD</div>
+                
+                <div class="score-row">
+                    <span class="score-emoji" id="scoreEmoji">🤯</span>
+                    <span class="score-value" id="finalScoreValue">Brilliant (5/5)</span>
+                </div>
+                
+                <button class="start-new-btn" id="startNewFinalBtn">
+                    <span>↻</span> Play Again
+                </button>
+                
+                <div class="challenge-text">🤔 Can your friends beat your score?</div>
+                
+                <button class="final-whatsapp-btn" id="finalWhatsappBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+                        <path d="M12.031 0C5.405 0 0 5.405 0 12.031c0 2.115.548 4.184 1.59 6.007L.425 23.57l5.658-1.485c1.761.97 3.754 1.481 5.811 1.481 6.626 0 12.03-5.405 12.03-12.03C23.924 5.405 18.519 0 12.031 0zM17.432 16.3c-.23.649-1.332 1.258-1.848 1.344-.516.086-1.168.172-3.411-.758-2.696-1.121-4.428-3.878-4.561-4.054-.133-.176-1.091-1.455-1.091-2.775 0-1.32.684-1.968.932-2.227.248-.259.54-.324.717-.324.177 0 .354 0 .506.008.163.009.38-.063.593.454.221.537.751 1.838.818 1.968.067.13.111.282.022.455-.089.173-.133.282-.266.434-.133.152-.28.324-.398.455-.133.152-.283.315-.12.593.163.278.723 1.196 1.558 1.944 1.077.967 1.977 1.267 2.254 1.4.277.133.443.111.61-.067.167-.178.718-.839.907-1.127.189-.288.378-.24.633-.152.255.088 1.618.764 1.895.902.277.138.461.208.528.324.067.116.067.668-.163 1.317z"/>
+                    </svg>
+                    Share Score
+                </button>
+            </div>
+            
+            <div class="final-overlay" id="finalOverlay"></div>
+        </div>
+
+        <div class="image-footer" id="imageFooter">
+            <span class="counter" id="counter">1/5</span>
+            <span class="question-inline">🤔 Is this image Real or AI?</span>
+            <button class="next-btn" id="nextBtn" onclick="next()">>> NEXT</button>
+        </div>
+
+        <div class="buttons" id="buttons">
+            <button class="btn btn-real" id="btnReal" onclick="answer('real')">
+                REAL <small>Looks authentic?</small>
+            </button>
+            <button class="btn btn-ai" id="btnAi" onclick="answer('ai')">
+                AI <small>Looks generated?</small>
+            </button>
+        </div>
+
+        <div class="result" id="result">
+            <div class="result-row">
+                <div id="circle" class="circle">✔</div>
+                <h3 id="title"></h3>
+            </div>
+            <p id="desc" class="desc-text"></p>
+        </div>
+
+        <div class="share">
+            <div class="share-title">
+                <svg width="16" fill="#9ca3af" viewBox="0 0 24 24">
+                    <path d="M18 8a3 3 0 10-2.83-4H15a3 3 0 003 3zM6 14a3 3 0 10-2.83-4H3a3 3 0 003 3zm12 6a3 3 0 10-2.83-4H15a3 3 0 003 3zM8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98" />
+                </svg>
+                Share this AI game with your friends!
+            </div>
+
+            <div class="share-buttons">
+                <button class="share-btn copy" onclick="copyLink()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                    Copy Link
+                </button>
+                <button class="share-btn facebook" onclick="shareFB()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    Facebook
+                </button>
+                <button class="share-btn whatsapp" onclick="shareWA()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    WhatsApp
+                </button>
+            </div>
+        </div>
+
+        <div class="footer">
+            🧠 Play directly on mobile without install App <span id="installArrow" class="install-arrow" title="Tap to install this game on your home screen">▼</span>
+            <br>
+            <a href="https://brainplayjoy.github.io/brainplay-daily/how-to-play.html" class="how-to-play-btn">How to play</a>
+        </div>
+
+    </div>
+
+    <script>
+        // ──────────────────────────────────
+        //  HIGH-QUALITY BELL & BUZZ SOUNDS
+        // ──────────────────────────────────
+        function playCorrectSound() {
+            try {
+                const ctx = new(window.AudioContext || window.webkitAudioContext)();
+                const now = ctx.currentTime;
+
+                const osc1 = ctx.createOscillator();
+                const gain1 = ctx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.value = 1175;
+                gain1.gain.setValueAtTime(0.4, now);
+                gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+                osc1.connect(gain1).connect(ctx.destination);
+                osc1.start(now);
+                osc1.stop(now + 0.35);
+
+                const osc2 = ctx.createOscillator();
+                const gain2 = ctx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.value = 1480;
+                gain2.gain.setValueAtTime(0.25, now + 0.05);
+                gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
+                osc2.connect(gain2).connect(ctx.destination);
+                osc2.start(now + 0.05);
+                osc2.stop(now + 0.4);
+
+                const osc3 = ctx.createOscillator();
+                const gain3 = ctx.createGain();
+                osc3.type = 'sine';
+                osc3.frequency.value = 2349;
+                gain3.gain.setValueAtTime(0.15, now + 0.1);
+                gain3.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
+                osc3.connect(gain3).connect(ctx.destination);
+                osc3.start(now + 0.1);
+                osc3.stop(now + 0.3);
+            } catch (e) {}
+        }
+
+        function playWrongSound() {
+            try {
+                const ctx = new(window.AudioContext || window.webkitAudioContext)();
+                const now = ctx.currentTime;
+
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'square';
+                osc.frequency.value = 220;
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.linearRampToValueAtTime(0.0001, now + 0.12);
+                osc.connect(gain).connect(ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.12);
+
+                const osc2 = ctx.createOscillator();
+                const gain2 = ctx.createGain();
+                osc2.type = 'square';
+                osc2.frequency.value = 200;
+                gain2.gain.setValueAtTime(0.25, now + 0.15);
+                gain2.gain.linearRampToValueAtTime(0.0001, now + 0.28);
+                osc2.connect(gain2).connect(ctx.destination);
+                osc2.start(now + 0.15);
+                osc2.stop(now + 0.28);
+            } catch (e) {}
+        }
+
+        // ──────────────────────────────────
+        //  GAME LOGIC
+        // ──────────────────────────────────
+        let index = 0;
+        let score = 0;
+        let isReal;
+        let answered = false;
+
+        const btnReal = document.getElementById('btnReal');
+        const btnAi = document.getElementById('btnAi');
+        const nextBtn = document.getElementById('nextBtn');
+        const counterEl = document.getElementById('counter');
+        const imageFooter = document.getElementById('imageFooter');
+        const resultCard = document.getElementById('result');
+        const imgElement = document.getElementById('img');
+        const scoreCardOverlay = document.getElementById('scoreCardOverlay');
+
+        function disableButtons() {
+            answered = true;
+            btnReal.disabled = true;
+            btnAi.disabled = true;
+        }
+
+        function enableButtons() {
+            answered = false;
+            btnReal.disabled = false;
+            btnAi.disabled = false;
+        }
+
+        function getRandomImage() {
+            return "https://picsum.photos/800/600?random=" + Math.random();
+        }
+
+        function load() {
+            imgElement.src = getRandomImage();
+            imgElement.style.display = "block";
+            scoreCardOverlay.style.display = "none";
+            isReal = Math.random() > 0.5;
+            resultCard.style.display = "none";
+            counterEl.innerText = (index + 1) + "/5";
+            nextBtn.style.display = "none";
+            enableButtons();
+        }
+
+        function answer(choice) {
+            if (answered) return;
+            disableButtons();
+
+            let correct = (choice === "real" && isReal) || (choice === "ai" && !isReal);
+
+            let circle = document.getElementById("circle");
+            let titleElement = document.getElementById("title");
+            let desc = document.getElementById("desc");
+
+            function highlightKeywords(text) {
+                return text
+                    .replace(/\bREAL\b/g, '<span class="real-word">REAL</span>')
+                    .replace(/\bAI\b/g, '<span class="ai-word">AI</span>')
+                    .replace(/\bAI-generated\b/gi, '<span class="ai-word">AI-generated</span>');
+            }
+
+            if (correct) {
+                playCorrectSound();
+                score++;
+                circle.className = "circle correct";
+                circle.innerHTML = "✔";
+                titleElement.innerHTML = "CORRECT";
+                if (isReal) {
+                    desc.innerHTML = highlightKeywords("Good catch! This image is REAL.");
+                } else {
+                    desc.innerHTML = highlightKeywords("Good catch! This image is AI generated.");
+                }
+            } else {
+                playWrongSound();
+                circle.className = "circle wrong";
+                circle.innerHTML = "✖";
+                titleElement.innerHTML = "WRONG";
+                if (isReal) {
+                    desc.innerHTML = highlightKeywords("This image is REAL. The lighting, textures and details match natural patterns.");
+                } else {
+                    desc.innerHTML = highlightKeywords("This image is AI-generated. Look for unnatural textures and repeating patterns.");
+                }
+            }
+
+            resultCard.style.display = "block";
+            nextBtn.style.display = "inline-block";
+        }
+
+        // Updated function to return both label and dynamic emoji
+        function getScoreData(scoreValue) {
+            if (scoreValue === 5) return { label: "Brilliant", emoji: "🤯" };
+            if (scoreValue === 4) return { label: "Excellent", emoji: "🔥" };
+            if (scoreValue === 3) return { label: "Good", emoji: "👍" };
+            if (scoreValue === 2) return { label: "Average", emoji: "😐" };
+            if (scoreValue === 1) return { label: "Poor", emoji: "😬" };
+            return { label: "Very Bad", emoji: "😭" };
+        }
+
+        function next() {
+            index++;
+            if (index >= 5) {
+                // Game complete - Show SCORE CARD
+                imgElement.style.display = "none";
+                
+                // Set the specific emoji and text based on score
+                const scoreData = getScoreData(score);
+                document.getElementById('scoreEmoji').innerText = scoreData.emoji;
+                document.getElementById('finalScoreValue').innerHTML = `${scoreData.label} (${score}/5)`;
+                
+                // Show score card overlay
+                scoreCardOverlay.style.display = "flex";
+                
+                // Hide the CORRECT/WRONG result card
+                resultCard.style.display = "none";
+                
+                // Disable real/ai buttons and hide NEXT button
+                btnReal.disabled = true;
+                btnAi.disabled = true;
+                nextBtn.style.display = "none";
+            } else {
+                load();
+            }
+        }
+
+        function restartGame() {
+            index = 0;
+            score = 0;
+            answered = false;
+            
+            scoreCardOverlay.style.display = "none";
+            imgElement.style.display = "block";
+            
+            resultCard.innerHTML = `
+                <div class="result-row">
+                    <div id="circle" class="circle">✔</div>
+                    <h3 id="title"></h3>
+                </div>
+                <p id="desc" class="desc-text"></p>
+            `;
+            resultCard.style.display = "none";
+            
+            enableButtons();
+            nextBtn.style.display = "none";
+            
+            load();
+        }
+
+        // Final Score Card Button Handlers
+        function startNewGame() {
+            restartGame();
+        }
+        
+        function shareOnWhatsApp() {
+            const scoreData = getScoreData(score);
+            const message = `🎮 BrainPlay Daily - Real vs AI Game!\n\nMy final score: ${scoreData.label} (${score}/5)\n\nWould you like to give challenge to your friend? Play here: ${location.href}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(message)}`);
+        }
+
+        document.getElementById('startNewFinalBtn').addEventListener('click', startNewGame);
+        document.getElementById('finalWhatsappBtn').addEventListener('click', shareOnWhatsApp);
+
+        // Copy & share functions
+        function copyLink() {
+            navigator.clipboard.writeText(location.href);
+            alert("Copied!");
+        }
+
+        function shareWA() {
+            window.open("https://wa.me/?text=Play this game: " + location.href);
+        }
+
+        function shareFB() {
+            window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(location.href));
+        }
+
+        // Random percentage stat
+        document.getElementById("percent").innerText = Math.floor(Math.random() * 50 + 30) + "%";
+
+        // PWA install logic
+        let deferredPrompt;
+        const installArrow = document.getElementById('installArrow');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+
+        installArrow.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`Install prompt outcome: ${outcome}`);
+                deferredPrompt = null;
+            } else {
+                alert(
+                    "To install this game on your home screen:\n\n" +
+                    "• iPhone/iPad: Tap the Share button and then 'Add to Home Screen'.\n" +
+                    "• Android: Open the browser menu and select 'Add to Home screen' or 'Install'."
+                );
+            }
+        });
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register(
+                    URL.createObjectURL(
+                        new Blob(
+                            [
+                                `self.addEventListener('install', e => { self.skipWaiting(); });
+                 self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
+                 self.addEventListener('fetch', e => { e.respondWith(fetch(e.request)); });`
+                            ], { type: 'application/javascript' }
+                        )
+                    )
+                ).catch((err) => console.log('SW registration failed:', err));
+            });
+        }
+
+        // Start the game
+        load();
+    </script>
+
 </body>
 </html>
