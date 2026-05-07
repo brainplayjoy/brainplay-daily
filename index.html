@@ -563,6 +563,12 @@
             background: rgba(250, 204, 21, 0.1);
             transform: translateY(-2px);
         }
+
+        /* score card install row */
+        .score-install-promo {
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 
@@ -622,6 +628,12 @@
                     </svg>
                     Share Score
                 </button>
+
+                <!-- New install row inside score card (below share score button) -->
+                <div class="score-install-promo" style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 15px; color: white; font-size: 13px; flex-wrap: wrap;">
+                    <span>🚀 Add BrainPlay AI to your phone • No <span style="color: #facc15;">App</span> needed</span>
+                    <button id="scoreCardSaveBtn" style="background: #dc2626; color: white; border: none; border-radius: 8px; padding: 4px 12px; font-weight: 600; cursor: pointer; font-size: 12px;">Save</button>
+                </div>
             </div>
             
             <div class="final-overlay" id="finalOverlay"></div>
@@ -674,8 +686,9 @@
             </div>
         </div>
 
+        <!-- FOOTER - updated with new message + SAVE button and arrow preserved -->
         <div class="footer">
-            🧠 Play directly on mobile without install App <span id="installArrow" class="install-arrow" title="Tap to install this game on your home screen">▼</span>
+           
             <br>
             <a href="https://brainplayjoy.github.io/brainplay-daily/how-to-play.html" class="how-to-play-btn">How to play</a>
         </div>
@@ -838,7 +851,6 @@
             nextBtn.style.display = "inline-block";
         }
 
-        // Updated function to return both label and dynamic emoji
         function getScoreData(scoreValue) {
             if (scoreValue === 5) return { label: "Brilliant", emoji: "🤯" };
             if (scoreValue === 4) return { label: "Excellent", emoji: "🔥" };
@@ -851,21 +863,12 @@
         function next() {
             index++;
             if (index >= 5) {
-                // Game complete - Show SCORE CARD
                 imgElement.style.display = "none";
-                
-                // Set the specific emoji and text based on score
                 const scoreData = getScoreData(score);
                 document.getElementById('scoreEmoji').innerText = scoreData.emoji;
                 document.getElementById('finalScoreValue').innerHTML = `${scoreData.label} (${score}/5)`;
-                
-                // Show score card overlay
                 scoreCardOverlay.style.display = "flex";
-                
-                // Hide the CORRECT/WRONG result card
                 resultCard.style.display = "none";
-                
-                // Disable real/ai buttons and hide NEXT button
                 btnReal.disabled = true;
                 btnAi.disabled = true;
                 nextBtn.style.display = "none";
@@ -878,10 +881,8 @@
             index = 0;
             score = 0;
             answered = false;
-            
             scoreCardOverlay.style.display = "none";
             imgElement.style.display = "block";
-            
             resultCard.innerHTML = `
                 <div class="result-row">
                     <div id="circle" class="circle">✔</div>
@@ -890,14 +891,11 @@
                 <p id="desc" class="desc-text"></p>
             `;
             resultCard.style.display = "none";
-            
             enableButtons();
             nextBtn.style.display = "none";
-            
             load();
         }
 
-        // Final Score Card Button Handlers
         function startNewGame() {
             restartGame();
         }
@@ -911,7 +909,6 @@
         document.getElementById('startNewFinalBtn').addEventListener('click', startNewGame);
         document.getElementById('finalWhatsappBtn').addEventListener('click', shareOnWhatsApp);
 
-        // Copy & share functions
         function copyLink() {
             navigator.clipboard.writeText(location.href);
             alert("Copied!");
@@ -925,10 +922,9 @@
             window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(location.href));
         }
 
-        // Random percentage stat
         document.getElementById("percent").innerText = Math.floor(Math.random() * 50 + 30) + "%";
 
-        // PWA install logic
+        // PWA install logic (shared for all save/arrow triggers)
         let deferredPrompt;
         const installArrow = document.getElementById('installArrow');
 
@@ -937,12 +933,13 @@
             deferredPrompt = e;
         });
 
-        installArrow.addEventListener('click', async () => {
+        function triggerInstall() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                console.log(`Install prompt outcome: ${outcome}`);
-                deferredPrompt = null;
+                deferredPrompt.userChoice.then(({ outcome }) => {
+                    console.log(`Install prompt outcome: ${outcome}`);
+                    deferredPrompt = null;
+                });
             } else {
                 alert(
                     "To install this game on your home screen:\n\n" +
@@ -950,7 +947,33 @@
                     "• Android: Open the browser menu and select 'Add to Home screen' or 'Install'."
                 );
             }
-        });
+        }
+
+        // attach install handler to original arrow
+        if (installArrow) {
+            installArrow.addEventListener('click', (e) => {
+                e.preventDefault();
+                triggerInstall();
+            });
+        }
+
+        // attach install to new footer Save button
+        const footerSaveBtn = document.getElementById('footerSaveBtn');
+        if (footerSaveBtn) {
+            footerSaveBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                triggerInstall();
+            });
+        }
+
+        // attach install to score card Save button
+        const scoreCardSaveBtn = document.getElementById('scoreCardSaveBtn');
+        if (scoreCardSaveBtn) {
+            scoreCardSaveBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                triggerInstall();
+            });
+        }
 
         // HAMBURGER MENU TOGGLE
         document.getElementById('hamburgerBtn').addEventListener('click', function(e) {
@@ -958,11 +981,10 @@
             document.getElementById('hamburgerMenu').classList.toggle('active');
         });
 
-        // Close hamburger menu when clicking outside
         document.addEventListener('click', function(e) {
             const menu = document.getElementById('hamburgerMenu');
             const btn = document.getElementById('hamburgerBtn');
-            if (!menu.contains(e.target) && e.target !== btn) {
+            if (menu && btn && !menu.contains(e.target) && e.target !== btn) {
                 menu.classList.remove('active');
             }
         });
@@ -983,7 +1005,6 @@
             });
         }
 
-        // Start the game
         load();
     </script>
 
