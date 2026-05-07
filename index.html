@@ -41,67 +41,64 @@
         }
 
         /* HEADER */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 12px;
-            border-radius: 15px;
-            background: #000;
-            border: 1px solid rgba(72, 72, 72, 72);
-            position: relative;
-        }
 
-        .header-left {
-            width: 40px; /* placeholder for balance */
-        }
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 15px;
+    background: #000;
+    border: 1px solid rgba(72, 72, 72, 72);
+    position: relative;
+}
 
-        .header-center {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 
-        .header-right {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
+.header-right {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
 
-        .header-logo-img {
-            width: 40px;
-            height: 40px;
-            object-fit: contain;
-        }
+.header-logo-img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
 
-        .brand-text {
-            display: flex;
-            align-items: baseline;
-            font-size: 20px;
-            font-weight: 900;
-            letter-spacing: 1px;
-        }
+.brand-text {
+    display: flex;
+    align-items: baseline;
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
 
-        .brainplay-text {
-            background: linear-gradient(90deg, #00ffff, #8A2BE2);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-weight: 900;
-        }
+.brainplay-text {
+    background: linear-gradient(90deg, #00ffff, #8A2BE2);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 900;
+}
 
-        .ai-text {
-            background: linear-gradient(90deg, #ff6ec4, #ff3b3b);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-weight: 900;
-            margin-left: 3px;
-        }
+.ai-text {
+    background: linear-gradient(90deg, #ff6ec4, #ff3b3b);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 900;
+    margin-left: 3px;
+}
 
-        /* Hamburger Button */
+
+
+                /* Hamburger Button */
         .hamburger-btn {
             background: none;
             border: none;
@@ -572,23 +569,22 @@
 
         <!-- UPDATED HEADER -->
         <div class="header">
-            <div class="header-left"></div>
-            <div class="header-center">
-                <img class="header-logo-img" src="brainplay-logo.webp" alt="BrainPlay Logo">
-                <div class="brand-text">
-                    <span class="brainplay-text">BRAINPLAY</span>
-                    <span class="ai-text">AI</span>
-                </div>
-            </div>
-            <div class="header-right">
-                <button class="hamburger-btn" id="hamburgerBtn">☰</button>
-                <div class="hamburger-menu" id="hamburgerMenu">
-                    <a href="index.html">Home</a>
-                    <a href="https://brainplayjoy.github.io/brainplay-daily/how-to-play.html">How to play</a>
-                    <a href="mailto:youremail@example.com">Contact</a>
-                </div>
-            </div>
+    <div class="header-left">
+        <img class="header-logo-img" src="brainplay-logo.webp" alt="BrainPlay Logo">
+        <div class="brand-text">
+            <span class="brainplay-text">BRAINPLAY</span>
+            <span class="ai-text">AI</span>
         </div>
+    </div>
+    <div class="header-right">
+        <button class="hamburger-btn" id="hamburgerBtn">☰</button>
+        <div class="hamburger-menu" id="hamburgerMenu">
+            <a href="index.html">Home</a>
+            <a href="https://brainplayjoy.github.io/brainplay-daily/how-to-play.html">How to play</a>
+            <a href="mailto:youremail@example.com">Contact</a>
+        </div>
+    </div>
+</div>
 
         <div class="title">
             <h1><span class="real">REAL</span> vs <span class="ai">AI</span></h1>
