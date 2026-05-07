@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Contact Us | BrainPlay AI - Real vs AI Game</title>
+
+  <!-- SEO -->
+  <meta name="description" content="Get in touch with BrainPlay AI. Have questions about the Real vs AI game, partnership inquiries, or feedback? Contact our team via email or form.">
+  <meta name="keywords" content="contact brainplay ai, support, game feedback, real vs ai game, brainplay contact, ai game help">
+  <meta name="author" content="BrainPlay AI">
+
+  <!-- Open Graph for social sharing -->
+  <meta property="og:title" content="Contact BrainPlay AI | Support & Inquiries">
+  <meta property="og:description" content="Questions about the Real vs AI game? Reach out to us. We'd love to hear from you!">
+  <meta property="og:image" content="https://brainplayai.in/brainplay-logo.webp">
+  <meta property="og:url" content="https://brainplayai.in/contact.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0b0f1a;
+      color: #ffffff;
+      line-height: 1.7;
+      padding: 30px 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      background: rgba(18, 25, 45, 0.7);
+      border-radius: 28px;
+      padding: 40px 35px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(0, 255, 213, 0.2);
+    }
+
+    .logo-area {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .logo-img {
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
+      border-radius: 18px;
+    }
+
+    h1 {
+      color: #00ffff;
+      font-size: 36px;
+      margin-bottom: 10px;
+      text-align: center;
+      letter-spacing: -0.5px;
+    }
+
+    .subhead {
+      text-align: center;
+      color: #9ca3af;
+      margin-bottom: 35px;
+      font-size: 16px;
+      border-bottom: 1px solid #2a3a5a;
+      padding-bottom: 18px;
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 35px;
+      margin-bottom: 40px;
+    }
+
+    /* Left side - Info Cards */
+    .info-card {
+      background: #0f1422;
+      border-radius: 20px;
+      padding: 22px;
+      margin-bottom: 20px;
+      border: 1px solid #2a3a5a;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .info-card:hover {
+      border-color: #00ffff;
+      transform: translateY(-3px);
+    }
+
+    .info-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    .info-card h3 {
+      color: #ffd700;
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+
+    .info-card p {
+      color: #e0e0e0;
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
+
+    .info-card a {
+      color: #00ffff;
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    .info-card a:hover {
+      text-decoration: underline;
+      color: #ffd700;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 15px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .social-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #1a1f2e;
+      padding: 8px 16px;
+      border-radius: 40px;
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .social-link:hover {
+      background: #00ffff;
+      color: #0b0f1a;
+      transform: translateY(-2px);
+    }
+
+    /* Right side - Form */
+    .form-card {
+      background: #0f1422;
+      border-radius: 20px;
+      padding: 28px;
+      border: 1px solid #2a3a5a;
+    }
+
+    .form-card h3 {
+      color: #ffd700;
+      font-size: 22px;
+      margin-bottom: 20px;
+      border-left: 3px solid #00ffff;
+      padding-left: 15px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #d1d5db;
+      font-size: 14px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 15px;
+      background: #1a1f2e;
+      border: 1px solid #2a3a5a;
+      border-radius: 12px;
+      color: #ffffff;
+      font-size: 15px;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #00ffff;
+      box-shadow: 0 0 0 2px rgba(0, 255, 255, 0.2);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 110px;
+    }
+
+    .submit-btn {
+      background: linear-gradient(135deg, #00ffff, #8A2BE2);
+      color: #000;
+      font-weight: 800;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 40px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(0, 255, 255, 0.3);
+    }
+
+    .form-note {
+      font-size: 12px;
+      color: #9ca3af;
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    /* FAQ Section */
+    .faq-section {
+      margin-top: 40px;
+      border-top: 1px solid #2a3a5a;
+      padding-top: 30px;
+    }
+
+    .faq-section h2 {
+      color: #ffd700;
+      font-size: 24px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .faq-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .faq-item {
+      background: #0f1422;
+      padding: 18px;
+      border-radius: 16px;
+      border: 1px solid #2a3a5a;
+    }
+
+    .faq-question {
+      color: #00ffff;
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    .faq-answer {
+      color: #cbd5e1;
+      font-size: 14px;
+    }
+
+    .footer-links {
+      text-align: center;
+      margin-top: 45px;
+      padding-top: 20px;
+      border-top: 1px solid #2a3a5a;
+      font-size: 14px;
+    }
+
+    .footer-links a {
+      margin: 0 12px;
+      color: #aaa;
+      text-decoration: none;
+    }
+
+    .footer-links a:hover {
+      color: #00ffff;
+    }
+
+    .alert-message {
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: none;
+      font-size: 14px;
+    }
+
+    .alert-success {
+      background: rgba(34, 197, 94, 0.2);
+      border: 1px solid #22c55e;
+      color: #22c55e;
+    }
+
+    .alert-error {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid #ef4444;
+      color: #ef4444;
+    }
+
+    @media (max-width: 750px) {
+      .container {
+        padding: 25px 18px;
+      }
+      .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 25px;
+      }
+      h1 {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="logo-area">
+    <img class="logo-img" src="https://brainplayai.in/brainplay-logo.webp" alt="BrainPlay AI Logo" onerror="this.src='brainplay-logo.webp'">
+  </div>
+
+  <h1>Contact Us</h1>
+  <div class="subhead">📬 We’d love to hear from you — questions, feedback, or partnership ideas</div>
+
+  <div class="contact-grid">
+    <!-- LEFT COLUMN: Contact Info -->
+    <div>
+      <div class="info-card">
+        <div class="info-icon">📧</div>
+        <h3>Email Us</h3>
+        <p>For general inquiries, feedback, or support:</p>
+        <p><a href="mailto:brainplayaigame@gmail.com"><strong>brainplayaigame@gmail.com</strong></a></p>
+        <p style="font-size: 13px; color: #9ca3af;">We typically reply within 24-48 hours.</p>
+      </div>
+
+      <div class="info-card">
+        <div class="info-icon">🌐</div>
+        <h3>Website</h3>
+        <p><a href="https://brainplayai.in">https://brainplayai.in</a></p>
+        <p style="font-size: 13px; color: #9ca3af;">Play Real vs AI game instantly — no download required.</p>
+      </div>
+
+      <div class="info-card">
+        <div class="info-icon">📍</div>
+        <h3>Location</h3>
+        <p>India (Online Service)</p>
+        <p style="font-size: 13px; color: #9ca3af;">We operate remotely and serve players worldwide.</p>
+      </div>
+
+      <div class="info-card">
+        <div class="info-icon">🤝</div>
+        <h3>Partnerships & Press</h3>
+        <p>For collaboration, advertising, or media inquiries:</p>
+        <p><a href="mailto:brainplayaigame@gmail.com">brainplayaigame@gmail.com</a></p>
+      </div>
+
+      <div class="info-card">
+        <div class="info-icon">📱</div>
+        <h3>Follow & Share</h3>
+        <div class="social-links">
+          <a href="https://wa.me/?text=Check%20out%20BrainPlay%20AI%20-%20Real%20vs%20AI%20Game%3A%20https%3A%2F%2Fbrainplayai.in" target="_blank" class="social-link">
+            💬 WhatsApp
+          </a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u=https://brainplayai.in" target="_blank" class="social-link">
+            📘 Facebook
+          </a>
+          <a href="mailto:?subject=BrainPlay%20AI%20Game&body=Try%20this%20fun%20game%3A%20https%3A%2F%2Fbrainplayai.in" class="social-link">
+            📧 Share
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: Contact Form -->
+    <div class="form-card">
+      <h3>✉️ Send us a message</h3>
+
+      <div id="formAlert" class="alert-message"></div>
+
+      <form id="contactForm">
+        <div class="form-group">
+          <label for="name">Full Name *</label>
+          <input type="text" id="name" name="name" required placeholder="Your name">
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address *</label>
+          <input type="email" id="email" name="email" required placeholder="you@example.com">
+        </div>
+
+        <div class="form-group">
+          <label for="subject">Subject *</label>
+          <select id="subject" name="subject" required>
+            <option value="">-- Select an option --</option>
+            <option value="Game Feedback">🎮 Game Feedback</option>
+            <option value="Bug Report">🐛 Bug Report</option>
+            <option value="Feature Suggestion">💡 Feature Suggestion</option>
+            <option value="Partnership">🤝 Partnership / Business</option>
+            <option value="AdSense Inquiry">📢 AdSense Inquiry</option>
+            <option value="Other">📝 Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="message">Message *</label>
+          <textarea id="message" name="message" required placeholder="Tell us more..."></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn">Send Message →</button>
+        <div class="form-note">🔒 Your information is private. We don't share data with third parties.</div>
+      </form>
+    </div>
+  </div>
+
+  <!-- FAQ SECTION -->
+  <div class="faq-section">
+    <h2>❓ Frequently Asked Questions</h2>
+    <div class="faq-grid">
+      <div class="faq-item">
+        <div class="faq-question">How do I play the Real vs AI game?</div>
+        <div class="faq-answer">Simply visit our homepage, look at each image, and tap REAL or AI. After 5 rounds, you'll get your final score. It's that easy!</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">Is the game free?</div>
+        <div class="faq-answer">Yes! BrainPlay AI is completely free to play. No hidden charges, no subscriptions — just fun brain training.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">Do I need to download an app?</div>
+        <div class="faq-answer">No app required. The game runs directly in your mobile or desktop browser. You can also save it to your home screen for quick access.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">Why do I see ads?</div>
+        <div class="faq-answer">We use Google AdSense to keep the game free for everyone. The ads help cover hosting and development costs. We never show intrusive pop-ups.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">Can I share my score?</div>
+        <div class="faq-answer">Absolutely! After completing the game, you'll see Share buttons for WhatsApp, Facebook, and copy link. Challenge your friends!</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">How accurate is the AI vs Real classification?</div>
+        <div class="faq-answer">The game is designed for entertainment and awareness. While we strive for realistic challenges, it's not a scientific tool.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-links">
+    <a href="https://brainplayai.in/">🏠 Home</a> |
+    <a href="https://brainplayai.in/play-now.html">🎮 Play Now</a> |
+    <a href="https://brainplayai.in/how-to-play.html">📖 How to Play</a> |
+    <a href="https://brainplayai.in/disclaimer.html">⚖️ Disclaimer</a> |
+    <a href="https://brainplayai.in/privacy-policy.html">🔒 Privacy Policy</a> |
+    <a href="https://brainplayai.in/terms-and-conditions.html">📜 Terms & Conditions</a> |
+    <a href="https://brainplayai.in/contact.html">📬 Contact</a>
+  </div>
+
+  <p style="text-align: center; margin-top: 25px; font-size: 13px; color: #6c7a8e;">&copy; 2026 BrainPlay AI — Real vs AI Game. All rights reserved.</p>
+
+</div>
+
+<script>
+  // Simple client-side form handling with mailto fallback
+  const contactForm = document.getElementById('contactForm');
+  const alertDiv = document.getElementById('formAlert');
+
+  contactForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    // Get form values
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const subject = document.getElementById('subject').value;
+    const message = document.getElementById('message').value.trim();
+
+    // Validation
+    if (!name || !email || !subject || !message) {
+      showAlert('Please fill in all required fields.', 'error');
+      return;
+    }
+
+    if (!email.includes('@') || !email.includes('.')) {
+      showAlert('Please enter a valid email address.', 'error');
+      return;
+    }
+
+    // Prepare email body
+    const fullSubject = `[BrainPlay AI] ${subject} from ${name}`;
+    const body = `Name: ${name}%0AEmail: ${email}%0ASubject: ${subject}%0A%0AMessage:%0A${message}%0A%0A---%0ASent via BrainPlay AI Contact Form`;
+
+    // Open mail client with prefilled details
+    window.location.href = `mailto:brainplayaigame@gmail.com?subject=${encodeURIComponent(fullSubject)}&body=${body}`;
+
+    // Show success message and reset form
+    showAlert('✓ Thank you! Your email client has opened. Please send the message to complete.', 'success');
+    contactForm.reset();
+
+    // Clear alert after 5 seconds
+    setTimeout(() => {
+      alertDiv.style.display = 'none';
+    }, 6000);
+  });
+
+  function showAlert(message, type) {
+    alertDiv.textContent = message;
+    alertDiv.className = `alert-message alert-${type}`;
+    alertDiv.style.display = 'block';
+    alertDiv.style.marginBottom = '20px';
+
+    // Auto-scroll to alert
+    alertDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+</script>
+
+</body>
+</html>
