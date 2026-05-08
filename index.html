@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>BrainPlay AI | Real vs AI Game</title>
 
-    <!-- Open Graph / Social Media Sharing -->
+    <!-- Open Graph / Social Media Sharing (updated for 1:1 preview + caption) -->
     <meta property="og:title" content="BrainPlay AI – Real vs AI Game">
     <meta property="og:description" content="Can you beat this AI test? Test your skills and share your score!">
     <meta property="og:image" content="https://raw.githubusercontent.com/brainplayjoy/brainplay-daily/main/brainplayai-square.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="1200">
     <meta property="og:url" content="https://brainplayjoy.github.io/brainplay-daily/">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="en_US">
@@ -952,8 +954,10 @@
             window.open("https://wa.me/?text=Play this game: " + location.href);
         }
 
+        // ✅ UPDATED: Facebook share now includes a caption (quote) for the shared post
         function shareFB() {
-            window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(location.href));
+            const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}&quote=${encodeURIComponent('🧠 Can you beat this AI test? Test your brain now!')}`;
+            window.open(fbUrl);
         }
 
         document.getElementById("percent").innerText = Math.floor(Math.random() * 50 + 30) + "%";
