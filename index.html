@@ -569,6 +569,31 @@
             margin-top: 15px;
             margin-bottom: 10px;
         }
+
+        /* Simple Play Now Button Style for How to Play page - Small size, no gradient */
+        .simple-playnow-btn {
+            display: inline-block;
+            background: #facc15;
+            color: #000000;
+            text-decoration: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 10px;
+        }
+
+        .simple-playnow-btn:hover {
+            background: #e5b800;
+            transform: translateY(-1px);
+        }
+
+        .simple-playnow-btn:active {
+            transform: translateY(1px);
+        }
     </style>
 </head>
 
@@ -592,7 +617,7 @@
     <a href="https://brainplayai.in/how-to-play.html">How to Play</a>
     <a href="https://brainplayai.in/disclaimer.html">Disclaimer</a>
     <a href="https://brainplayai.in/privacy-policy.html">Privacy Policy</a>
-    <a href="mailto:your@email.com">Contact</a>
+    <a href="mailto:brainplayaigame@gmail.com">Contact</a>
 </div>
     </div>
 </div>
@@ -688,11 +713,17 @@
             </div>
         </div>
 
-        <!-- FOOTER - updated with new message + SAVE button and arrow preserved -->
+        <!-- FOOTER - Removed Play Now button, only How to Play remains -->
         <div class="footer">
-           
             <br>
-          <a href="https://brainplayai.in/how-to-play.html" class="how-to-play-btn">How to play</a>
+            <a href="https://brainplayai.in/how-to-play.html" class="how-to-play-btn">How to play</a>
+        </div>
+
+        <!-- Simple Play Now Button for How to Play page - This will only appear on the How to Play page -->
+        <!-- If you want this button on the main game page, move it outside the footer. 
+             For How to Play page specifically, this button style is small, simple, no gradient -->
+        <div style="text-align: center; margin-top: 20px; display: none;" id="playNowContainer">
+            <a href="https://brainplayai.in/play-now.html" class="simple-playnow-btn">▶ Play Now</a>
         </div>
 
     </div>
@@ -1008,6 +1039,15 @@
         }
 
         load();
+
+        // Check if this is the How to Play page and show the simple Play Now button
+        // This will automatically work on how-to-play.html
+        if (window.location.pathname.includes('how-to-play.html')) {
+            const playNowContainer = document.getElementById('playNowContainer');
+            if (playNowContainer) {
+                playNowContainer.style.display = 'block';
+            }
+        }
     </script>
 
 </body>
