@@ -1,0 +1,474 @@
+# leaderboard.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BrainPlay AI | Leaderboard</title>
+
+<link rel="icon" type="image/png" href="favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Inter',sans-serif;
+}
+
+body{
+background:#050510;
+color:#fff;
+padding:18px;
+display:flex;
+justify-content:center;
+}
+
+.container{
+width:100%;
+max-width:520px;
+}
+
+.header{
+background:rgba(20,20,35,0.9);
+border:1px solid rgba(255,255,255,0.08);
+border-radius:20px;
+padding:18px;
+backdrop-filter:blur(10px);
+margin-bottom:18px;
+}
+
+.title{
+font-size:28px;
+font-weight:900;
+text-align:center;
+letter-spacing:1px;
+margin-bottom:16px;
+}
+
+.tabs{
+display:flex;
+gap:10px;
+margin-top:10px;
+}
+
+.tab-btn{
+flex:1;
+background:#111827;
+color:#9ca3af;
+border:none;
+padding:12px;
+border-radius:12px;
+font-weight:700;
+cursor:pointer;
+transition:0.2s;
+}
+
+.tab-btn.active{
+background:#facc15;
+color:#000;
+}
+
+.search-box{
+margin-top:18px;
+position:relative;
+}
+
+.search-box input{
+width:100%;
+padding:14px 16px;
+border:none;
+border-radius:14px;
+background:#111827;
+color:#fff;
+font-size:14px;
+outline:none;
+}
+
+.search-results{
+margin-top:12px;
+background:#111827;
+border-radius:14px;
+padding:12px;
+display:none;
+}
+
+.rank-card{
+background:linear-gradient(145deg,#16162b,#0b0b15);
+border:1px solid rgba(250,204,21,0.2);
+border-radius:20px;
+padding:18px;
+margin-bottom:18px;
+box-shadow:0 0 25px rgba(250,204,21,0.08);
+}
+
+.rank-title{
+font-size:15px;
+font-weight:800;
+color:#facc15;
+margin-bottom:10px;
+}
+
+.rank-line{
+font-size:16px;
+font-weight:700;
+line-height:1.6;
+}
+
+.board{
+background:rgba(17,24,39,0.95);
+border:1px solid rgba(255,255,255,0.06);
+border-radius:22px;
+padding:18px;
+backdrop-filter:blur(10px);
+}
+
+.board-header{
+display:grid;
+grid-template-columns:60px 1fr 80px 90px;
+gap:8px;
+padding-bottom:14px;
+margin-bottom:14px;
+border-bottom:1px solid rgba(255,255,255,0.08);
+font-size:12px;
+font-weight:800;
+color:#9ca3af;
+text-transform:uppercase;
+}
+
+.player-row{
+display:grid;
+grid-template-columns:60px 1fr 80px 90px;
+gap:8px;
+align-items:center;
+padding:14px 0;
+border-bottom:1px solid rgba(255,255,255,0.06);
+}
+
+.player-row:last-child{
+border-bottom:none;
+}
+
+.rank{
+font-weight:800;
+font-size:15px;
+}
+
+.name{
+font-weight:700;
+font-size:14px;
+overflow:hidden;
+text-overflow:ellipsis;
+white-space:nowrap;
+}
+
+.score,
+.perfect{
+font-weight:700;
+font-size:14px;
+text-align:center;
+}
+
+.share-section{
+margin-top:20px;
+display:flex;
+gap:10px;
+}
+
+.share-btn{
+flex:1;
+padding:13px;
+border:none;
+border-radius:14px;
+font-weight:700;
+cursor:pointer;
+transition:0.2s;
+}
+
+.whatsapp{
+background:#25D366;
+color:#000;
+}
+
+.facebook{
+background:#1877F2;
+color:#fff;
+}
+
+.copy{
+background:#1f2937;
+color:#fff;
+}
+
+.share-btn:hover{
+transform:translateY(-2px);
+}
+
+.footer-note{
+margin-top:20px;
+text-align:center;
+color:#6b7280;
+font-size:12px;
+}
+
+.loading{
+text-align:center;
+padding:40px 10px;
+color:#9ca3af;
+font-size:14px;
+}
+
+@media(max-width:600px){
+.board-header,
+.player-row{
+grid-template-columns:50px 1fr 65px 75px;
+font-size:12px;
+}
+
+.title{
+font-size:24px;
+}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="header">
+<div class="title">🏆 LEADERBOARD</div>
+
+<div class="tabs">
+<button class="tab-btn active" id="todayTab">Today</button>
+<button class="tab-btn" id="allTimeTab">All-Time</button>
+</div>
+
+<div class="search-box">
+<input type="text" id="searchInput" placeholder="🔍 Search Player">
+<div class="search-results" id="searchResults"></div>
+</div>
+</div>
+
+<div class="rank-card">
+<div class="rank-title">🔥 Your Rank</div>
+<div class="rank-line" id="yourRank">
+#18 • Joydeep • 4/5 • 2
+</div>
+</div>
+
+<div class="board">
+<div class="board-header" id="boardHeader">
+<div>Rank</div>
+<div>Name</div>
+<div>Score</div>
+<div>Today 5/5</div>
+</div>
+
+<div id="leaderboardList">
+<div class="loading">Loading leaderboard...</div>
+</div>
+</div>
+
+<div class="share-section">
+<button class="share-btn whatsapp" id="waBtn">WhatsApp</button>
+<button class="share-btn facebook" id="fbBtn">Facebook</button>
+<button class="share-btn copy" id="copyBtn">Copy Link</button>
+</div>
+
+<div class="footer-note">
+BrainPlay AI • Real vs AI Challenge
+</div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import {
+getFirestore,
+collection,
+query,
+orderBy,
+limit,
+getDocs
+} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+const firebaseConfig = {
+apiKey: 'YOUR_API_KEY',
+authDomain: 'YOUR_AUTH_DOMAIN',
+projectId: 'YOUR_PROJECT_ID',
+storageBucket: 'YOUR_STORAGE_BUCKET',
+messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
+appId: 'YOUR_APP_ID'
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const leaderboardList = document.getElementById('leaderboardList');
+const todayTab = document.getElementById('todayTab');
+const allTimeTab = document.getElementById('allTimeTab');
+const boardHeader = document.getElementById('boardHeader');
+const searchInput = document.getElementById('searchInput');
+const searchResults = document.getElementById('searchResults');
+
+let leaderboardData = [];
+let currentTab = 'today';
+
+async function loadLeaderboard(type='today') {
+leaderboardList.innerHTML = '<div class="loading">Loading leaderboard...</div>';
+
+let leaderboardQuery;
+
+if(type === 'today'){
+boardHeader.innerHTML = `
+<div>Rank</div>
+<div>Name</div>
+<div>Score</div>
+<div>Today 5/5</div>
+`;
+
+leaderboardQuery = query(
+collection(db,'real_vs_ai_leaderboard'),
+orderBy('todayPerfectScoreCount','desc'),
+orderBy('score','desc'),
+limit(10)
+);
+
+}else{
+boardHeader.innerHTML = `
+<div>Rank</div>
+<div>Name</div>
+<div>Score</div>
+<div>All-Time</div>
+`;
+
+leaderboardQuery = query(
+collection(db,'real_vs_ai_leaderboard'),
+orderBy('allTimePerfectScoreCount','desc'),
+orderBy('score','desc'),
+limit(10)
+);
+}
+
+const snapshot = await getDocs(leaderboardQuery);
+
+leaderboardData = [];
+
+snapshot.forEach(doc=>{
+leaderboardData.push(doc.data());
+});
+
+renderLeaderboard(type);
+}
+
+function renderLeaderboard(type){
+leaderboardList.innerHTML = '';
+
+leaderboardData.forEach((player,index)=>{
+
+let medal = `${index+1}.`;
+
+if(index===0) medal='🥇';
+if(index===1) medal='🥈';
+if(index===2) medal='🥉';
+
+const row = document.createElement('div');
+row.className='player-row';
+
+row.innerHTML = `
+<div class="rank">${medal}</div>
+<div class="name">${player.username}</div>
+<div class="score">${player.score || '0/5'}</div>
+<div class="perfect">
+${type==='today'
+? player.todayPerfectScoreCount || 0
+: player.allTimePerfectScoreCount || 0}
+</div>
+`;
+
+leaderboardList.appendChild(row);
+});
+}
+
+function searchPlayers(){
+const value = searchInput.value.toLowerCase();
+
+if(value.length===0){
+searchResults.style.display='none';
+return;
+}
+
+const filtered = leaderboardData.filter(player=>
+player.username.toLowerCase().includes(value)
+);
+
+searchResults.innerHTML='';
+searchResults.style.display='block';
+
+if(filtered.length===0){
+searchResults.innerHTML='<div>No player found</div>';
+return;
+}
+
+filtered.forEach((player,index)=>{
+const item = document.createElement('div');
+item.style.padding='10px 0';
+item.style.borderBottom='1px solid rgba(255,255,255,0.06)';
+
+item.innerHTML=`
+#${index+1} • ${player.username} • ${player.score || '0/5'} •
+${currentTab==='today'
+? player.todayPerfectScoreCount || 0
+: player.allTimePerfectScoreCount || 0}
+`;
+
+searchResults.appendChild(item);
+});
+}
+
+todayTab.addEventListener('click',()=>{
+currentTab='today';
+todayTab.classList.add('active');
+allTimeTab.classList.remove('active');
+loadLeaderboard('today');
+});
+
+allTimeTab.addEventListener('click',()=>{
+currentTab='alltime';
+allTimeTab.classList.add('active');
+todayTab.classList.remove('active');
+loadLeaderboard('alltime');
+});
+
+searchInput.addEventListener('input',searchPlayers);
+
+function shareWhatsApp(){
+const text='🔥 I scored 5/5 on BrainPlay AI. Can you beat me? https://brainplayai.in';
+window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+}
+
+function shareFacebook(){
+const url='https://brainplayai.in';
+window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`);
+}
+
+function copyLink(){
+navigator.clipboard.writeText('https://brainplayai.in');
+alert('Link copied!');
+}
+
+document.getElementById('waBtn').addEventListener('click',shareWhatsApp);
+document.getElementById('fbBtn').addEventListener('click',shareFacebook);
+document.getElementById('copyBtn').addEventListener('click',copyLink);
+
+loadLeaderboard();
+
+</script>
+
+</body>
+</html>
+```
