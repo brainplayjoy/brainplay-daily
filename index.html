@@ -1032,13 +1032,13 @@
         });
 
         // Leaderboard button placeholder integration (future firebase)
-        const leaderboardBtn = document.getElementById('leaderboardActionBtn');
-        if (leaderboardBtn) {
-            leaderboardBtn.addEventListener('click', () => {
-                alert("🏆 Leaderboard will be integrated soon with Firebase! Get ready to compete.");
-                // later receive leaderboard page code with firebase code
-            });
-        }
+     const leaderboardBtn = document.getElementById('leaderboardActionBtn');
+if (leaderboardBtn) {
+    leaderboardBtn.addEventListener('click', () => {
+        // Redirect to leaderboard page (same directory)
+        window.location.href = 'leaderboard.html';
+    });
+}
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
