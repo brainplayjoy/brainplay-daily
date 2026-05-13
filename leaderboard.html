@@ -8,7 +8,7 @@
     <script type="module">
         // Import Firebase modules dynamically
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyDgAH9ZbCy5Rbq2F9TgZmv91EJYjxeP2-I",
@@ -23,21 +23,17 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         
-        // Make db globally accessible for inline scripts
         window.db = db;
         window.getFirestore = () => db;
         
-        // Collection reference
         const USERS_COLLECTION = "leaderboard_users";
         
-        // Helper: derive name from email
         function getNameFromEmail(email) {
             if (!email) return "Player";
             const localPart = email.split('@')[0];
             return localPart.charAt(0).toUpperCase() + localPart.slice(1);
         }
         
-        // Seed 20 demo users if collection is empty
         async function seedDemoUsers() {
             const usersRef = collection(db, USERS_COLLECTION);
             const snapshot = await getDocs(usersRef);
@@ -69,7 +65,6 @@
             const todayStr = new Date().toISOString().slice(0,10);
             for (let i = 0; i < demoList.length; i++) {
                 const user = demoList[i];
-                // Random today perfect count (0-6) and all-time perfect (0-25)
                 const todayPerfect = Math.floor(Math.random() * 7);
                 const allTimePerfect = Math.floor(Math.random() * 26);
                 const userData = {
@@ -85,7 +80,6 @@
             console.log("Demo users seeded");
         }
         
-        // Reset today counts if date changed (run on each load)
         async function resetTodayCountsIfNeeded() {
             const todayStr = new Date().toISOString().slice(0,10);
             const usersRef = collection(db, USERS_COLLECTION);
@@ -102,7 +96,6 @@
             }
         }
         
-        // Fetch all users and return sorted list for today or all-time
         async function fetchLeaderboardData(type) {
             const usersRef = collection(db, USERS_COLLECTION);
             const snapshot = await getDocs(usersRef);
@@ -119,7 +112,7 @@
             if (type === 'today') {
                 users.sort((a,b) => {
                     if (a.todayPerfectCount !== b.todayPerfectCount) return b.todayPerfectCount - a.todayPerfectCount;
-                    return b.allTimePerfectCount - a.allTimePerfectCount; // tie-break
+                    return b.allTimePerfectCount - a.allTimePerfectCount;
                 });
             } else {
                 users.sort((a,b) => {
@@ -130,14 +123,12 @@
             return users;
         }
         
-        // Get current logged-in user from localStorage
         function getCurrentUser() {
             const email = localStorage.getItem('brainplay_user_email');
             if (email) return { email, name: getNameFromEmail(email) };
             return null;
         }
         
-        // Save login email & ensure user exists in Firestore
         async function loginUser(email) {
             if (!email || !email.includes('@')) throw new Error("Valid email required");
             const normalized = email.toLowerCase();
@@ -145,7 +136,6 @@
             const userSnap = await getDoc(userRef);
             const todayStr = new Date().toISOString().slice(0,10);
             if (!userSnap.exists()) {
-                // Create new user with zero stats
                 await setDoc(userRef, {
                     name: getNameFromEmail(normalized),
                     email: normalized,
@@ -155,7 +145,6 @@
                     createdAt: new Date().toISOString()
                 });
             } else {
-                // ensure reset date
                 const existing = userSnap.data();
                 if (existing.lastResetDate !== todayStr) {
                     await updateDoc(userRef, { todayPerfectCount: 0, lastResetDate: todayStr });
@@ -170,7 +159,6 @@
             location.reload();
         }
         
-        // Expose global functions
         window.loginUser = loginUser;
         window.logoutUser = logoutUser;
         window.getCurrentUser = getCurrentUser;
@@ -178,27 +166,23 @@
         window.seedDemoUsers = seedDemoUsers;
         window.resetTodayCountsIfNeeded = resetTodayCountsIfNeeded;
         
-        // Initialize app after DOM
         window.initLeaderboard = async () => {
             await resetTodayCountsIfNeeded();
             await seedDemoUsers();
             renderLeaderboardUI();
         };
         
-        // Global render function
         window.renderLeaderboardUI = async () => {
             const activeTab = document.querySelector('.tab-active')?.getAttribute('data-tab') || 'today';
             const users = await fetchLeaderboardData(activeTab);
             const currentUser = getCurrentUser();
             const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
             
-            // Filter by search term
             let filteredUsers = users;
             if (searchTerm) {
                 filteredUsers = users.filter(u => u.name.toLowerCase().includes(searchTerm));
             }
             
-            // Find rank of current user for "Your Rank" section
             let currentUserRankData = null;
             if (currentUser) {
                 const idx = filteredUsers.findIndex(u => u.email === currentUser.email);
@@ -207,7 +191,6 @@
                 }
             }
             
-            // Prepare leaderboard rows (excluding current user from main list? we'll show separately then list others)
             let mainList = filteredUsers;
             if (currentUserRankData) {
                 mainList = filteredUsers.filter(u => u.email !== currentUser.email);
@@ -217,28 +200,33 @@
             if (!tbody) return;
             tbody.innerHTML = '';
             
-            // Show "Your Rank" section if logged in and has rank
+            // Your Rank section (always at top)
             if (currentUserRankData) {
                 const yourRow = document.createElement('tr');
                 yourRow.className = 'your-rank-row';
-                const rankDisplay = currentUserRankData.rank;
-                const medalHtml = rankDisplay === 1 ? '🥇' : (rankDisplay === 2 ? '🥈' : (rankDisplay === 3 ? '🥉' : `#${rankDisplay}`));
+                let rankDisplay = '';
+                const r = currentUserRankData.rank;
+                if (r === 1) rankDisplay = '🥇';
+                else if (r === 2) rankDisplay = '🥈';
+                else if (r === 3) rankDisplay = '🥉';
+                else rankDisplay = `#${r}`;
+                
                 const scoreCount = activeTab === 'today' ? currentUserRankData.user.todayPerfectCount : currentUserRankData.user.allTimePerfectCount;
                 const scoreLabel = activeTab === 'today' ? 'Today 5/5' : 'All-Time 5/5';
                 yourRow.innerHTML = `
-                    <td class="rank-cell">🔥 ${medalHtml}</td>
+                    <td class="rank-cell">${rankDisplay}</td>
                     <td class="name-cell">${currentUserRankData.user.name} <span class="you-badge">(You)</span></td>
                     <td class="score-cell">${scoreCount}× ${scoreLabel}</td>
                 `;
                 tbody.appendChild(yourRow);
-                // Add separator row
+                // separator line (blue horizontal line)
                 const sep = document.createElement('tr');
                 sep.className = 'separator-row';
                 sep.innerHTML = '<td colspan="3"><div class="sep-line"></div></td>';
                 tbody.appendChild(sep);
             }
             
-            // Render main leaderboard
+            // Main leaderboard list
             mainList.forEach((user, idx) => {
                 const globalRank = currentUserRankData ? idx + 1 : idx + 1;
                 let rankDisplay = '';
@@ -262,7 +250,7 @@
                 tbody.innerHTML = '<tr><td colspan="3" class="empty-row">No players found 🔍</td></tr>';
             }
             
-            // Update Join Now button text if logged in
+            // Toggle join button / logged user display
             const joinBtn = document.getElementById('joinNowBtn');
             const userDisplaySpan = document.getElementById('loggedUserDisplay');
             if (currentUser) {
@@ -289,12 +277,11 @@
         
         window.addEventListener('DOMContentLoaded', async () => {
             await initLeaderboard();
-            // Setup search listener
             const searchInput = document.getElementById('searchInput');
             if (searchInput) {
                 searchInput.addEventListener('input', () => renderLeaderboardUI());
             }
-            // Popup modal logic
+            // Modal logic
             const modal = document.getElementById('loginModal');
             const joinBtn = document.getElementById('joinNowBtn');
             const closeModal = document.getElementById('closeModal');
@@ -353,7 +340,7 @@
             box-shadow: 0 20px 35px -12px rgba(0,0,0,0.5);
             border: 1px solid rgba(255,255,255,0.1);
         }
-        /* Header with hamburger */
+        /* Professional header with emoji */
         .leaderboard-header {
             display: flex;
             justify-content: space-between;
@@ -362,13 +349,20 @@
             flex-wrap: wrap;
         }
         .title-section h1 {
-            font-size: 26px;
+            font-size: 28px;
             font-weight: 800;
-            background: linear-gradient(135deg, #FFD966, #FFB347);
+            background: linear-gradient(135deg, #FFE6A3, #FFB347);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            letter-spacing: -0.3px;
+            letter-spacing: -0.2px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .title-section h1 span {
+            background: none;
+            color: #FFD966;
         }
         .title-section p {
             font-size: 12px;
@@ -459,6 +453,7 @@
             gap: 10px;
             align-items: center;
             display: inline-flex;
+            color: white;
         }
         .logout-mini {
             background: none;
@@ -534,7 +529,7 @@
             color: #f0f0f0;
         }
         .rank-cell { font-weight: 700; width: 70px; }
-        .name-cell { font-weight: 500; }
+        .name-cell { font-weight: 500; color: #ffffff; }
         .score-cell { text-align: right; font-family: monospace; font-weight: 600; color: #FFD966; }
         .your-rank-row {
             background: rgba(253,218,13,0.12);
@@ -555,12 +550,13 @@
         .separator-row td { padding: 4px 0; }
         .sep-line {
             height: 2px;
-            background: linear-gradient(90deg, #facc15, transparent);
+            background: linear-gradient(90deg, #3b82f6, transparent);
             width: 100%;
+            margin: 4px 0;
         }
         .empty-row { text-align: center; padding: 32px; color: #aaa; }
         
-        /* Play Again Button */
+        /* Play Button - Only "Play" */
         .play-again-wrapper {
             display: flex;
             justify-content: center;
@@ -569,8 +565,8 @@
         .play-again-btn {
             background: #FDDA0D;
             border: none;
-            padding: 12px 28px;
-            border-radius: 60px;
+            padding: 10px 24px;
+            border-radius: 40px;
             font-weight: 800;
             font-size: 16px;
             color: #000;
@@ -583,14 +579,14 @@
         }
         .play-again-btn:hover { background: #ffea70; transform: translateY(-2px);}
         
-        /* Modal */
+        /* Modal - professional white close, heading white */
         .modal {
             display: none;
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(6px);
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
             align-items: center;
             justify-content: center;
             z-index: 1000;
@@ -602,23 +598,31 @@
             width: 90%;
             padding: 28px 22px;
             position: relative;
-            border: 1px solid gold;
+            border: 1px solid rgba(255,215,0,0.5);
             box-shadow: 0 20px 35px black;
         }
         .modal-close {
             position: absolute;
-            top: 16px;
-            right: 20px;
-            font-size: 24px;
+            top: 12px;
+            right: 16px;
+            font-size: 20px;
             cursor: pointer;
             color: white;
             background: none;
             border: none;
+            font-weight: 300;
+            transition: 0.2s;
+            padding: 4px;
+            line-height: 1;
         }
+        .modal-close:hover { opacity: 0.7; }
         .modal-card h3 {
             font-size: 24px;
             margin-bottom: 8px;
-            color: #FFD966;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         .modal-card p {
             font-size: 14px;
@@ -645,10 +649,11 @@
             font-weight: 800;
             cursor: pointer;
             font-size: 16px;
+            color: #000;
         }
         @media (max-width: 480px) {
             .leaderboard-container { padding: 16px; }
-            .title-section h1 { font-size: 22px; }
+            .title-section h1 { font-size: 24px; }
             .rank-cell { width: 55px; }
         }
     </style>
@@ -657,7 +662,7 @@
 <div class="leaderboard-container">
     <div class="leaderboard-header">
         <div class="title-section">
-            <h1>🏆 LEADERBOARD</h1>
+            <h1><span>🏆</span> LEADERBOARD</h1>
             <p>Top players • Real vs AI challenge</p>
         </div>
         <div class="hamburger-menu-leader">
@@ -698,15 +703,15 @@
     </div>
     
     <div class="play-again-wrapper">
-        <button class="play-again-btn" id="playAgainBtn">🎮 PLAY AGAIN</button>
+        <button class="play-again-btn" id="playAgainBtn">▶ Play</button>
     </div>
 </div>
 
-<!-- Login Modal -->
+<!-- Login Modal with polished design -->
 <div id="loginModal" class="modal">
     <div class="modal-card">
-        <button class="modal-close" id="closeModal">&times;</button>
-        <h3>✨ Join the Arena</h3>
+        <button class="modal-close" id="closeModal">×</button>
+        <h3>✨ Join Now</h3>
         <p>Enter your email to compete on leaderboard</p>
         <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email">
         <button id="saveEmailBtn">Save & Continue</button>
@@ -714,7 +719,7 @@
 </div>
 
 <script type="module">
-    // Additional dynamic control for menu and logout, play again
+    // Hamburger & dynamic menu controls
     const menuToggle = document.getElementById('menuToggle');
     const dropdown = document.getElementById('dropdownMenu');
     if (menuToggle && dropdown) {
@@ -738,10 +743,9 @@
     const playAgain = document.getElementById('playAgainBtn');
     if (playAgain) {
         playAgain.addEventListener('click', () => {
-            window.location.href = 'index.html'; // redirect to main game page
+            window.location.href = 'index.html';
         });
     }
-    // Ensure any global scope functions are attached
     window.renderLeaderboardUI = window.renderLeaderboardUI;
     window.switchTab = window.switchTab;
 </script>
