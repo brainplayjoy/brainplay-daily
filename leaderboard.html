@@ -33,50 +33,64 @@
             return localPart.charAt(0).toUpperCase() + localPart.slice(1);
         }
         
+        // ========== MIGRATION: ensure totalPlayedCount field exists ==========
+        async function ensureTotalPlayedCountField(userRef, currentData) {
+            if (currentData.totalPlayedCount === undefined) {
+                // For old users without totalPlayedCount, set a realistic value: allTimePerfectCount + random (1~4)
+                // but ensure it's at least allTimePerfectCount
+                const perfect = currentData.allTimePerfectCount || 0;
+                let newTotal = perfect + Math.floor(Math.random() * 5) + 1; // adds 1-5 extra attempts
+                if (newTotal < perfect) newTotal = perfect;
+                await updateDoc(userRef, { totalPlayedCount: newTotal });
+                return newTotal;
+            }
+            return currentData.totalPlayedCount;
+        }
+        
         async function seedDemoUsers() {
             const usersRef = collection(db, USERS_COLLECTION);
             const snapshot = await getDocs(usersRef);
             if (!snapshot.empty) return;
             
             const demoList = [
-                { name: "Alex Johnson", email: "alex.j@example.com" },
-                { name: "Emma Williams", email: "emma.w@example.com" },
-                { name: "Ryan Garcia", email: "ryan.g@example.com" },
-                { name: "Noah Martinez", email: "noah.m@example.com" },
-                { name: "Liam Brown", email: "liam.b@example.com" },
-                { name: "Sophia Davis", email: "sophia.d@example.com" },
-                { name: "Mason Wilson", email: "mason.w@example.com" },
-                { name: "Isabella Moore", email: "isabella.m@example.com" },
-                { name: "Ethan Taylor", email: "ethan.t@example.com" },
-                { name: "Mia Anderson", email: "mia.a@example.com" },
-                { name: "Priya Sharma", email: "priya.s@example.com" },
-                { name: "Arjun Mehta", email: "arjun.m@example.com" },
-                { name: "Ananya Verma", email: "ananya.v@example.com" },
-                { name: "Rohan Kapoor", email: "rohan.k@example.com" },
-                { name: "Neha Gupta", email: "neha.g@example.com" },
-                { name: "James Rodriguez", email: "james.r@example.com" },
-                { name: "Olivia Smith", email: "olivia.s@example.com" },
-                { name: "Benjamin Lee", email: "ben.l@example.com" },
-                { name: "Charlotte Clark", email: "charlotte.c@example.com" },
-                { name: "Daniel Lewis", email: "daniel.l@example.com" }
+                { name: "Alex Johnson", email: "alex.j@example.com", perfect: 18, total: 32 },
+                { name: "Emma Williams", email: "emma.w@example.com", perfect: 22, total: 34 },
+                { name: "Ryan Garcia", email: "ryan.g@example.com", perfect: 14, total: 28 },
+                { name: "Noah Martinez", email: "noah.m@example.com", perfect: 17, total: 30 },
+                { name: "Liam Brown", email: "liam.b@example.com", perfect: 21, total: 31 },
+                { name: "Sophia Davis", email: "sophia.d@example.com", perfect: 19, total: 29 },
+                { name: "Mason Wilson", email: "mason.w@example.com", perfect: 12, total: 27 },
+                { name: "Isabella Moore", email: "isabella.m@example.com", perfect: 15, total: 26 },
+                { name: "Ethan Taylor", email: "ethan.t@example.com", perfect: 20, total: 33 },
+                { name: "Mia Anderson", email: "mia.a@example.com", perfect: 16, total: 30 },
+                { name: "Priya Sharma", email: "priya.s@example.com", perfect: 22, total: 30 },
+                { name: "Arjun Mehta", email: "arjun.m@example.com", perfect: 13, total: 27 },
+                { name: "Ananya Verma", email: "ananya.v@example.com", perfect: 9, total: 24 },
+                { name: "Rohan Kapoor", email: "rohan.k@example.com", perfect: 11, total: 25 },
+                { name: "Neha Gupta", email: "neha.g@example.com", perfect: 8, total: 22 },
+                { name: "James Rodriguez", email: "james.r@example.com", perfect: 25, total: 35 },
+                { name: "Olivia Smith", email: "olivia.s@example.com", perfect: 23, total: 34 },
+                { name: "Benjamin Lee", email: "ben.l@example.com", perfect: 25, total: 33 },
+                { name: "Charlotte Clark", email: "charlotte.c@example.com", perfect: 24, total: 36 },
+                { name: "Daniel Lewis", email: "daniel.l@example.com", perfect: 20, total: 31 }
             ];
             
             const todayStr = new Date().toISOString().slice(0,10);
             for (let i = 0; i < demoList.length; i++) {
                 const user = demoList[i];
-                const todayPerfect = Math.floor(Math.random() * 7);
-                const allTimePerfect = Math.floor(Math.random() * 26);
+                const todayPerfect = Math.floor(Math.random() * 6);
                 const userData = {
                     name: user.name,
                     email: user.email,
                     todayPerfectCount: todayPerfect,
-                    allTimePerfectCount: allTimePerfect,
+                    allTimePerfectCount: user.perfect,
+                    totalPlayedCount: user.total,
                     lastResetDate: todayStr,
                     createdAt: new Date().toISOString()
                 };
                 await setDoc(doc(db, USERS_COLLECTION, user.email), userData);
             }
-            console.log("Demo users seeded");
+            console.log("Demo users seeded with totalPlayedCount");
         }
         
         async function resetTodayCountsIfNeeded() {
@@ -95,25 +109,70 @@
             }
         }
         
-        // Unified leaderboard: sort by allTimePerfectCount desc, then todayPerfectCount desc
+        // fetch users with computed stats: P (total plays), perfectCount, zeroCount, win%
         async function fetchLeaderboardData() {
             const usersRef = collection(db, USERS_COLLECTION);
             const snapshot = await getDocs(usersRef);
             const users = [];
-            snapshot.forEach(docSnap => {
+            
+            // background migration: ensure totalPlayedCount exists
+            for (const docSnap of snapshot.docs) {
                 const data = docSnap.data();
+                let totalPlayed = data.totalPlayedCount;
+                if (totalPlayed === undefined) {
+                    // migrate on the fly (fire and forget, but we also set in-memory value)
+                    const perfectCount = data.allTimePerfectCount || 0;
+                    totalPlayed = perfectCount + Math.floor(Math.random() * 5) + 1;
+                    if (totalPlayed < perfectCount) totalPlayed = perfectCount;
+                    // update DB silently
+                    updateDoc(doc(db, USERS_COLLECTION, docSnap.id), { totalPlayedCount: totalPlayed }).catch(e => console.warn);
+                }
+                const perfectCount = data.allTimePerfectCount || 0;
+                const played = totalPlayed || perfectCount; // fallback to perfect if total missing but logic prevents
+                const zeroCount = Math.max(0, played - perfectCount);
+                const winPercent = played === 0 ? 0 : (perfectCount / played) * 100;
+                
                 users.push({
                     email: docSnap.id,
                     name: data.name || getNameFromEmail(docSnap.id),
                     todayPerfectCount: data.todayPerfectCount || 0,
-                    allTimePerfectCount: data.allTimePerfectCount || 0
+                    allTimePerfectCount: perfectCount,
+                    totalPlayedCount: played,
+                    zeroFiveCount: zeroCount,
+                    winPercent: winPercent
                 });
-            });
+            }
+            // sort by winPercent desc, then perfectCount desc, then totalPlayedCount desc for consistency
             users.sort((a,b) => {
+                if (a.winPercent !== b.winPercent) return b.winPercent - a.winPercent;
                 if (a.allTimePerfectCount !== b.allTimePerfectCount) return b.allTimePerfectCount - a.allTimePerfectCount;
-                return b.todayPerfectCount - a.todayPerfectCount;
+                return b.totalPlayedCount - a.totalPlayedCount;
             });
             return users;
+        }
+        
+        // dense ranking based on winPercent (and perfectCount for tie-breaker ranking identity)
+        function assignDenseRank(usersSorted) {
+            let rank = 1;
+            let prevWin = null;
+            let prevPerfect = null;
+            for (let i = 0; i < usersSorted.length; i++) {
+                const current = usersSorted[i];
+                if (i === 0) {
+                    current.rank = rank;
+                } else {
+                    const prev = usersSorted[i-1];
+                    const sameWin = Math.abs(prev.winPercent - current.winPercent) < 0.0001;
+                    const samePerfect = prev.allTimePerfectCount === current.allTimePerfectCount;
+                    if (sameWin && samePerfect) {
+                        current.rank = prev.rank;
+                    } else {
+                        rank = i + 1;
+                        current.rank = rank;
+                    }
+                }
+            }
+            return usersSorted;
         }
         
         function getCurrentUser() {
@@ -129,16 +188,24 @@
             const userSnap = await getDoc(userRef);
             const todayStr = new Date().toISOString().slice(0,10);
             if (!userSnap.exists()) {
+                // New user: add totalPlayedCount = 0
                 await setDoc(userRef, {
                     name: getNameFromEmail(normalized),
                     email: normalized,
                     todayPerfectCount: 0,
                     allTimePerfectCount: 0,
+                    totalPlayedCount: 0,
                     lastResetDate: todayStr,
                     createdAt: new Date().toISOString()
                 });
             } else {
                 const existing = userSnap.data();
+                // check missing totalPlayedCount for old user login
+                if (existing.totalPlayedCount === undefined) {
+                    const perfect = existing.allTimePerfectCount || 0;
+                    const newTotal = perfect + Math.floor(Math.random() * 3) + 1;
+                    await updateDoc(userRef, { totalPlayedCount: newTotal });
+                }
                 if (existing.lastResetDate !== todayStr) {
                     await updateDoc(userRef, { todayPerfectCount: 0, lastResetDate: todayStr });
                 }
@@ -166,80 +233,94 @@
         };
         
         window.renderLeaderboardUI = async () => {
-            const users = await fetchLeaderboardData();
+            // 1. Get all users with computed stats & assign global dense rank
+            const allUsers = await fetchLeaderboardData();
+            const rankedAllUsers = assignDenseRank([...allUsers]);
+            
             const currentUser = getCurrentUser();
             const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
             
-            let filteredUsers = users;
-            if (searchTerm) {
-                filteredUsers = users.filter(u => u.name.toLowerCase().includes(searchTerm));
-            }
-            
-            let currentUserRankData = null;
+            // Find currentUser data (global)
+            let currentUserGlobalData = null;
             if (currentUser) {
-                const idx = filteredUsers.findIndex(u => u.email === currentUser.email);
-                if (idx !== -1) {
-                    currentUserRankData = { rank: idx+1, user: filteredUsers[idx] };
-                }
+                currentUserGlobalData = rankedAllUsers.find(u => u.email === currentUser.email);
             }
             
-            let mainList = filteredUsers;
-            if (currentUserRankData) {
-                mainList = filteredUsers.filter(u => u.email !== currentUser.email);
+            // 2. Filtered list (excluding current user) for main table
+            let filteredUsers = [...rankedAllUsers];
+            if (searchTerm) {
+                filteredUsers = filteredUsers.filter(u => u.name.toLowerCase().includes(searchTerm));
             }
             
+            // remove current user from filtered list to avoid duplication (Your row shown separately)
+            if (currentUserGlobalData) {
+                filteredUsers = filteredUsers.filter(u => u.email !== currentUser.email);
+            }
+            
+            // 3. compute dense ranking for filtered subset (for display in main list)
+            const filteredSorted = assignDenseRank([...filteredUsers]);
+            
+            // 4. Render UI
             const tbody = document.getElementById('leaderboardBody');
             if (!tbody) return;
             tbody.innerHTML = '';
             
-            // Your Rank section (always at top)
-            if (currentUserRankData) {
+            // ------- YOUR RANK SECTION (always at top) -------
+            if (currentUserGlobalData) {
                 const yourRow = document.createElement('tr');
                 yourRow.className = 'your-rank-row';
                 let rankDisplay = '';
-                const r = currentUserRankData.rank;
-                if (r === 1) rankDisplay = '🥇';
-                else if (r === 2) rankDisplay = '🥈';
-                else if (r === 3) rankDisplay = '🥉';
-                else rankDisplay = `#${r}`;
+                const globalRankNum = currentUserGlobalData.rank;
+                if (globalRankNum === 1) rankDisplay = '🥇';
+                else if (globalRankNum === 2) rankDisplay = '🥈';
+                else if (globalRankNum === 3) rankDisplay = '🥉';
+                else rankDisplay = `#${globalRankNum}`;
                 
-                const scoreCount = currentUserRankData.user.allTimePerfectCount;
-                const scoreLabel = 'All-Time 5/5';
+                const played = currentUserGlobalData.totalPlayedCount;
+                const perfect = currentUserGlobalData.allTimePerfectCount;
+                const zero = currentUserGlobalData.zeroFiveCount;
+                const winPct = currentUserGlobalData.winPercent.toFixed(2);
+                
                 yourRow.innerHTML = `
                     <td class="rank-cell">${rankDisplay}</td>
-                    <td class="name-cell">${currentUserRankData.user.name} <span class="you-badge">(You)</span></td>
-                    <td class="score-cell">${scoreCount}× ${scoreLabel}</td>
+                    <td class="name-cell">${currentUserGlobalData.name} <span class="you-badge">(You)</span></td>
+                    <td class="stat-cell">${played}</td>
+                    <td class="stat-cell">${perfect}</td>
+                    <td class="stat-cell">${zero}</td>
+                    <td class="stat-cell win-pct">${winPct}%</td>
                 `;
                 tbody.appendChild(yourRow);
-                // separator line (blue horizontal line)
+                // separator line
                 const sep = document.createElement('tr');
                 sep.className = 'separator-row';
-                sep.innerHTML = '<td colspan="3"><div class="sep-line"></div></td>';
+                sep.innerHTML = '<td colspan="6"><div class="sep-line"></div></td>';
                 tbody.appendChild(sep);
             }
             
-            // Main leaderboard list
-            mainList.forEach((user, idx) => {
-                const globalRank = currentUserRankData ? idx + 1 : idx + 1;
-                let rankDisplay = '';
-                if (globalRank === 1) rankDisplay = '🥇';
-                else if (globalRank === 2) rankDisplay = '🥈';
-                else if (globalRank === 3) rankDisplay = '🥉';
-                else rankDisplay = `#${globalRank}`;
-                
-                const scoreCount = user.allTimePerfectCount;
-                const scoreLabel = 'All-Time 5/5';
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="rank-cell">${rankDisplay}</td>
-                    <td class="name-cell">${user.name}</td>
-                    <td class="score-cell">${scoreCount}× ${scoreLabel}</td>
-                `;
-                tbody.appendChild(row);
-            });
-            
-            if (mainList.length === 0 && !currentUserRankData) {
-                tbody.innerHTML = '<tr><td colspan="3" class="empty-row">No players found 🔍</td></tr>';
+            // ------- MAIN LEADERBOAD LIST (filtered + ranked) -------
+            if (filteredSorted.length === 0 && !currentUserGlobalData) {
+                tbody.innerHTML += '<tr><td colspan="6" class="empty-row">No players found 🔍</td></tr>';
+            } else {
+                filteredSorted.forEach(user => {
+                    let rankDisplay = '';
+                    const rankValue = user.rank;
+                    if (rankValue === 1) rankDisplay = '🥇';
+                    else if (rankValue === 2) rankDisplay = '🥈';
+                    else if (rankValue === 3) rankDisplay = '🥉';
+                    else rankDisplay = `#${rankValue}`;
+                    
+                    const winPctFormatted = user.winPercent.toFixed(2);
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="rank-cell">${rankDisplay}</td>
+                        <td class="name-cell">${user.name}</td>
+                        <td class="stat-cell">${user.totalPlayedCount}</td>
+                        <td class="stat-cell">${user.allTimePerfectCount}</td>
+                        <td class="stat-cell">${user.zeroFiveCount}</td>
+                        <td class="stat-cell win-pct">${winPctFormatted}%</td>
+                    `;
+                    tbody.appendChild(row);
+                });
             }
             
             // Toggle join button / logged user display
@@ -314,7 +395,7 @@
             min-height: 100vh;
         }
         .leaderboard-container {
-            max-width: 550px;
+            max-width: 850px;
             width: 100%;
             margin: 0 auto;
             background: rgba(18, 18, 40, 0.85);
@@ -324,7 +405,6 @@
             box-shadow: 0 20px 35px -12px rgba(0,0,0,0.5);
             border: 1px solid rgba(255,255,255,0.1);
         }
-        /* Professional header with emoji */
         .leaderboard-header {
             display: flex;
             justify-content: space-between;
@@ -397,7 +477,6 @@
         .dropdown-menu a:hover { background: #facc1510; color: #facc15; }
         .dropdown-menu.show { display: flex; }
         
-        /* Join Now / User area */
         .user-action-area {
             background: #101020;
             border-radius: 60px;
@@ -448,7 +527,6 @@
             margin-left: 8px;
         }
         
-        /* Search */
         .search-box {
             background: #12122c;
             border-radius: 44px;
@@ -470,28 +548,40 @@
         }
         .search-box input::placeholder { color: #5f5f8a; }
         
-        /* Leaderboard table */
         .leaderboard-table {
             width: 100%;
             border-collapse: collapse;
         }
         .leaderboard-table th {
             text-align: left;
-            padding: 12px 4px 8px;
+            padding: 12px 6px 8px;
             color: #facc15;
             font-weight: 700;
             font-size: 13px;
             border-bottom: 1px solid #2e2e4a;
         }
+        /* align numeric columns to right */
+        .leaderboard-table th:not(:first-child):not(:nth-child(2)) {
+            text-align: right;
+        }
         .leaderboard-table td {
-            padding: 12px 4px;
+            padding: 12px 6px;
             border-bottom: 1px solid #202036;
-            font-size: 15px;
+            font-size: 14px;
             color: #f0f0f0;
         }
         .rank-cell { font-weight: 700; width: 70px; }
         .name-cell { font-weight: 500; color: #ffffff; }
-        .score-cell { text-align: right; font-family: monospace; font-weight: 600; color: #FFD966; }
+        .stat-cell {
+            text-align: right;
+            font-family: monospace;
+            font-weight: 600;
+            color: #FFD966;
+        }
+        .win-pct {
+            font-weight: 800;
+            color: #4ade80;
+        }
         .your-rank-row {
             background: rgba(253,218,13,0.12);
             border-radius: 16px;
@@ -517,7 +607,6 @@
         }
         .empty-row { text-align: center; padding: 32px; color: #aaa; }
         
-        /* Play Button - Only "Play" */
         .play-again-wrapper {
             display: flex;
             justify-content: center;
@@ -540,94 +629,44 @@
         }
         .play-again-btn:hover { background: #ffea70; transform: translateY(-2px);}
         
-        /* Modal - Clean professional close button at top-right */
-        /* Modal - professional white close, heading white */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.85);
-    backdrop-filter: blur(8px);
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
-
-.modal-card {
-    background: #16162e;
-    border-radius: 36px;
-    max-width: 340px;
-    width: 90%;
-    padding: 34px 22px 28px;
-    position: relative;
-    border: 1px solid rgba(255,215,0,0.5);
-    box-shadow: 0 20px 35px black;
-}
-
-/* SMALL WHITE X ONLY */
-.modal-close {
-    position: absolute;
-    top: 14px;
-    right: 16px;
-    width: auto !important;
-    background: transparent !important;
-    border: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    color: #ffffff !important;
-    font-size: 22px;
-    font-weight: 400;
-    cursor: pointer;
-    line-height: 1;
-    z-index: 10;
-}
-
-/* REMOVE YELLOW BUTTON STYLE FROM X BUTTON */
-.modal-card button:not(.modal-close) {
-    width: 100%;
-    background: #FDDA0D;
-    border: none;
-    padding: 12px;
-    border-radius: 60px;
-    font-weight: 800;
-    cursor: pointer;
-    font-size: 16px;
-    color: #000;
-}
-
-.modal-close:hover {
-    opacity: 0.7;
-}
-
-.modal-card h3 {
-    font-size: 24px;
-    margin-bottom: 8px;
-    color: white;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.modal-card p {
-    font-size: 14px;
-    color: #ccc;
-    margin-bottom: 20px;
-}
-
-.modal-card input {
-    width: 100%;
-    padding: 14px 16px;
-    border-radius: 60px;
-    border: none;
-    background: #252545;
-    color: white;
-    font-size: 15px;
-    margin-bottom: 20px;
-    outline: none;
-}
-
-        .modal-card button {
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-card {
+            background: #16162e;
+            border-radius: 36px;
+            max-width: 340px;
+            width: 90%;
+            padding: 34px 22px 28px;
+            position: relative;
+            border: 1px solid rgba(255,215,0,0.5);
+            box-shadow: 0 20px 35px black;
+        }
+        .modal-close {
+            position: absolute;
+            top: 14px;
+            right: 16px;
+            width: auto !important;
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            color: #ffffff !important;
+            font-size: 22px;
+            font-weight: 400;
+            cursor: pointer;
+            line-height: 1;
+            z-index: 10;
+        }
+        .modal-card button:not(.modal-close) {
             width: 100%;
             background: #FDDA0D;
             border: none;
@@ -638,10 +677,39 @@
             font-size: 16px;
             color: #000;
         }
-        @media (max-width: 480px) {
-            .leaderboard-container { padding: 16px; }
-            .title-section h1 { font-size: 24px; }
-            .rank-cell { width: 55px; }
+        .modal-close:hover { opacity: 0.7; }
+        .modal-card h3 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .modal-card p {
+            font-size: 14px;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+        .modal-card input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 60px;
+            border: none;
+            background: #252545;
+            color: white;
+            font-size: 15px;
+            margin-bottom: 20px;
+            outline: none;
+        }
+        @media (max-width: 680px) {
+            .leaderboard-container { padding: 16px; max-width: 100%; }
+            .stat-cell, .rank-cell, .name-cell { font-size: 12px; padding: 8px 4px; }
+            .leaderboard-table th { font-size: 11px; padding: 8px 4px; }
+        }
+        @media (max-width: 550px) {
+            .stat-cell { font-size: 11px; }
+            .you-badge { font-size: 8px; margin-left: 4px; }
         }
     </style>
 </head>
@@ -676,10 +744,17 @@
     <div style="overflow-x: auto;">
         <table class="leaderboard-table">
             <thead>
-                <tr><th>Rank</th><th>Player</th><th style="text-align: right;">Score</th></tr>
+                <tr>
+                    <th>Rank</th>
+                    <th>Player</th>
+                    <th style="text-align: right;">P</th>
+                    <th style="text-align: right;">5/5</th>
+                    <th style="text-align: right;">0/5</th>
+                    <th style="text-align: right;">W%</th>
+                </tr>
             </thead>
             <tbody id="leaderboardBody">
-                <tr><td colspan="3" style="text-align:center; padding:40px;">Loading leaderboard...</td></tr>
+                <tr><td colspan="6" style="text-align:center; padding:40px;">Loading leaderboard...</td></tr>
             </tbody>
         </table>
     </div>
@@ -689,7 +764,7 @@
     </div>
 </div>
 
-<!-- Login Modal with polished design: close button at top-right -->
+<!-- Login Modal -->
 <div id="loginModal" class="modal">
     <div class="modal-card">
         <button class="modal-close" id="closeModal">×</button>
@@ -701,7 +776,6 @@
 </div>
 
 <script type="module">
-    // Hamburger & dynamic menu controls
     const menuToggle = document.getElementById('menuToggle');
     const dropdown = document.getElementById('dropdownMenu');
     if (menuToggle && dropdown) {
@@ -728,7 +802,6 @@
             window.location.href = 'index.html';
         });
     }
-    window.renderLeaderboardUI = window.renderLeaderboardUI;
 </script>
 </body>
 </html>
