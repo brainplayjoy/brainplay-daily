@@ -6,7 +6,6 @@
     <title>BrainPlay AI | Leaderboard</title>
     <!-- Firebase SDKs -->
     <script type="module">
-        // Import Firebase modules dynamically
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         
@@ -96,7 +95,8 @@
             }
         }
         
-        async function fetchLeaderboardData(type) {
+        // Unified leaderboard: sort by allTimePerfectCount desc, then todayPerfectCount desc
+        async function fetchLeaderboardData() {
             const usersRef = collection(db, USERS_COLLECTION);
             const snapshot = await getDocs(usersRef);
             const users = [];
@@ -109,17 +109,10 @@
                     allTimePerfectCount: data.allTimePerfectCount || 0
                 });
             });
-            if (type === 'today') {
-                users.sort((a,b) => {
-                    if (a.todayPerfectCount !== b.todayPerfectCount) return b.todayPerfectCount - a.todayPerfectCount;
-                    return b.allTimePerfectCount - a.allTimePerfectCount;
-                });
-            } else {
-                users.sort((a,b) => {
-                    if (a.allTimePerfectCount !== b.allTimePerfectCount) return b.allTimePerfectCount - a.allTimePerfectCount;
-                    return b.todayPerfectCount - a.todayPerfectCount;
-                });
-            }
+            users.sort((a,b) => {
+                if (a.allTimePerfectCount !== b.allTimePerfectCount) return b.allTimePerfectCount - a.allTimePerfectCount;
+                return b.todayPerfectCount - a.todayPerfectCount;
+            });
             return users;
         }
         
@@ -173,8 +166,7 @@
         };
         
         window.renderLeaderboardUI = async () => {
-            const activeTab = document.querySelector('.tab-active')?.getAttribute('data-tab') || 'today';
-            const users = await fetchLeaderboardData(activeTab);
+            const users = await fetchLeaderboardData();
             const currentUser = getCurrentUser();
             const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
             
@@ -211,8 +203,8 @@
                 else if (r === 3) rankDisplay = '🥉';
                 else rankDisplay = `#${r}`;
                 
-                const scoreCount = activeTab === 'today' ? currentUserRankData.user.todayPerfectCount : currentUserRankData.user.allTimePerfectCount;
-                const scoreLabel = activeTab === 'today' ? 'Today 5/5' : 'All-Time 5/5';
+                const scoreCount = currentUserRankData.user.allTimePerfectCount;
+                const scoreLabel = 'All-Time 5/5';
                 yourRow.innerHTML = `
                     <td class="rank-cell">${rankDisplay}</td>
                     <td class="name-cell">${currentUserRankData.user.name} <span class="you-badge">(You)</span></td>
@@ -235,8 +227,8 @@
                 else if (globalRank === 3) rankDisplay = '🥉';
                 else rankDisplay = `#${globalRank}`;
                 
-                const scoreCount = activeTab === 'today' ? user.todayPerfectCount : user.allTimePerfectCount;
-                const scoreLabel = activeTab === 'today' ? 'Today 5/5' : 'All-Time 5/5';
+                const scoreCount = user.allTimePerfectCount;
+                const scoreLabel = 'All-Time 5/5';
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td class="rank-cell">${rankDisplay}</td>
@@ -265,14 +257,6 @@
                 if (joinBtn) joinBtn.style.display = 'flex';
                 if (userDisplaySpan) userDisplaySpan.style.display = 'none';
             }
-        };
-        
-        window.switchTab = (tab) => {
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                if (btn.getAttribute('data-tab') === tab) btn.classList.add('tab-active');
-                else btn.classList.remove('tab-active');
-            });
-            renderLeaderboardUI();
         };
         
         window.addEventListener('DOMContentLoaded', async () => {
@@ -463,30 +447,7 @@
             color: #facc15;
             margin-left: 8px;
         }
-        /* Tabs */
-        .tabs {
-            display: flex;
-            gap: 12px;
-            margin: 20px 0 18px;
-            border-bottom: 1px solid #2a2a44;
-            padding-bottom: 8px;
-        }
-        .tab-btn {
-            background: none;
-            border: none;
-            padding: 8px 18px;
-            font-weight: 700;
-            font-size: 16px;
-            border-radius: 40px;
-            color: #bbb;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .tab-active {
-            background: #FDDA0D;
-            color: #000;
-            box-shadow: 0 2px 8px rgba(253,218,13,0.3);
-        }
+        
         /* Search */
         .search-box {
             background: #12122c;
@@ -579,7 +540,7 @@
         }
         .play-again-btn:hover { background: #ffea70; transform: translateY(-2px);}
         
-        /* Modal - professional white close, heading white */
+        /* Modal - Clean professional close button at top-right */
         .modal {
             display: none;
             position: fixed;
@@ -596,7 +557,7 @@
             border-radius: 36px;
             max-width: 340px;
             width: 90%;
-            padding: 28px 22px;
+            padding: 32px 24px 28px;
             position: relative;
             border: 1px solid rgba(255,215,0,0.5);
             box-shadow: 0 20px 35px black;
@@ -605,9 +566,9 @@
             position: absolute;
             top: 12px;
             right: 16px;
-            font-size: 20px;
+            font-size: 22px;
             cursor: pointer;
-            color: white;
+            color: rgba(255,255,255,0.8);
             background: none;
             border: none;
             font-weight: 300;
@@ -615,9 +576,9 @@
             padding: 4px;
             line-height: 1;
         }
-        .modal-close:hover { opacity: 0.7; }
+        .modal-close:hover { color: white; opacity: 1; }
         .modal-card h3 {
-            font-size: 24px;
+            font-size: 26px;
             margin-bottom: 8px;
             color: white;
             display: flex;
@@ -681,11 +642,6 @@
         <span id="loggedUserDisplay" style="display: none;" class="logged-user-badge"></span>
     </div>
     
-    <div class="tabs">
-        <button class="tab-btn tab-active" data-tab="today" onclick="switchTab('today')">📅 Today</button>
-        <button class="tab-btn" data-tab="alltime" onclick="switchTab('alltime')">🏆 All-Time</button>
-    </div>
-    
     <div class="search-box">
         <span>🔍</span>
         <input type="text" id="searchInput" placeholder="Search player...">
@@ -707,7 +663,7 @@
     </div>
 </div>
 
-<!-- Login Modal with polished design -->
+<!-- Login Modal with polished design: close button at top-right -->
 <div id="loginModal" class="modal">
     <div class="modal-card">
         <button class="modal-close" id="closeModal">×</button>
@@ -747,7 +703,6 @@
         });
     }
     window.renderLeaderboardUI = window.renderLeaderboardUI;
-    window.switchTab = window.switchTab;
 </script>
 </body>
 </html>
