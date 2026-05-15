@@ -37,21 +37,19 @@
         const db = getFirestore(app);
         const USERS_COLLECTION = "leaderboard_users";
         
-        // Helper: get name from email
         function getNameFromEmail(email) {
             if (!email) return "Player";
             const localPart = email.split('@')[0];
             return localPart.charAt(0).toUpperCase() + localPart.slice(1);
         }
         
-        // Get current logged in user (same as leaderboard)
         function getCurrentUser() {
             const email = localStorage.getItem('brainplay_user_email');
             if (email) return { email, name: getNameFromEmail(email) };
             return null;
         }
         
-        // Save game result to Firestore (updates totalPlayedCount and allTimePerfectCount)
+        // Saves score with proper perfect (5/5) and zero (0/5) counting
         async function saveGameResultToFirestore(score) {
             const user = getCurrentUser();
             if (!user) {
@@ -61,22 +59,28 @@
             const userRef = doc(db, USERS_COLLECTION, user.email);
             try {
                 const userSnap = await getDoc(userRef);
-                let currentData = { totalPlayedCount: 0, allTimePerfectCount: 0 };
+                let currentData = { totalPlayedCount: 0, allTimePerfectCount: 0, allTimeZeroCount: 0 };
                 if (userSnap.exists()) {
                     currentData = userSnap.data();
                 }
                 const newTotal = (currentData.totalPlayedCount || 0) + 1;
-                const newPerfect = (currentData.allTimePerfectCount || 0) + (score === 5 ? 1 : 0);
+                let newPerfect = currentData.allTimePerfectCount || 0;
+                let newZero = currentData.allTimeZeroCount || 0;
+                
+                if (score === 5) newPerfect++;
+                else if (score === 0) newZero++;
+                
                 await setDoc(userRef, {
                     name: user.name,
                     email: user.email,
                     totalPlayedCount: newTotal,
                     allTimePerfectCount: newPerfect,
+                    allTimeZeroCount: newZero,
                     todayPerfectCount: (currentData.todayPerfectCount || 0) + (score === 5 ? 1 : 0),
                     lastResetDate: currentData.lastResetDate || new Date().toISOString().slice(0,10),
                     createdAt: currentData.createdAt || new Date().toISOString()
                 }, { merge: true });
-                console.log(`✅ Score saved: ${score}/5 for ${user.email}. Total plays: ${newTotal}, Perfect: ${newPerfect}`);
+                console.log(`✅ Score saved: ${score}/5. Total:${newTotal}, Perfect:${newPerfect}, Zero:${newZero}`);
                 return true;
             } catch (err) {
                 console.error("Firestore error:", err);
@@ -84,7 +88,6 @@
             }
         }
         
-        // Login / Join modal logic (identical to leaderboard)
         async function loginUser(email) {
             if (!email || !email.includes('@')) throw new Error("Valid email required");
             const normalized = email.toLowerCase();
@@ -97,6 +100,7 @@
                     email: normalized,
                     todayPerfectCount: 0,
                     allTimePerfectCount: 0,
+                    allTimeZeroCount: 0,
                     totalPlayedCount: 0,
                     lastResetDate: todayStr,
                     createdAt: new Date().toISOString()
@@ -121,13 +125,11 @@
             location.reload();
         }
         
-        // Expose functions globally for UI
         window.loginUser = loginUser;
         window.logoutUser = logoutUser;
         window.getCurrentUser = getCurrentUser;
         window.saveGameResultToFirestore = saveGameResultToFirestore;
         
-        // Update UI based on login state
         function updateLoginUI() {
             const user = getCurrentUser();
             const joinBtn = document.getElementById('joinNowBtnGame');
@@ -137,9 +139,8 @@
                 if (joinBtn) joinBtn.style.display = 'none';
                 if (userDisplaySpan) {
                     userDisplaySpan.style.display = 'inline-flex';
-                    userDisplaySpan.innerHTML = `👋 ${user.name} <button id="logoutGameBtn" class="logout-mini">🚪</button>`;
-                    const logoutGame = document.getElementById('logoutGameBtn');
-                    if (logoutGame) logoutGame.onclick = (e) => { e.stopPropagation(); logoutUser(); };
+                    // Removed the mini logout icon (🚪) beside the name – only the red Logout button remains
+                    userDisplaySpan.innerHTML = `👋 ${user.name}`;
                 }
                 if (logoutBtn) logoutBtn.style.display = 'flex';
             } else {
@@ -149,7 +150,6 @@
             }
         }
         
-        // Modal handling
         function initLoginModal() {
             const modal = document.getElementById('loginModalGame');
             const joinBtn = document.getElementById('joinNowBtnGame');
@@ -187,7 +187,6 @@
         window.updateLoginUI = updateLoginUI;
         window.initLoginModal = initLoginModal;
         
-        // Call after DOM ready
         document.addEventListener('DOMContentLoaded', () => {
             updateLoginUI();
             initLoginModal();
@@ -349,14 +348,6 @@
             align-items: center;
             display: inline-flex;
             color: white;
-        }
-        .logout-mini {
-            background: none;
-            border: none;
-            font-size: 16px;
-            cursor: pointer;
-            color: #facc15;
-            margin-left: 6px;
         }
         .logout-header-btn {
             background: #dc2626;
@@ -938,6 +929,7 @@
             <div class="hamburger-menu" id="hamburgerMenu">
                 <a href="https://brainplayai.in/">Home</a>
                 <a href="https://brainplayai.in/how-to-play.html">How to Play</a>
+                <a href="#" id="leaderboardMenuLink">🏆 Leaderboard</a>
                 <a href="https://brainplayai.in/disclaimer.html">Disclaimer</a>
                 <a href="https://brainplayai.in/privacy-policy.html">Privacy Policy</a>
                 <a href="https://brainplayai.in/contact.html">Contact</a>
@@ -1051,7 +1043,7 @@
 </div>
 
 <script>
-    // ======================= SOUND (untouched) ========================
+    // ======================= SOUND (unchanged) ========================
     function playCorrectSound() {
         try {
             const ctx = new(window.AudioContext || window.webkitAudioContext)();
@@ -1110,11 +1102,44 @@
         } catch (e) {}
     }
 
-    // ======================= GAME STATE ========================
+    // ======================= FIXED IMAGE POOL (consistent Real/AI) ========================
+    // Each image URL has a fixed isReal flag that never changes
+    const imagePool = [
+        { url: "https://picsum.photos/id/1/800/600", isReal: true },
+        { url: "https://picsum.photos/id/2/800/600", isReal: false },
+        { url: "https://picsum.photos/id/3/800/600", isReal: true },
+        { url: "https://picsum.photos/id/4/800/600", isReal: false },
+        { url: "https://picsum.photos/id/5/800/600", isReal: true },
+        { url: "https://picsum.photos/id/6/800/600", isReal: false },
+        { url: "https://picsum.photos/id/7/800/600", isReal: true },
+        { url: "https://picsum.photos/id/8/800/600", isReal: false },
+        { url: "https://picsum.photos/id/9/800/600", isReal: true },
+        { url: "https://picsum.photos/id/10/800/600", isReal: false },
+        { url: "https://picsum.photos/id/11/800/600", isReal: true },
+        { url: "https://picsum.photos/id/12/800/600", isReal: false },
+        { url: "https://picsum.photos/id/13/800/600", isReal: true },
+        { url: "https://picsum.photos/id/14/800/600", isReal: false },
+        { url: "https://picsum.photos/id/15/800/600", isReal: true },
+        { url: "https://picsum.photos/id/16/800/600", isReal: false },
+        { url: "https://picsum.photos/id/17/800/600", isReal: true },
+        { url: "https://picsum.photos/id/18/800/600", isReal: false },
+        { url: "https://picsum.photos/id/19/800/600", isReal: true },
+        { url: "https://picsum.photos/id/20/800/600", isReal: false }
+    ];
+    
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+    
+    let currentGameImages = [];   // Stores the 5 images for the current session
     let index = 0;
     let score = 0;
-    let isReal;
     let answered = false;
+    let currentImageObj = null;
 
     const btnReal = document.getElementById('btnReal');
     const btnAi = document.getElementById('btnAi');
@@ -1149,24 +1174,29 @@
         btnReal.disabled = false;
         btnAi.disabled = false;
     }
-    function getRandomImage() {
-        return "https://picsum.photos/800/600?random=" + Math.random();
+    
+    function initNewGameSet() {
+        const shuffled = shuffleArray([...imagePool]);
+        currentGameImages = shuffled.slice(0, 5);
     }
+    
     function load() {
-        imgElement.src = getRandomImage();
+        if (currentGameImages.length === 0) initNewGameSet();
+        currentImageObj = currentGameImages[index];
+        imgElement.src = currentImageObj.url;
         imgElement.style.display = "block";
         scoreCardOverlay.style.display = "none";
-        isReal = Math.random() > 0.5;
         resultCard.style.display = "none";
         counterEl.innerText = (index + 1) + "/5";
         nextBtn.style.display = "none";
         enableButtons();
         setLeaderboardMode(false);
     }
+    
     function answer(choice) {
         if (answered) return;
         disableButtons();
-        let correct = (choice === "real" && isReal) || (choice === "ai" && !isReal);
+        let correct = (choice === "real" && currentImageObj.isReal) || (choice === "ai" && !currentImageObj.isReal);
         let circle = document.getElementById("circle");
         let titleElement = document.getElementById("title");
         let desc = document.getElementById("desc");
@@ -1181,19 +1211,20 @@
             circle.className = "circle correct";
             circle.innerHTML = "✔";
             titleElement.innerHTML = "CORRECT";
-            if (isReal) desc.innerHTML = highlightKeywords("Good catch! This image is REAL.");
+            if (currentImageObj.isReal) desc.innerHTML = highlightKeywords("Good catch! This image is REAL.");
             else desc.innerHTML = highlightKeywords("Good catch! This image is AI generated.");
         } else {
             playWrongSound();
             circle.className = "circle wrong";
             circle.innerHTML = "✖";
             titleElement.innerHTML = "WRONG";
-            if (isReal) desc.innerHTML = highlightKeywords("This image is REAL. The lighting, textures and details match natural patterns.");
+            if (currentImageObj.isReal) desc.innerHTML = highlightKeywords("This image is REAL. The lighting, textures and details match natural patterns.");
             else desc.innerHTML = highlightKeywords("This image is AI-generated. Look for unnatural textures and repeating patterns.");
         }
         resultCard.style.display = "block";
         nextBtn.style.display = "inline-block";
     }
+    
     function getScoreData(scoreValue) {
         if (scoreValue === 5) return { label: "Brilliant", emoji: "🤯" };
         if (scoreValue === 4) return { label: "Excellent", emoji: "🔥" };
@@ -1202,18 +1233,14 @@
         if (scoreValue === 1) return { label: "Poor", emoji: "😬" };
         return { label: "Very Bad", emoji: "😭" };
     }
+    
     async function next() {
         index++;
         if (index >= 5) {
-            // Game finished: save score to Firebase
             const user = window.getCurrentUser ? window.getCurrentUser() : null;
             if (user) {
                 const saved = await window.saveGameResultToFirestore(score);
-                if (saved) {
-                    console.log("Score recorded in leaderboard");
-                } else {
-                    alert("⚠️ Failed to save score. Please check your internet and try again.");
-                }
+                if (!saved) alert("⚠️ Failed to save score. Please check your internet.");
             } else {
                 alert("🔐 You are not logged in. Your score won't be saved to leaderboard. Click 'Join' to save scores.");
             }
@@ -1231,10 +1258,12 @@
             load();
         }
     }
+    
     function restartGame() {
         index = 0;
         score = 0;
         answered = false;
+        initNewGameSet();
         scoreCardOverlay.style.display = "none";
         imgElement.style.display = "block";
         resultCard.innerHTML = `<div class="result-row"><div id="circle" class="circle">✔</div><h3 id="title"></h3></div><p id="desc" class="desc-text"></p>`;
@@ -1244,19 +1273,24 @@
         setLeaderboardMode(false);
         load();
     }
+    
     function startNewGame() { restartGame(); }
+    
     function shareOnWhatsApp() {
         const scoreData = getScoreData(score);
         const message = `🎮 BrainPlay AI - Real vs AI Game!\n\nMy final score: ${scoreData.label} (${score}/5)\n\nWould you like to give challenge to your friend? Play here: ${location.href}`;
         window.open(`https://wa.me/?text=${encodeURIComponent(message)}`);
     }
+    
     document.getElementById('startNewFinalBtn').addEventListener('click', startNewGame);
     document.getElementById('finalWhatsappBtn').addEventListener('click', shareOnWhatsApp);
+    
     window.copyLink = function() { navigator.clipboard.writeText(location.href); alert("Link copied!"); }
     window.shareWA = function() { window.open("https://wa.me/?text=Play this game: " + location.href); }
     window.shareFB = function() { window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}&quote=${encodeURIComponent('🧠 Can you beat this AI test? Test your brain now!')}`); }
+    
     document.getElementById("percent").innerText = Math.floor(Math.random() * 50 + 30) + "%";
-
+    
     // PWA Install
     let deferredPrompt;
     window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
@@ -1265,7 +1299,7 @@
         else alert("To install: tap Share then 'Add to Home Screen' on iOS, or 'Install' on Android.");
     }
     document.getElementById('scoreCardSaveBtn')?.addEventListener('click', (e) => { e.preventDefault(); triggerInstall(); });
-
+    
     // Hamburger menu
     document.getElementById('hamburgerBtn').addEventListener('click', function(e) {
         e.stopPropagation();
@@ -1276,17 +1310,27 @@
         const btn = document.getElementById('hamburgerBtn');
         if (menu && btn && !menu.contains(e.target) && e.target !== btn) menu.classList.remove('active');
     });
-
-    // Leaderboard button
-    document.getElementById('leaderboardActionBtn')?.addEventListener('click', () => { window.location.href = 'leaderboard.html'; });
+    
+    // Leaderboard button (strip) opens in new tab
+    document.getElementById('leaderboardActionBtn')?.addEventListener('click', () => {
+        window.open('leaderboard.html', '_blank');
+    });
+    // Leaderboard link in hamburger menu
+    document.getElementById('leaderboardMenuLink')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.open('leaderboard.html', '_blank');
+    });
+    
     // Logout header button
     document.getElementById('logoutHeaderBtn')?.addEventListener('click', () => { window.logoutUser(); });
-
+    
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register(URL.createObjectURL(new Blob([`self.addEventListener('install', e => self.skipWaiting()); self.addEventListener('activate', e => e.waitUntil(clients.claim())); self.addEventListener('fetch', e => e.respondWith(fetch(e.request)));`], {type: 'application/javascript'}))).catch(console.log);
         });
     }
+    
+    initNewGameSet();
     load();
     if (window.location.pathname.includes('how-to-play.html')) {
         document.getElementById('playNowContainer').style.display = 'block';
