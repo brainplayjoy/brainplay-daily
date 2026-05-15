@@ -6,12 +6,12 @@
     <title>BrainPlay AI | Real vs AI Game</title>
     <meta name="description" content="Play viral AI brain games and challenge your mind with Real vs AI puzzles on BrainPlay AI.">
     <link rel="icon" type="image/png" href="favicon.png">
-    <!-- Open Graph / Social Media Sharing (UPDATED: custom Facebook share image) -->
+    <!-- Open Graph / Social Media Sharing -->
     <meta property="og:title" content="BrainPlay AI – Real vs AI Game">
     <meta property="og:description" content="Can you beat this AI test? Test your skills and share your score!">
-    <meta property="og:image" content="https://raw.githubusercontent.com/brainplayjoy/brainplay-daily/main/brainplayai-fb.webp">
+    <meta property="og:image" content="https://raw.githubusercontent.com/brainplayjoy/brainplay-daily/main/brainplayai-square.webp">
     <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
+    <meta property="og:image:height" content="1200">
     <meta property="og:url" content="https://brainplayjoy.github.io/brainplay-daily/">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="en_US">
@@ -49,7 +49,7 @@
             return null;
         }
         
-        // UPDATED: Saves score with proper perfect (5/5) and zero (0/5) counting
+        // Saves score with proper perfect (5/5) and zero (0/5) counting
         async function saveGameResultToFirestore(score) {
             const user = getCurrentUser();
             if (!user) {
@@ -112,10 +112,6 @@
                     const newTotal = perfect + Math.floor(Math.random() * 3) + 1;
                     await updateDoc(userRef, { totalPlayedCount: newTotal });
                 }
-                // Ensure zeroCount field exists for old users
-                if (existing.allTimeZeroCount === undefined) {
-                    await updateDoc(userRef, { allTimeZeroCount: 0 });
-                }
                 if (existing.lastResetDate !== todayStr) {
                     await updateDoc(userRef, { todayPerfectCount: 0, lastResetDate: todayStr });
                 }
@@ -143,6 +139,7 @@
                 if (joinBtn) joinBtn.style.display = 'none';
                 if (userDisplaySpan) {
                     userDisplaySpan.style.display = 'inline-flex';
+                    // Removed the mini logout icon (🚪) beside the name – only the red Logout button remains
                     userDisplaySpan.innerHTML = `👋 ${user.name}`;
                 }
                 if (logoutBtn) logoutBtn.style.display = 'flex';
@@ -774,49 +771,14 @@
             color: #fff;
         }
 
-        /* FOOTER - NEW: Side by side buttons (Leaderboard left, How to Play right) */
-        .footer-buttons {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            margin-top: 24px;
-            margin-bottom: 10px;
-        }
-        .footer-btn {
-            flex: 1;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 10px 20px;
-            border-radius: 40px;
-            font-weight: 800;
-            font-size: 14px;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
+        /* FOOTER */
+        .footer {
+            margin-top: 4px;
             text-align: center;
+            color: #fff;
+            font-size: 1px;
         }
-        .leaderboard-footer-btn {
-            background: #000000;
-            color: white;
-            border: 2px solid #facc15;
-        }
-        .leaderboard-footer-btn:hover {
-            background: #1a1a1a;
-            transform: translateY(-2px);
-            border-color: #fbbf24;
-        }
-        .how-to-play-footer-btn {
-            background: transparent;
-            color: #ffffff;
-            border: 2px solid #facc15;
-        }
-        .how-to-play-footer-btn:hover {
-            background: rgba(250, 204, 21, 0.1);
-            transform: translateY(-2px);
-        }
+
         .install-arrow {
             color: #facc15;
             font-size: 20px;
@@ -826,13 +788,36 @@
             display: inline-block;
             transition: transform 0.2s;
         }
+
         .install-arrow:hover {
             transform: scale(1.3);
         }
+
+        .how-to-play-btn {
+            display: inline-block;
+            margin-top: 14px;
+            padding: 10px 24px;
+            border: 2px solid #facc15;
+            border-radius: 12px;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 14px;
+            text-decoration: none;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .how-to-play-btn:hover {
+            background: rgba(250, 204, 21, 0.1);
+            transform: translateY(-2px);
+        }
+
         .score-install-promo {
             margin-top: 15px;
             margin-bottom: 10px;
         }
+
         .simple-playnow-btn {
             display: inline-block;
             background: #facc15;
@@ -847,6 +832,7 @@
             transition: all 0.2s ease;
             margin-top: 10px;
         }
+
         .simple-playnow-btn:hover {
             background: #e5b800;
             transform: translateY(-1px);
@@ -920,10 +906,6 @@
             font-size: 15px;
             margin-bottom: 20px;
             outline: none;
-        }
-        
-        @media (max-width: 550px) {
-            .footer-btn { padding: 8px 12px; font-size: 12px; }
         }
     </style>
 </head>
@@ -1040,12 +1022,11 @@
         </div>
     </div>
 
-    <!-- NEW FOOTER: Leaderboard button (left) + How to Play button (right) -->
-    <div class="footer-buttons">
-        <button class="footer-btn leaderboard-footer-btn" id="footerLeaderboardBtn">🏆 Leaderboard</button>
-        <a href="https://brainplayai.in/how-to-play.html" class="footer-btn how-to-play-footer-btn">📖 How to Play</a>
+    <div class="footer">
+        <br>
+        <a href="https://brainplayai.in/how-to-play.html" class="how-to-play-btn">How to play</a>
     </div>
-    <div style="text-align: center; margin-top: 10px; display: none;" id="playNowContainer">
+    <div style="text-align: center; margin-top: 20px; display: none;" id="playNowContainer">
         <a href="https://brainplayai.in/play-now.html" class="simple-playnow-btn">▶ Play Now</a>
     </div>
 </div>
@@ -1122,6 +1103,7 @@
     }
 
     // ======================= FIXED IMAGE POOL (consistent Real/AI) ========================
+    // Each image URL has a fixed isReal flag that never changes
     const imagePool = [
         { url: "https://picsum.photos/id/1/800/600", isReal: true },
         { url: "https://picsum.photos/id/2/800/600", isReal: false },
@@ -1153,7 +1135,7 @@
         return arr;
     }
     
-    let currentGameImages = [];
+    let currentGameImages = [];   // Stores the 5 images for the current session
     let index = 0;
     let score = 0;
     let answered = false;
@@ -1336,10 +1318,6 @@
     // Leaderboard link in hamburger menu
     document.getElementById('leaderboardMenuLink')?.addEventListener('click', (e) => {
         e.preventDefault();
-        window.open('leaderboard.html', '_blank');
-    });
-    // Footer Leaderboard button
-    document.getElementById('footerLeaderboardBtn')?.addEventListener('click', () => {
         window.open('leaderboard.html', '_blank');
     });
     
