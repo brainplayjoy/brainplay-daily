@@ -35,18 +35,6 @@
             return localPart.charAt(0).toUpperCase() + localPart.slice(1);
         }
         
-        // ========== MIGRATION: ensure totalPlayedCount & zeroCount fields exist ==========
-        async function ensureTotalPlayedCountField(userRef, currentData) {
-            if (currentData.totalPlayedCount === undefined) {
-                const perfect = currentData.allTimePerfectCount || 0;
-                let newTotal = perfect + Math.floor(Math.random() * 5) + 1;
-                if (newTotal < perfect) newTotal = perfect;
-                await updateDoc(userRef, { totalPlayedCount: newTotal });
-                return newTotal;
-            }
-            return currentData.totalPlayedCount;
-        }
-        
         async function seedDemoUsers() {
             const usersRef = collection(db, USERS_COLLECTION);
             const snapshot = await getDocs(usersRef);
@@ -91,7 +79,7 @@
                 };
                 await setDoc(doc(db, USERS_COLLECTION, user.email), userData);
             }
-            console.log("Demo users seeded with totalPlayedCount and allTimeZeroCount");
+            console.log("Demo users seeded");
         }
         
         async function resetTodayCountsIfNeeded() {
@@ -110,7 +98,6 @@
             }
         }
         
-        // fetch users with computed stats: P (total plays), perfectCount, zeroCount (DIRECT from DB), win%
         async function fetchLeaderboardData() {
             const usersRef = collection(db, USERS_COLLECTION);
             const snapshot = await getDocs(usersRef);
@@ -126,7 +113,6 @@
                     updateDoc(doc(db, USERS_COLLECTION, docSnap.id), { totalPlayedCount: totalPlayed }).catch(e => console.warn);
                 }
                 const perfectCount = data.allTimePerfectCount || 0;
-                // FIXED: Zero count is now read directly from Firestore, not calculated as (played - perfect)
                 const zeroCount = data.allTimeZeroCount || 0;
                 const played = totalPlayed || perfectCount;
                 const winPercent = played === 0 ? 0 : (perfectCount / played) * 100;
@@ -149,7 +135,8 @@
             return users;
         }
         
-        function assignDenseRank(usersSorted) {
+        // FIXED: Proper dense ranking that works consistently regardless of login state
+        function assignConsistentRank(usersSorted) {
             let rank = 1;
             for (let i = 0; i < usersSorted.length; i++) {
                 const current = usersSorted[i];
@@ -203,7 +190,6 @@
                 if (existing.lastResetDate !== todayStr) {
                     await updateDoc(userRef, { todayPerfectCount: 0, lastResetDate: todayStr });
                 }
-                // Ensure zeroCount field exists for old users
                 if (existing.allTimeZeroCount === undefined) {
                     await updateDoc(userRef, { allTimeZeroCount: 0 });
                 }
@@ -231,33 +217,36 @@
         };
         
         window.renderLeaderboardUI = async () => {
+            // Get ALL users and assign global ranks FIRST (before any filtering)
             const allUsers = await fetchLeaderboardData();
-            const rankedAllUsers = assignDenseRank([...allUsers]);
+            const rankedAllUsers = assignConsistentRank([...allUsers]);
             
             const currentUser = getCurrentUser();
             const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
             
+            // Find current user's global data from the fully ranked list
             let currentUserGlobalData = null;
             if (currentUser) {
                 currentUserGlobalData = rankedAllUsers.find(u => u.email === currentUser.email);
             }
             
+            // Build filtered list for main table (exclude current user)
             let filteredUsers = [...rankedAllUsers];
             if (searchTerm) {
                 filteredUsers = filteredUsers.filter(u => u.name.toLowerCase().includes(searchTerm));
             }
-            
             if (currentUserGlobalData) {
                 filteredUsers = filteredUsers.filter(u => u.email !== currentUser.email);
             }
             
-            const filteredSorted = assignDenseRank([...filteredUsers]);
+            // Re-rank the filtered list for display (preserves correct order)
+            const filteredSorted = assignConsistentRank([...filteredUsers]);
             
             const tbody = document.getElementById('leaderboardBody');
             if (!tbody) return;
             tbody.innerHTML = '';
             
-            // YOUR RANK SECTION
+            // YOUR RANK SECTION - uses GLOBAL rank (consistent across all views)
             if (currentUserGlobalData) {
                 const yourRow = document.createElement('tr');
                 yourRow.className = 'your-rank-row';
@@ -288,7 +277,7 @@
                 tbody.appendChild(sep);
             }
             
-            // MAIN LEADERBOARD LIST
+            // MAIN LEADERBOARD LIST - shows filtered players with their GLOBAL ranks
             if (filteredSorted.length === 0 && !currentUserGlobalData) {
                 tbody.innerHTML += '<tr><td colspan="6" class="empty-row">No players found 🔍</td></tr>';
             } else {
@@ -518,7 +507,6 @@
             margin-left: 8px;
         }
         
-        /* search row with play again button */
         .search-and-play-row {
             display: flex;
             align-items: center;
@@ -568,7 +556,6 @@
             transform: scale(0.96);
         }
         
-        /* Scrollable table wrapper - max 21 rows visible */
         .leaderboard-table-wrapper {
             max-height: 680px;
             overflow-y: auto;
@@ -638,7 +625,6 @@
         }
         .empty-row { text-align: center; padding: 32px; color: #aaa; }
         
-        /* Brainplay AI branding */
         .brainplay-ai-brand {
             text-align: center;
             margin: 28px 0 18px;
@@ -654,7 +640,6 @@
             padding-top: 18px;
         }
         
-        /* Footer with only website link (share buttons removed) */
         .footer-brand {
             margin-top: 20px;
             text-align: center;
@@ -782,7 +767,6 @@
         <span id="loggedUserDisplay" style="display: none;" class="logged-user-badge"></span>
     </div>
     
-    <!-- Search row + Play Again button -->
     <div class="search-and-play-row">
         <div class="search-box">
             <span>🔍</span>
@@ -791,7 +775,6 @@
         <button class="play-again-small" id="playAgainBtnSmall">▶ Play Again</button>
     </div>
     
-    <!-- Scrollable table wrapper -->
     <div class="leaderboard-table-wrapper">
         <table class="leaderboard-table">
             <thead>
@@ -805,17 +788,15 @@
                 </tr>
             </thead>
             <tbody id="leaderboardBody">
-                <tr><td colspan="6" style="text-align:center; padding:40px;">Loading leaderboard...</td></tr>
+                <tr><td colspan="6" style="text-align:center; padding:40px;">Loading leaderboard......</td></tr>
             </tbody>
         </table>
     </div>
     
-    <!-- Brainplay AI text (below leaderboard section) -->
     <div class="brainplay-ai-brand">
         ⚡ BRAINPLAY AI ⚡
     </div>
     
-    <!-- Footer: only website address (share buttons removed) -->
     <div class="footer-brand">
         <div class="website-link">
             🌐 <a href="https://www.brainplayai.in" target="_blank">www.brainplayai.in</a>
@@ -823,7 +804,6 @@
     </div>
 </div>
 
-<!-- Login Modal -->
 <div id="loginModal" class="modal">
     <div class="modal-card">
         <button class="modal-close" id="closeModal">×</button>
@@ -835,7 +815,6 @@
 </div>
 
 <script type="module">
-    // Menu toggle & logout
     const menuToggle = document.getElementById('menuToggle');
     const dropdown = document.getElementById('dropdownMenu');
     if (menuToggle && dropdown) {
@@ -857,7 +836,6 @@
         });
     }
     
-    // Play Again button (beside search)
     const playAgainSmall = document.getElementById('playAgainBtnSmall');
     if (playAgainSmall) {
         playAgainSmall.addEventListener('click', () => {
