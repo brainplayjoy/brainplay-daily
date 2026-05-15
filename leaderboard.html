@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>BrainPlay AI | Leaderboard</title>
+    <!-- Font Awesome Icons (for share buttons & UI) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -36,10 +38,8 @@
         // ========== MIGRATION: ensure totalPlayedCount field exists ==========
         async function ensureTotalPlayedCountField(userRef, currentData) {
             if (currentData.totalPlayedCount === undefined) {
-                // For old users without totalPlayedCount, set a realistic value: allTimePerfectCount + random (1~4)
-                // but ensure it's at least allTimePerfectCount
                 const perfect = currentData.allTimePerfectCount || 0;
-                let newTotal = perfect + Math.floor(Math.random() * 5) + 1; // adds 1-5 extra attempts
+                let newTotal = perfect + Math.floor(Math.random() * 5) + 1;
                 if (newTotal < perfect) newTotal = perfect;
                 await updateDoc(userRef, { totalPlayedCount: newTotal });
                 return newTotal;
@@ -115,20 +115,17 @@
             const snapshot = await getDocs(usersRef);
             const users = [];
             
-            // background migration: ensure totalPlayedCount exists
             for (const docSnap of snapshot.docs) {
                 const data = docSnap.data();
                 let totalPlayed = data.totalPlayedCount;
                 if (totalPlayed === undefined) {
-                    // migrate on the fly (fire and forget, but we also set in-memory value)
                     const perfectCount = data.allTimePerfectCount || 0;
                     totalPlayed = perfectCount + Math.floor(Math.random() * 5) + 1;
                     if (totalPlayed < perfectCount) totalPlayed = perfectCount;
-                    // update DB silently
                     updateDoc(doc(db, USERS_COLLECTION, docSnap.id), { totalPlayedCount: totalPlayed }).catch(e => console.warn);
                 }
                 const perfectCount = data.allTimePerfectCount || 0;
-                const played = totalPlayed || perfectCount; // fallback to perfect if total missing but logic prevents
+                const played = totalPlayed || perfectCount;
                 const zeroCount = Math.max(0, played - perfectCount);
                 const winPercent = played === 0 ? 0 : (perfectCount / played) * 100;
                 
@@ -142,7 +139,6 @@
                     winPercent: winPercent
                 });
             }
-            // sort by winPercent desc, then perfectCount desc, then totalPlayedCount desc for consistency
             users.sort((a,b) => {
                 if (a.winPercent !== b.winPercent) return b.winPercent - a.winPercent;
                 if (a.allTimePerfectCount !== b.allTimePerfectCount) return b.allTimePerfectCount - a.allTimePerfectCount;
@@ -151,11 +147,8 @@
             return users;
         }
         
-        // dense ranking based on winPercent (and perfectCount for tie-breaker ranking identity)
         function assignDenseRank(usersSorted) {
             let rank = 1;
-            let prevWin = null;
-            let prevPerfect = null;
             for (let i = 0; i < usersSorted.length; i++) {
                 const current = usersSorted[i];
                 if (i === 0) {
@@ -188,7 +181,6 @@
             const userSnap = await getDoc(userRef);
             const todayStr = new Date().toISOString().slice(0,10);
             if (!userSnap.exists()) {
-                // New user: add totalPlayedCount = 0
                 await setDoc(userRef, {
                     name: getNameFromEmail(normalized),
                     email: normalized,
@@ -200,7 +192,6 @@
                 });
             } else {
                 const existing = userSnap.data();
-                // check missing totalPlayedCount for old user login
                 if (existing.totalPlayedCount === undefined) {
                     const perfect = existing.allTimePerfectCount || 0;
                     const newTotal = perfect + Math.floor(Math.random() * 3) + 1;
@@ -233,39 +224,33 @@
         };
         
         window.renderLeaderboardUI = async () => {
-            // 1. Get all users with computed stats & assign global dense rank
             const allUsers = await fetchLeaderboardData();
             const rankedAllUsers = assignDenseRank([...allUsers]);
             
             const currentUser = getCurrentUser();
             const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
             
-            // Find currentUser data (global)
             let currentUserGlobalData = null;
             if (currentUser) {
                 currentUserGlobalData = rankedAllUsers.find(u => u.email === currentUser.email);
             }
             
-            // 2. Filtered list (excluding current user) for main table
             let filteredUsers = [...rankedAllUsers];
             if (searchTerm) {
                 filteredUsers = filteredUsers.filter(u => u.name.toLowerCase().includes(searchTerm));
             }
             
-            // remove current user from filtered list to avoid duplication (Your row shown separately)
             if (currentUserGlobalData) {
                 filteredUsers = filteredUsers.filter(u => u.email !== currentUser.email);
             }
             
-            // 3. compute dense ranking for filtered subset (for display in main list)
             const filteredSorted = assignDenseRank([...filteredUsers]);
             
-            // 4. Render UI
             const tbody = document.getElementById('leaderboardBody');
             if (!tbody) return;
             tbody.innerHTML = '';
             
-            // ------- YOUR RANK SECTION (always at top) -------
+            // YOUR RANK SECTION
             if (currentUserGlobalData) {
                 const yourRow = document.createElement('tr');
                 yourRow.className = 'your-rank-row';
@@ -290,14 +275,13 @@
                     <td class="stat-cell win-pct">${winPct}%</td>
                 `;
                 tbody.appendChild(yourRow);
-                // separator line
                 const sep = document.createElement('tr');
                 sep.className = 'separator-row';
                 sep.innerHTML = '<td colspan="6"><div class="sep-line"></div></td>';
                 tbody.appendChild(sep);
             }
             
-            // ------- MAIN LEADERBOAD LIST (filtered + ranked) -------
+            // MAIN LEADERBOARD LIST
             if (filteredSorted.length === 0 && !currentUserGlobalData) {
                 tbody.innerHTML += '<tr><td colspan="6" class="empty-row">No players found 🔍</td></tr>';
             } else {
@@ -323,7 +307,7 @@
                 });
             }
             
-            // Toggle join button / logged user display
+            // toggle join button
             const joinBtn = document.getElementById('joinNowBtn');
             const userDisplaySpan = document.getElementById('loggedUserDisplay');
             if (currentUser) {
@@ -527,15 +511,23 @@
             margin-left: 8px;
         }
         
+        /* NEW: search row with play again button */
+        .search-and-play-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
         .search-box {
             background: #12122c;
             border-radius: 44px;
             padding: 8px 16px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
+            gap: 10px;
             border: 1px solid #2e2e4a;
+            flex: 1;
+            max-width: 70%;
         }
         .search-box span { font-size: 18px; }
         .search-box input {
@@ -548,6 +540,35 @@
         }
         .search-box input::placeholder { color: #5f5f8a; }
         
+        .play-again-small {
+            background: #FDDA0D;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 800;
+            font-size: 14px;
+            color: #000;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        .play-again-small:hover {
+            background: #ffea70;
+            transform: scale(0.96);
+        }
+        
+        /* Scrollable table wrapper - max 21 rows visible */
+        .leaderboard-table-wrapper {
+            max-height: 680px;
+            overflow-y: auto;
+            border-radius: 20px;
+            margin-top: 6px;
+            scrollbar-width: thin;
+        }
         .leaderboard-table {
             width: 100%;
             border-collapse: collapse;
@@ -559,8 +580,11 @@
             font-weight: 700;
             font-size: 13px;
             border-bottom: 1px solid #2e2e4a;
+            position: sticky;
+            top: 0;
+            background: #12122c;
+            z-index: 5;
         }
-        /* align numeric columns to right */
         .leaderboard-table th:not(:first-child):not(:nth-child(2)) {
             text-align: right;
         }
@@ -607,27 +631,77 @@
         }
         .empty-row { text-align: center; padding: 32px; color: #aaa; }
         
-        .play-again-wrapper {
+        /* Brainplay AI branding */
+        .brainplay-ai-brand {
+            text-align: center;
+            margin: 28px 0 18px;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            background: linear-gradient(120deg, #FFD966, #FFB347);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-transform: uppercase;
+            border-top: 1px dashed rgba(255,215,0,0.3);
+            padding-top: 18px;
+        }
+        
+        /* Share Buttons + Footer */
+        .share-footer {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+        .share-buttons {
             display: flex;
             justify-content: center;
-            margin-top: 28px;
+            gap: 20px;
+            flex-wrap: wrap;
         }
-        .play-again-btn {
-            background: #FDDA0D;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 40px;
-            font-weight: 800;
-            font-size: 16px;
-            color: #000;
-            cursor: pointer;
-            transition: 0.2s;
+        .share-btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            gap: 10px;
+            background: #1e1e36;
+            padding: 10px 22px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 15px;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid #3a3a5a;
+            text-decoration: none;
         }
-        .play-again-btn:hover { background: #ffea70; transform: translateY(-2px);}
+        .share-btn i {
+            font-size: 20px;
+        }
+        .share-btn.fb:hover {
+            background: #1877f2;
+            border-color: #1877f2;
+        }
+        .share-btn.whatsapp:hover {
+            background: #25D366;
+            border-color: #25D366;
+        }
+        .website-link {
+            font-size: 14px;
+            color: #aaa;
+            text-align: center;
+            margin-top: 8px;
+            letter-spacing: 0.5px;
+        }
+        .website-link a {
+            color: #FFD966;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .website-link a:hover {
+            text-decoration: underline;
+        }
         
         .modal {
             display: none;
@@ -654,17 +728,13 @@
             position: absolute;
             top: 14px;
             right: 16px;
-            width: auto !important;
             background: transparent !important;
             border: none !important;
             padding: 0 !important;
             margin: 0 !important;
             color: #ffffff !important;
             font-size: 22px;
-            font-weight: 400;
             cursor: pointer;
-            line-height: 1;
-            z-index: 10;
         }
         .modal-card button:not(.modal-close) {
             width: 100%;
@@ -677,7 +747,6 @@
             font-size: 16px;
             color: #000;
         }
-        .modal-close:hover { opacity: 0.7; }
         .modal-card h3 {
             font-size: 24px;
             margin-bottom: 8px;
@@ -702,14 +771,21 @@
             margin-bottom: 20px;
             outline: none;
         }
+        
         @media (max-width: 680px) {
             .leaderboard-container { padding: 16px; max-width: 100%; }
             .stat-cell, .rank-cell, .name-cell { font-size: 12px; padding: 8px 4px; }
             .leaderboard-table th { font-size: 11px; padding: 8px 4px; }
+            .search-and-play-row { gap: 8px; }
+            .search-box { max-width: 65%; }
+            .play-again-small { padding: 6px 14px; font-size: 12px; }
+            .leaderboard-table-wrapper { max-height: 520px; }
+            .share-btn { padding: 7px 16px; font-size: 13px; }
         }
         @media (max-width: 550px) {
             .stat-cell { font-size: 11px; }
             .you-badge { font-size: 8px; margin-left: 4px; }
+            .play-again-small { padding: 5px 12px; font-size: 11px; }
         }
     </style>
 </head>
@@ -736,12 +812,17 @@
         <span id="loggedUserDisplay" style="display: none;" class="logged-user-badge"></span>
     </div>
     
-    <div class="search-box">
-        <span>🔍</span>
-        <input type="text" id="searchInput" placeholder="Search player...">
+    <!-- NEW: Search row + Play Again button (yellow, reduced search length) -->
+    <div class="search-and-play-row">
+        <div class="search-box">
+            <span>🔍</span>
+            <input type="text" id="searchInput" placeholder="Search player...">
+        </div>
+        <button class="play-again-small" id="playAgainBtnSmall">▶ Play Again</button>
     </div>
     
-    <div style="overflow-x: auto;">
+    <!-- Scrollable table wrapper (max 21 players, then scroll) -->
+    <div class="leaderboard-table-wrapper">
         <table class="leaderboard-table">
             <thead>
                 <tr>
@@ -759,8 +840,20 @@
         </table>
     </div>
     
-    <div class="play-again-wrapper">
-        <button class="play-again-btn" id="playAgainBtn">▶ Play</button>
+    <!-- Brainplay AI text (below leaderboard section) -->
+    <div class="brainplay-ai-brand">
+        ⚡ BRAINPLAY AI ⚡
+    </div>
+    
+    <!-- Share buttons + website address -->
+    <div class="share-footer">
+        <div class="share-buttons">
+            <button class="share-btn fb" id="shareFacebookBtn"><i class="fab fa-facebook-f"></i> Facebook</button>
+            <button class="share-btn whatsapp" id="shareWhatsappBtn"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+        </div>
+        <div class="website-link">
+            🌐 <a href="https://www.brainplayai.in" target="_blank">www.brainplayai.in</a>
+        </div>
     </div>
 </div>
 
@@ -776,6 +869,7 @@
 </div>
 
 <script type="module">
+    // Menu toggle & logout
     const menuToggle = document.getElementById('menuToggle');
     const dropdown = document.getElementById('dropdownMenu');
     if (menuToggle && dropdown) {
@@ -796,10 +890,28 @@
             if (typeof window.logoutUser === 'function') window.logoutUser();
         });
     }
-    const playAgain = document.getElementById('playAgainBtn');
-    if (playAgain) {
-        playAgain.addEventListener('click', () => {
+    
+    // NEW Play Again button (beside search)
+    const playAgainSmall = document.getElementById('playAgainBtnSmall');
+    if (playAgainSmall) {
+        playAgainSmall.addEventListener('click', () => {
             window.location.href = 'index.html';
+        });
+    }
+    
+    // Share functionality
+    const shareFb = document.getElementById('shareFacebookBtn');
+    const shareWa = document.getElementById('shareWhatsappBtn');
+    const currentUrl = encodeURIComponent(window.location.href);
+    const shareText = encodeURIComponent("Check out the BrainPlay AI Leaderboard! 🧠🏆 Can you beat the best?");
+    if (shareFb) {
+        shareFb.addEventListener('click', () => {
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${currentUrl}`, '_blank', 'width=600,height=400');
+        });
+    }
+    if (shareWa) {
+        shareWa.addEventListener('click', () => {
+            window.open(`https://api.whatsapp.com/send?text=${shareText}%20${currentUrl}`, '_blank');
         });
     }
 </script>
