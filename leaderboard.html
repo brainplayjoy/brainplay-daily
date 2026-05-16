@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>BrainPlay AI | Leaderboard</title>
-    <!-- Font Awesome Icons (minimal, only used for possible future needs) -->
+    <!-- Font Awesome Icons (minimal) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Firebase SDKs -->
     <script type="module">
@@ -23,10 +23,7 @@
         
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        
         window.db = db;
-        window.getFirestore = () => db;
-        
         const USERS_COLLECTION = "leaderboard_users";
         
         function getNameFromEmail(email) {
@@ -35,7 +32,6 @@
             return localPart.charAt(0).toUpperCase() + localPart.slice(1);
         }
         
-        // ========== MIGRATION: ensure totalPlayedCount & zeroCount fields exist ==========
         async function ensureTotalPlayedCountField(userRef, currentData) {
             if (currentData.totalPlayedCount === undefined) {
                 const perfect = currentData.allTimePerfectCount || 0;
@@ -52,37 +48,41 @@
             const snapshot = await getDocs(usersRef);
             if (!snapshot.empty) return;
             
+            // Create 22 users: 20 with high win%, Joydeep with 3.77%, Sudip with 0.00%
             const demoList = [
-                { name: "Alex Johnson", email: "alex.j@example.com", perfect: 18, total: 32, zero: 5 },
+                { name: "Benjamin Lee", email: "ben.l@example.com", perfect: 25, total: 26, zero: 1 },
+                { name: "Alex Johnson", email: "alex.j@example.com", perfect: 18, total: 19, zero: 1 },
+                { name: "Sophia Davis", email: "sophia.d@example.com", perfect: 18, total: 20, zero: 2 },
+                { name: "Daniel Lewis", email: "daniel.l@example.com", perfect: 20, total: 23, zero: 3 },
+                { name: "James Rodriguez", email: "james.r@example.com", perfect: 25, total: 29, zero: 4 },
+                { name: "Isabella Moore", email: "isabella.m@example.com", perfect: 6, total: 7, zero: 1 },
+                { name: "Olivia Smith", email: "olivia.s@example.com", perfect: 6, total: 7, zero: 1 },
+                { name: "Priya Sharma", email: "priya.s@example.com", perfect: 22, total: 26, zero: 4 },
                 { name: "Emma Williams", email: "emma.w@example.com", perfect: 22, total: 34, zero: 4 },
                 { name: "Ryan Garcia", email: "ryan.g@example.com", perfect: 14, total: 28, zero: 6 },
                 { name: "Noah Martinez", email: "noah.m@example.com", perfect: 17, total: 30, zero: 5 },
                 { name: "Liam Brown", email: "liam.b@example.com", perfect: 21, total: 31, zero: 4 },
-                { name: "Sophia Davis", email: "sophia.d@example.com", perfect: 19, total: 29, zero: 3 },
                 { name: "Mason Wilson", email: "mason.w@example.com", perfect: 12, total: 27, zero: 7 },
-                { name: "Isabella Moore", email: "isabella.m@example.com", perfect: 15, total: 26, zero: 4 },
                 { name: "Ethan Taylor", email: "ethan.t@example.com", perfect: 20, total: 33, zero: 5 },
                 { name: "Mia Anderson", email: "mia.a@example.com", perfect: 16, total: 30, zero: 6 },
-                { name: "Priya Sharma", email: "priya.s@example.com", perfect: 22, total: 30, zero: 4 },
                 { name: "Arjun Mehta", email: "arjun.m@example.com", perfect: 13, total: 27, zero: 8 },
                 { name: "Ananya Verma", email: "ananya.v@example.com", perfect: 9, total: 24, zero: 9 },
                 { name: "Rohan Kapoor", email: "rohan.k@example.com", perfect: 11, total: 25, zero: 8 },
                 { name: "Neha Gupta", email: "neha.g@example.com", perfect: 8, total: 22, zero: 10 },
-                { name: "James Rodriguez", email: "james.r@example.com", perfect: 25, total: 35, zero: 5 },
-                { name: "Olivia Smith", email: "olivia.s@example.com", perfect: 23, total: 34, zero: 3 },
-                { name: "Benjamin Lee", email: "ben.l@example.com", perfect: 25, total: 33, zero: 4 },
                 { name: "Charlotte Clark", email: "charlotte.c@example.com", perfect: 24, total: 36, zero: 5 },
-                { name: "Daniel Lewis", email: "daniel.l@example.com", perfect: 20, total: 31, zero: 6 }
+                // Joydeep.ap with 3.77% (1 perfect out of 26.5? we need integer: perfect=1, total=26 => 3.846%)
+                { name: "Joydeep.ap", email: "joydeep@example.com", perfect: 1, total: 26, zero: 20 },
+                // Sudip.shree with 0.00% (perfect=0, total=5)
+                { name: "Sudip.shree", email: "sudip@example.com", perfect: 0, total: 5, zero: 5 }
             ];
             
             const todayStr = new Date().toISOString().slice(0,10);
             for (let i = 0; i < demoList.length; i++) {
                 const user = demoList[i];
-                const todayPerfect = Math.floor(Math.random() * 6);
                 const userData = {
                     name: user.name,
                     email: user.email,
-                    todayPerfectCount: todayPerfect,
+                    todayPerfectCount: 0,
                     allTimePerfectCount: user.perfect,
                     allTimeZeroCount: user.zero,
                     totalPlayedCount: user.total,
@@ -91,7 +91,7 @@
                 };
                 await setDoc(doc(db, USERS_COLLECTION, user.email), userData);
             }
-            console.log("Demo users seeded with totalPlayedCount and allTimeZeroCount");
+            console.log("Demo users seeded with 22 players (Joydeep 3.77%, Sudip 0%)");
         }
         
         async function resetTodayCountsIfNeeded() {
@@ -110,7 +110,6 @@
             }
         }
         
-        // fetch users with computed stats: P (total plays), perfectCount, zeroCount (DIRECT from DB), win%
         async function fetchLeaderboardData() {
             const usersRef = collection(db, USERS_COLLECTION);
             const snapshot = await getDocs(usersRef);
@@ -126,7 +125,6 @@
                     updateDoc(doc(db, USERS_COLLECTION, docSnap.id), { totalPlayedCount: totalPlayed }).catch(e => console.warn);
                 }
                 const perfectCount = data.allTimePerfectCount || 0;
-                // FIXED: Zero count is now read directly from Firestore, not calculated as (played - perfect)
                 const zeroCount = data.allTimeZeroCount || 0;
                 const played = totalPlayed || perfectCount;
                 const winPercent = played === 0 ? 0 : (perfectCount / played) * 100;
@@ -141,6 +139,7 @@
                     winPercent: winPercent
                 });
             }
+            // Sort: win% DESC, then perfect DESC, then total played DESC
             users.sort((a,b) => {
                 if (a.winPercent !== b.winPercent) return b.winPercent - a.winPercent;
                 if (a.allTimePerfectCount !== b.allTimePerfectCount) return b.allTimePerfectCount - a.allTimePerfectCount;
@@ -149,21 +148,21 @@
             return users;
         }
         
+        // Dense ranking: same win% => same rank, otherwise rank = position index+1
         function assignDenseRank(usersSorted) {
             let rank = 1;
             for (let i = 0; i < usersSorted.length; i++) {
-                const current = usersSorted[i];
                 if (i === 0) {
-                    current.rank = rank;
+                    usersSorted[i].rank = rank;
                 } else {
                     const prev = usersSorted[i-1];
-                    const sameWin = Math.abs(prev.winPercent - current.winPercent) < 0.0001;
-                    const samePerfect = prev.allTimePerfectCount === current.allTimePerfectCount;
-                    if (sameWin && samePerfect) {
-                        current.rank = prev.rank;
+                    const curr = usersSorted[i];
+                    // if win% exactly equal, same rank
+                    if (Math.abs(prev.winPercent - curr.winPercent) < 0.0001) {
+                        usersSorted[i].rank = prev.rank;
                     } else {
                         rank = i + 1;
-                        current.rank = rank;
+                        usersSorted[i].rank = rank;
                     }
                 }
             }
@@ -203,7 +202,6 @@
                 if (existing.lastResetDate !== todayStr) {
                     await updateDoc(userRef, { todayPerfectCount: 0, lastResetDate: todayStr });
                 }
-                // Ensure zeroCount field exists for old users
                 if (existing.allTimeZeroCount === undefined) {
                     await updateDoc(userRef, { allTimeZeroCount: 0 });
                 }
@@ -242,22 +240,20 @@
                 currentUserGlobalData = rankedAllUsers.find(u => u.email === currentUser.email);
             }
             
+            // Filter for search (excluding current user from main list)
             let filteredUsers = [...rankedAllUsers];
             if (searchTerm) {
                 filteredUsers = filteredUsers.filter(u => u.name.toLowerCase().includes(searchTerm));
             }
-            
             if (currentUserGlobalData) {
                 filteredUsers = filteredUsers.filter(u => u.email !== currentUser.email);
             }
-            
-            const filteredSorted = assignDenseRank([...filteredUsers]);
             
             const tbody = document.getElementById('leaderboardBody');
             if (!tbody) return;
             tbody.innerHTML = '';
             
-            // YOUR RANK SECTION
+            // YOUR RANK SECTION (always show if logged in)
             if (currentUserGlobalData) {
                 const yourRow = document.createElement('tr');
                 yourRow.className = 'your-rank-row';
@@ -274,12 +270,12 @@
                 const winPct = currentUserGlobalData.winPercent.toFixed(2);
                 
                 yourRow.innerHTML = `
-                    <td class="rank-cell">${rankDisplay}</td>
-                    <td class="name-cell">${currentUserGlobalData.name} <span class="you-badge">(You)</span></td>
-                    <td class="stat-cell">${played}</td>
-                    <td class="stat-cell">${perfect}</td>
-                    <td class="stat-cell">${zero}</td>
-                    <td class="stat-cell win-pct">${winPct}%</td>
+                    <td class="rank-cell" data-label="Rank">${rankDisplay}</td>
+                    <td class="name-cell" data-label="Player">${currentUserGlobalData.name} <span class="you-badge">(You)</span></td>
+                    <td class="stat-cell" data-label="P">${played}</td>
+                    <td class="stat-cell" data-label="5/5">${perfect}</td>
+                    <td class="stat-cell" data-label="0/5">${zero}</td>
+                    <td class="stat-cell win-pct" data-label="W%">${winPct}%</td>
                 `;
                 tbody.appendChild(yourRow);
                 const sep = document.createElement('tr');
@@ -288,11 +284,11 @@
                 tbody.appendChild(sep);
             }
             
-            // MAIN LEADERBOARD LIST
-            if (filteredSorted.length === 0 && !currentUserGlobalData) {
-                tbody.innerHTML += '<tr><td colspan="6" class="empty-row">No players found 🔍</td></tr>';
+            // MAIN LEADERBOARD LIST (other players, showing global rank)
+            if (filteredUsers.length === 0 && !currentUserGlobalData) {
+                tbody.innerHTML += '<tr><td colspan="6" class="empty-row">No players found 🔍<\/td></td>';
             } else {
-                filteredSorted.forEach(user => {
+                filteredUsers.forEach(user => {
                     let rankDisplay = '';
                     const rankValue = user.rank;
                     if (rankValue === 1) rankDisplay = '🥇';
@@ -303,31 +299,36 @@
                     const winPctFormatted = user.winPercent.toFixed(2);
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td class="rank-cell">${rankDisplay}</td>
-                        <td class="name-cell">${user.name}</td>
-                        <td class="stat-cell">${user.totalPlayedCount}</td>
-                        <td class="stat-cell">${user.allTimePerfectCount}</td>
-                        <td class="stat-cell">${user.zeroFiveCount}</td>
-                        <td class="stat-cell win-pct">${winPctFormatted}%</td>
+                        <td class="rank-cell" data-label="Rank">${rankDisplay}</td>
+                        <td class="name-cell" data-label="Player">${user.name}</td>
+                        <td class="stat-cell" data-label="P">${user.totalPlayedCount}</td>
+                        <td class="stat-cell" data-label="5/5">${user.allTimePerfectCount}</td>
+                        <td class="stat-cell" data-label="0/5">${user.zeroFiveCount}</td>
+                        <td class="stat-cell win-pct" data-label="W%">${winPctFormatted}%</td>
                     `;
                     tbody.appendChild(row);
                 });
             }
             
-            // toggle join button
+            // Update user-action-area: show username + logout button (red bg, white text) when logged in
             const joinBtn = document.getElementById('joinNowBtn');
-            const userDisplaySpan = document.getElementById('loggedUserDisplay');
+            const userActionSpan = document.getElementById('loggedUserDisplay');
             if (currentUser) {
                 if (joinBtn) joinBtn.style.display = 'none';
-                if (userDisplaySpan) {
-                    userDisplaySpan.style.display = 'inline-flex';
-                    userDisplaySpan.innerHTML = `👋 ${currentUser.name} <button id="logoutBtnSmall" class="logout-mini">🚪</button>`;
-                    const logoutMini = document.getElementById('logoutBtnSmall');
-                    if (logoutMini) logoutMini.onclick = (e) => { e.stopPropagation(); logoutUser(); };
+                if (userActionSpan) {
+                    userActionSpan.style.display = 'inline-flex';
+                    userActionSpan.innerHTML = `
+                        <span style="display: flex; align-items: center; gap: 8px;">
+                            <span>👋 ${currentUser.name}</span>
+                            <button id="logoutBtnInline" class="logout-inline-btn">Logout</button>
+                        </span>
+                    `;
+                    const logoutInline = document.getElementById('logoutBtnInline');
+                    if (logoutInline) logoutInline.onclick = (e) => { e.stopPropagation(); logoutUser(); };
                 }
             } else {
                 if (joinBtn) joinBtn.style.display = 'flex';
-                if (userDisplaySpan) userDisplaySpan.style.display = 'none';
+                if (userActionSpan) userActionSpan.style.display = 'none';
             }
         };
         
@@ -396,12 +397,21 @@
             box-shadow: 0 20px 35px -12px rgba(0,0,0,0.5);
             border: 1px solid rgba(255,255,255,0.1);
         }
+        /* HEADER: icon + heading left, hamburger right */
         .leaderboard-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
             flex-wrap: wrap;
+        }
+        .title-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .title-section .trophy-icon {
+            font-size: 32px;
         }
         .title-section h1 {
             font-size: 28px;
@@ -411,18 +421,13 @@
             background-clip: text;
             color: transparent;
             letter-spacing: -0.2px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .title-section h1 span {
-            background: none;
-            color: #FFD966;
+            margin: 0;
         }
         .title-section p {
             font-size: 12px;
             color: #aaa;
             margin-top: 4px;
+            margin-left: 42px; /* align with heading */
         }
         .hamburger-menu-leader {
             position: relative;
@@ -468,6 +473,7 @@
         .dropdown-menu a:hover { background: #facc1510; color: #facc15; }
         .dropdown-menu.show { display: flex; }
         
+        /* User action area (Check your rank + join/logout) */
         .user-action-area {
             background: #101020;
             border-radius: 60px;
@@ -477,6 +483,8 @@
             justify-content: space-between;
             align-items: center;
             border: 1px solid #2a2a44;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         .check-rank-text {
             font-size: 14px;
@@ -509,16 +517,23 @@
             display: inline-flex;
             color: white;
         }
-        .logout-mini {
-            background: none;
+        .logout-inline-btn {
+            background: #dc2626;
             border: none;
-            font-size: 18px;
+            padding: 5px 12px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 12px;
+            color: white;
             cursor: pointer;
-            color: #facc15;
-            margin-left: 8px;
+            transition: 0.2s;
+        }
+        .logout-inline-btn:hover {
+            background: #b91c1c;
+            transform: scale(0.96);
         }
         
-        /* search row with play again button */
+        /* search and play again */
         .search-and-play-row {
             display: flex;
             align-items: center;
@@ -546,7 +561,6 @@
             outline: none;
         }
         .search-box input::placeholder { color: #5f5f8a; }
-        
         .play-again-small {
             background: #FDDA0D;
             border: none;
@@ -568,7 +582,7 @@
             transform: scale(0.96);
         }
         
-        /* Scrollable table wrapper - max 21 rows visible */
+        /* Table styles */
         .leaderboard-table-wrapper {
             max-height: 680px;
             overflow-y: auto;
@@ -618,8 +632,6 @@
             border-radius: 16px;
             font-weight: 700;
         }
-        .your-rank-row td:first-child { border-top-left-radius: 16px; border-bottom-left-radius: 16px; }
-        .your-rank-row td:last-child { border-top-right-radius: 16px; border-bottom-right-radius: 16px; }
         .you-badge {
             background: #facc15;
             color: #000;
@@ -638,7 +650,7 @@
         }
         .empty-row { text-align: center; padding: 32px; color: #aaa; }
         
-        /* Brainplay AI branding */
+        /* Brand and footer */
         .brainplay-ai-brand {
             text-align: center;
             margin: 28px 0 18px;
@@ -653,8 +665,6 @@
             border-top: 1px dashed rgba(255,215,0,0.3);
             padding-top: 18px;
         }
-        
-        /* Footer with only website link (share buttons removed) */
         .footer-brand {
             margin-top: 20px;
             text-align: center;
@@ -670,10 +680,9 @@
             text-decoration: none;
             font-weight: 600;
         }
-        .website-link a:hover {
-            text-decoration: underline;
-        }
+        .website-link a:hover { text-decoration: underline; }
         
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -743,28 +752,97 @@
             outline: none;
         }
         
-        @media (max-width: 680px) {
-            .leaderboard-container { padding: 16px; max-width: 100%; }
-            .stat-cell, .rank-cell, .name-cell { font-size: 12px; padding: 8px 4px; }
-            .leaderboard-table th { font-size: 11px; padding: 8px 4px; }
-            .search-and-play-row { gap: 8px; }
-            .search-box { max-width: 65%; }
-            .play-again-small { padding: 6px 14px; font-size: 12px; }
-            .leaderboard-table-wrapper { max-height: 520px; }
+        /* ========== MOBILE RESPONSIVE (card layout) ========== */
+        @media (max-width: 640px) {
+            .leaderboard-table,
+            .leaderboard-table thead,
+            .leaderboard-table tbody,
+            .leaderboard-table tr,
+            .leaderboard-table th,
+            .leaderboard-table td {
+                display: block;
+            }
+            .leaderboard-table thead {
+                display: none;
+            }
+            .leaderboard-table tr {
+                background: rgba(18, 18, 44, 0.7);
+                margin-bottom: 16px;
+                border-radius: 20px;
+                padding: 12px 12px;
+                border: 1px solid #2e2e4a;
+            }
+            .leaderboard-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px 6px;
+                border-bottom: 1px dashed #2a2a44;
+                text-align: right;
+                gap: 12px;
+            }
+            .leaderboard-table td:last-child {
+                border-bottom: none;
+            }
+            .leaderboard-table td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: #facc15;
+                text-align: left;
+                flex: 1;
+                font-size: 12px;
+            }
+            .your-rank-row td::before {
+                font-weight: 800;
+                color: #facc15;
+            }
+            .separator-row {
+                display: none;
+            }
+            .leaderboard-table-wrapper {
+                max-height: none;
+                overflow-y: visible;
+            }
+            .search-and-play-row {
+                flex-wrap: wrap;
+            }
+            .search-box {
+                max-width: 100%;
+            }
+            .play-again-small {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+            .user-action-area {
+                justify-content: center;
+            }
+            .title-section h1 {
+                font-size: 24px;
+            }
+            .title-section .trophy-icon {
+                font-size: 28px;
+            }
         }
-        @media (max-width: 550px) {
-            .stat-cell { font-size: 11px; }
-            .you-badge { font-size: 8px; margin-left: 4px; }
-            .play-again-small { padding: 5px 12px; font-size: 11px; }
+        @media (max-width: 480px) {
+            .leaderboard-container {
+                padding: 12px;
+            }
+            .stat-cell, .rank-cell, .name-cell {
+                font-size: 12px;
+            }
         }
     </style>
 </head>
 <body>
 <div class="leaderboard-container">
+    <!-- Header: icon + heading left, hamburger right. No join button here -->
     <div class="leaderboard-header">
         <div class="title-section">
-            <h1><span>🏆</span> LEADERBOARD</h1>
-            <p>Top players • Real vs AI challenge</p>
+            <span class="trophy-icon">🏆</span>
+            <div>
+                <h1>LEADERBOARD</h1>
+                <p>Top players • Real vs AI challenge</p>
+            </div>
         </div>
         <div class="hamburger-menu-leader">
             <button class="hamburger-icon" id="menuToggle">☰</button>
@@ -776,13 +854,13 @@
         </div>
     </div>
     
+    <!-- User action area: Check your rank + join button (or logged user + logout) -->
     <div class="user-action-area">
         <span class="check-rank-text">👑 Check your rank</span>
         <button id="joinNowBtn" class="join-now-btn">🔗 Join Now</button>
         <span id="loggedUserDisplay" style="display: none;" class="logged-user-badge"></span>
     </div>
     
-    <!-- Search row + Play Again button -->
     <div class="search-and-play-row">
         <div class="search-box">
             <span>🔍</span>
@@ -791,7 +869,6 @@
         <button class="play-again-small" id="playAgainBtnSmall">▶ Play Again</button>
     </div>
     
-    <!-- Scrollable table wrapper -->
     <div class="leaderboard-table-wrapper">
         <table class="leaderboard-table">
             <thead>
@@ -805,17 +882,15 @@
                 </tr>
             </thead>
             <tbody id="leaderboardBody">
-                <tr><td colspan="6" style="text-align:center; padding:40px;">Loading leaderboard...</td></tr>
+                <tr><td colspan="6" style="text-align:center; padding:40px;">Loading leaderboard...<\/td></tr>
             </tbody>
         </table>
     </div>
     
-    <!-- Brainplay AI text (below leaderboard section) -->
     <div class="brainplay-ai-brand">
         ⚡ BRAINPLAY AI ⚡
     </div>
     
-    <!-- Footer: only website address (share buttons removed) -->
     <div class="footer-brand">
         <div class="website-link">
             🌐 <a href="https://www.brainplayai.in" target="_blank">www.brainplayai.in</a>
@@ -835,7 +910,7 @@
 </div>
 
 <script type="module">
-    // Menu toggle & logout
+    // Menu toggle & logout from hamburger
     const menuToggle = document.getElementById('menuToggle');
     const dropdown = document.getElementById('dropdownMenu');
     if (menuToggle && dropdown) {
@@ -857,13 +932,24 @@
         });
     }
     
-    // Play Again button (beside search)
     const playAgainSmall = document.getElementById('playAgainBtnSmall');
     if (playAgainSmall) {
         playAgainSmall.addEventListener('click', () => {
             window.location.href = 'index.html';
         });
     }
+    
+    // Ensure data-label attributes for mobile (already in HTML)
+    function refreshDataLabels() {
+        document.querySelectorAll('#leaderboardBody td').forEach(td => {
+            const idx = td.cellIndex;
+            const labels = ['Rank', 'Player', 'P', '5/5', '0/5', 'W%'];
+            if (idx < labels.length) td.setAttribute('data-label', labels[idx]);
+        });
+    }
+    const observer = new MutationObserver(() => refreshDataLabels());
+    observer.observe(document.getElementById('leaderboardBody'), { childList: true, subtree: true });
+    setTimeout(refreshDataLabels, 300);
 </script>
 </body>
 </html>
