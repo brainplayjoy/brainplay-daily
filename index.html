@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>BrainPlay AI | Real vs AI Game</title>
     <meta name="description" content="Play viral AI brain games and challenge your mind with Real vs AI puzzles on BrainPlay AI.">
     <link rel="icon" type="image/png" href="favicon.png">
-    <!-- Open Graph / Social Media Sharing (UPDATED: custom Facebook share image) -->
+    <!-- Open Graph / Social Media Sharing (custom images per platform) -->
     <meta property="og:title" content="BrainPlay AI – Real vs AI Game">
     <meta property="og:description" content="Can you beat this AI test? Test your skills and share your score!">
     <meta property="og:image" content="https://raw.githubusercontent.com/brainplayjoy/brainplay-daily/main/brainplayai-fb.webp">
@@ -14,11 +14,10 @@
     <meta property="og:image:height" content="630">
     <meta property="og:url" content="https://brainplayjoy.github.io/brainplay-daily/">
     <meta property="og:type" content="website">
-    <meta property="og:locale" content="en_US">
     <meta name="twitter:card" content="summary_large_image">
     <link rel="manifest" href="manifest.json">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Anton&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
-    <!-- Firebase SDKs (modular) -->
+    <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -49,7 +48,6 @@
             return null;
         }
         
-        // UPDATED: Saves score with proper perfect (5/5) and zero (0/5) counting
         async function saveGameResultToFirestore(score) {
             const user = getCurrentUser();
             if (!user) {
@@ -112,7 +110,6 @@
                     const newTotal = perfect + Math.floor(Math.random() * 3) + 1;
                     await updateDoc(userRef, { totalPlayedCount: newTotal });
                 }
-                // Ensure zeroCount field exists for old users
                 if (existing.allTimeZeroCount === undefined) {
                     await updateDoc(userRef, { allTimeZeroCount: 0 });
                 }
@@ -153,6 +150,20 @@
             }
         }
         
+        // NEW unified popup: Join Now + score saving info + email entry
+        function showUnifiedJoinPopup() {
+            const modal = document.getElementById('loginModalGame');
+            if (modal) modal.style.display = 'flex';
+            // ensure score info is displayed inside popup
+            const lastGameScore = window._lastGameScore !== undefined ? window._lastGameScore : null;
+            const scoreInfoSpan = document.getElementById('modalScoreInfo');
+            if (scoreInfoSpan && lastGameScore !== null) {
+                scoreInfoSpan.innerText = `🎯 Your last game score: ${lastGameScore}/5. Join now to save this result & compete globally!`;
+            } else if (scoreInfoSpan) {
+                scoreInfoSpan.innerText = `✨ Save your scores, track perfect rounds, and climb the leaderboard!`;
+            }
+        }
+        
         function initLoginModal() {
             const modal = document.getElementById('loginModalGame');
             const joinBtn = document.getElementById('joinNowBtnGame');
@@ -162,7 +173,7 @@
             
             if (joinBtn) {
                 joinBtn.addEventListener('click', () => {
-                    if (modal) modal.style.display = 'flex';
+                    showUnifiedJoinPopup();
                 });
             }
             if (closeModal) {
@@ -180,7 +191,15 @@
                         if (modal) modal.style.display = 'none';
                         emailInput.value = '';
                         updateLoginUI();
-                        alert("✅ Logged in successfully! Your next game scores will be recorded.");
+                        // after login, if there was a pending score, save it now
+                        if (window._pendingScore !== undefined && window._pendingScore !== null) {
+                            await saveGameResultToFirestore(window._pendingScore);
+                            alert(`✅ Score ${window._pendingScore}/5 saved to your account!`);
+                            window._pendingScore = null;
+                        } else {
+                            alert("✅ Logged in successfully! Your next game scores will be recorded.");
+                        }
+                        location.reload(); // refresh UI to reflect new stats
                     } catch(err) { alert("Error: "+err.message); }
                 });
             }
@@ -189,6 +208,7 @@
         
         window.updateLoginUI = updateLoginUI;
         window.initLoginModal = initLoginModal;
+        window.showUnifiedJoinPopup = showUnifiedJoinPopup;
         
         document.addEventListener('DOMContentLoaded', () => {
             updateLoginUI();
@@ -210,7 +230,7 @@
             color: #fff;
             display: flex;
             justify-content: center;
-            padding: 20px;
+            padding: 16px 12px;
         }
 
         .container {
@@ -218,15 +238,15 @@
             width: 100%;
         }
 
-        /* HEADER */
+        /* HEADER - mobile optimized */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 5px 10px;
-            border-radius: 15px;
+            padding: 6px 12px;
+            border-radius: 20px;
             background: #000;
-            border: 1px solid rgba(72, 72, 72, 72);
+            border: 1px solid rgba(72, 72, 72, 0.8);
             position: relative;
         }
 
@@ -240,21 +260,21 @@
             position: relative;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .header-logo-img {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             object-fit: contain;
         }
 
         .brand-text {
             display: flex;
             align-items: baseline;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 900;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
 
         .brainplay-text {
@@ -274,33 +294,28 @@
             margin-left: 3px;
         }
 
-        /* Hamburger Button */
         .hamburger-btn {
             background: none;
             border: none;
             color: #fff;
-            font-size: 24px;
+            font-size: 26px;
             cursor: pointer;
             padding: 4px 8px;
             line-height: 1;
         }
 
-        .hamburger-btn:hover {
-            opacity: 0.8;
-        }
-
         .hamburger-menu {
             display: none;
             position: absolute;
-            top: 40px;
+            top: 44px;
             right: 0;
             background: #1a1a2e;
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 16px;
             overflow: hidden;
             z-index: 100;
-            min-width: 160px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            min-width: 170px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
         }
 
         .hamburger-menu.active {
@@ -309,7 +324,7 @@
 
         .hamburger-menu a {
             display: block;
-            padding: 12px 16px;
+            padding: 12px 18px;
             color: #ffffff;
             text-decoration: none;
             font-weight: 600;
@@ -317,15 +332,6 @@
             border-bottom: 1px solid rgba(255,255,255,0.08);
         }
 
-        .hamburger-menu a:last-child {
-            border-bottom: none;
-        }
-
-        .hamburger-menu a:hover {
-            background: rgba(255,255,255,0.1);
-        }
-
-        /* Join Now / User Badge styles */
         .join-now-btn-game {
             background: #FDDA0D;
             border: none;
@@ -363,7 +369,6 @@
             cursor: pointer;
         }
 
-        /* TITLE */
         .title {
             text-align: center;
             margin-top: 18px;
@@ -371,35 +376,16 @@
 
         .title h1 {
             font-family: 'Anton', sans-serif;
-            font-size: 40px;
+            font-size: 38px;
             letter-spacing: 2px;
         }
 
-        .real {
-            color: #fff;
-            text-shadow: 0 0 12px cyan;
-        }
+        .real { color: #fff; text-shadow: 0 0 12px cyan; }
+        .ai { color: #ff3b3b; text-shadow: 0 0 12px red; }
+        .subtitle { color: #9ca3af; }
+        .can-you-beat { color: #ffffff; font-size: 14px; }
+        .ai-test { color: #facc15; font-size: 14px; }
 
-        .ai {
-            color: #ff3b3b;
-            text-shadow: 0 0 12px red;
-        }
-
-        .subtitle {
-            color: #9ca3af;
-        }
-
-        .can-you-beat {
-            color: #ffffff;
-            font-size: 14px;
-        }
-
-        .ai-test {
-            color: #facc15;
-            font-size: 14px;
-        }
-
-        /* STAT */
         .stat {
             margin: 12px auto;
             padding: 10px;
@@ -408,243 +394,75 @@
             background: #121226;
             font-size: 14px;
         }
+        .highlight { color: #facc15; font-weight: 800; }
 
-        .highlight {
-            color: #facc15;
-            font-weight: 800;
-        }
-
-        /* IMAGE BOX */
         .image-box {
             border-radius: 24px;
             overflow: hidden;
             margin-top: 20px;
             position: relative;
-            min-height: 320px;
+            min-height: 310px;
             background: #000000;
         }
-
         .image-box img {
             width: 100%;
-            height: 310px;
+            height: auto;
+            min-height: 280px;
             object-fit: cover;
             display: block;
             border-radius: 24px;
         }
-
         @media (max-width: 600px) {
-            .image-box img {
-                height: 285px;
-            }
-            .image-box {
-                min-height: 285px;
-            }
+            .image-box img { min-height: 260px; }
+            .image-box { min-height: 260px; }
         }
 
-        /* SCORE CARD OVERLAY */
-        .image-box .score-card-overlay {
+        .score-card-overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(145deg, rgba(15, 16, 32, 0.95) 0%, rgba(5, 5, 16, 0.98) 100%);
-            backdrop-filter: blur(5px);
+            background: linear-gradient(145deg, rgba(15, 16, 32, 0.96) 0%, rgba(5, 5, 16, 0.98) 100%);
+            backdrop-filter: blur(6px);
             border-radius: 24px;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
+            justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 0 20px;
+            padding: 20px;
             z-index: 10;
         }
+        .score-card-title { font-family: 'Montserrat', sans-serif; font-size: 22px; font-weight: 800; margin-bottom: 12px; }
+        .score-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+        .score-emoji { font-size: 32px; }
+        .score-value { font-family: 'Anton', sans-serif; font-size: 26px; background: linear-gradient(135deg, #fde047, #f59e0b); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .start-new-btn { background: #FDDA0D; border: none; padding: 8px 18px; border-radius: 40px; font-weight: 800; margin-bottom: 15px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .final-whatsapp-btn { background: #16a34a; border: none; padding: 8px 18px; border-radius: 40px; color: white; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; margin-top: 5px; }
 
-        .score-card-title {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 20px;
-            font-weight: 800;
-            color: #ffffff;
-            margin-top: 25px;
-            margin-bottom: 12px;
-            letter-spacing: 1px;
-        }
-
-        .score-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .score-emoji {
-            font-size: 22px;
-        }
-
-        .score-value {
-            font-family: 'Anton', sans-serif;
-            font-size: 24px;
-            letter-spacing: 1px;
-            background: linear-gradient(135deg, #fde047, #f59e0b);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-shadow: 0px 4px 20px rgba(245, 158, 11, 0.2);
-            line-height: 1;
-        }
-
-        .start-new-btn {
-            background: #FDDA0D;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 10px;
-            color: #000000;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .start-new-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
-        }
-
-        .start-new-btn:active {
-            transform: scale(0.97);
-        }
-
-        .challenge-text {
-            color: #ffffff;
-            font-size: 14px;
-            font-weight: 600;
-            margin: 5px 0 10px 0;
-            width: 90%;
-        }
-
-        .final-whatsapp-btn {
-            background: #16a34a;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 10px;
-            color: white;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 15px rgba(22, 163, 74, 0.2);
-            transition: all 0.2s ease;
-        }
-
-        .final-whatsapp-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(22, 163, 74, 0.3);
-        }
-
-        .final-overlay {
-            display: none;
-        }
-
-        /* IMAGE FOOTER */
         .image-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 10px;
+            margin-top: 12px;
             padding: 0 4px;
             gap: 8px;
         }
+        .counter { font-weight: 700; font-size: 15px; color: #d1d5db; }
+        .question-inline { flex: 1; text-align: center; font-weight: 700; font-size: 14px; }
+        .next-btn { background: none; border: none; color: #facc15; font-weight: 800; font-size: 15px; cursor: pointer; display: none; }
+        .leaderboard-strip { display: none; align-items: center; justify-content: space-between; width: 100%; gap: 12px; }
+        .leaderboard-btn { background: #000000; color: white; border: 2px solid #facc15; border-radius: 32px; padding: 6px 16px; font-weight: 800; font-size: 13px; cursor: pointer; }
 
-        .counter {
-            font-weight: 700;
-            font-size: 15px;
-            color: #d1d5db;
-            white-space: nowrap;
-        }
-
-        .question-inline {
-            flex: 1;
-            text-align: center;
-            font-weight: 700;
-            font-size: 15px;
-            color: #fff;
-            white-space: nowrap;
-        }
-
-        .next-btn {
-            background: none;
-            border: none;
-            color: #facc15;
-            font-weight: 800;
-            font-size: 15px;
-            cursor: pointer;
-            display: none;
-            white-space: nowrap;
-            padding: 0;
-        }
-
-        .next-btn:hover {
-            opacity: 0.8;
-        }
-
-        .leaderboard-strip {
-            display: none;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            gap: 12px;
-        }
-
-        .today-top-players {
-            font-weight: 700;
-            font-size: 14px;
-            color: #ffffff;
-            letter-spacing: 0.3px;
-            background: rgba(0,0,0,0.3);
-            padding: 4px 8px;
-            border-radius: 20px;
-            white-space: nowrap;
-        }
-
-        .leaderboard-btn {
-            background: #000000;
-            color: white;
-            border: 2px solid #facc15;
-            border-radius: 32px;
-            padding: 6px 16px;
-            font-weight: 800;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-family: 'Inter', sans-serif;
-            white-space: nowrap;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-        }
-
-        .leaderboard-btn:hover {
-            background: #1a1a1a;
-            transform: scale(0.97);
-            border-color: #fbbf24;
-        }
-
-        /* BUTTONS */
         .buttons {
             display: flex;
             gap: 12px;
-            margin-top: 16px;
+            margin-top: 18px;
         }
-
         .btn {
             flex: 1;
-            padding: 16px;
+            padding: 14px;
             border-radius: 18px;
             font-weight: 800;
             border: none;
@@ -652,27 +470,10 @@
             color: #fff;
             transition: opacity 0.2s;
         }
+        .btn-real { background: linear-gradient(#16a34a, #065f46); }
+        .btn-ai { background: linear-gradient(#ef4444, #7f1d1d); }
+        .btn small { display: block; font-size: 11px; opacity: 0.7; }
 
-        .btn:disabled {
-            opacity: 0.5;
-            pointer-events: none;
-        }
-
-        .btn-real {
-            background: linear-gradient(#16a34a, #065f46);
-        }
-
-        .btn-ai {
-            background: linear-gradient(#ef4444, #7f1d1d);
-        }
-
-        .btn small {
-            display: block;
-            font-size: 12px;
-            opacity: 0.7;
-        }
-
-        /* RESULT CARD */
         .result {
             margin-top: 20px;
             padding: 20px;
@@ -680,264 +481,60 @@
             background: #121226;
             display: none;
         }
+        .circle { width: 55px; height: 55px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 28px; flex-shrink: 0; }
+        .correct { background: #22c55e; box-shadow: 0 0 20px #22c55e; }
+        .wrong { background: #ef4444; box-shadow: 0 0 20px #ef4444; }
 
-        .result-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .circle {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 28px;
-            flex-shrink: 0;
-        }
-
-        .correct {
-            background: #22c55e;
-            box-shadow: 0 0 20px #22c55e;
-        }
-
-        .wrong {
-            background: #ef4444;
-            box-shadow: 0 0 20px #ef4444;
-        }
-
-        .desc-text {
-            margin-top: 12px;
-            color: #ffffff;
-            font-size: 14px;
-            text-align: left;
-        }
-
-        .desc-text .real-word {
-            color: #22c55e;
-            font-weight: 700;
-        }
-
-        .desc-text .ai-word {
-            color: #ef4444;
-            font-weight: 700;
-        }
-
-        /* SHARE SECTION */
         .share {
             margin-top: 20px;
         }
+        .share-title { text-align: center; color: #9ca3af; display: flex; justify-content: center; align-items: center; gap: 6px; font-size: 13px; }
+        .share-buttons { display: flex; gap: 10px; margin-top: 10px; }
+        .share-btn { flex: 1; padding: 10px; border-radius: 40px; font-weight: 700; display: flex; justify-content: center; align-items: center; gap: 6px; cursor: pointer; }
+        .copy { background: #1f2937; color: #fff; }
+        .whatsapp { background: #25D366; color: #000; }
+        .facebook { background: #1877F2; color: #fff; }
 
-        .share-title {
-            text-align: center;
-            color: #9ca3af;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 6px;
-            font-size: 14px;
-        }
+        .footer-buttons { display: flex; justify-content: space-between; gap: 12px; margin-top: 24px; margin-bottom: 10px; }
+        .footer-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 16px; border-radius: 40px; font-weight: 800; font-size: 13px; cursor: pointer; background: #000; color: white; border: 2px solid #facc15; text-decoration: none; }
+        .how-to-play-footer-btn { background: transparent; }
 
-        .share-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .share-btn {
-            flex: 1;
-            padding: 12px;
-            border-radius: 12px;
-            border: none;
-            font-weight: 700;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-        }
-
-        .copy {
-            background: #1f2937;
-            color: #fff;
-        }
-
-        .whatsapp {
-            background: #25D366;
-            color: #000;
-        }
-
-        .facebook {
-            background: #1877F2;
-            color: #fff;
-        }
-
-        /* FOOTER - NEW: Side by side buttons (Leaderboard left, How to Play right) */
-        .footer-buttons {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            margin-top: 24px;
-            margin-bottom: 10px;
-        }
-        .footer-btn {
-            flex: 1;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 10px 20px;
-            border-radius: 40px;
-            font-weight: 800;
-            font-size: 14px;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: center;
-        }
-        .leaderboard-footer-btn {
-            background: #000000;
-            color: white;
-            border: 2px solid #facc15;
-        }
-        .leaderboard-footer-btn:hover {
-            background: #1a1a1a;
-            transform: translateY(-2px);
-            border-color: #fbbf24;
-        }
-        .how-to-play-footer-btn {
-            background: transparent;
-            color: #ffffff;
-            border: 2px solid #facc15;
-        }
-        .how-to-play-footer-btn:hover {
-            background: rgba(250, 204, 21, 0.1);
-            transform: translateY(-2px);
-        }
-        .install-arrow {
-            color: #facc15;
-            font-size: 20px;
-            vertical-align: middle;
-            cursor: pointer;
-            margin-left: 6px;
-            display: inline-block;
-            transition: transform 0.2s;
-        }
-        .install-arrow:hover {
-            transform: scale(1.3);
-        }
-        .score-install-promo {
-            margin-top: 15px;
-            margin-bottom: 10px;
-        }
-        .simple-playnow-btn {
-            display: inline-block;
-            background: #facc15;
-            color: #000000;
-            text-decoration: none;
-            padding: 8px 20px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 14px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            margin-top: 10px;
-        }
-        .simple-playnow-btn:hover {
-            background: #e5b800;
-            transform: translateY(-1px);
-        }
-
-        /* MODAL */
+        /* MODAL with score info */
         .modal-game {
             display: none;
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(8px);
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(10px);
             align-items: center;
             justify-content: center;
-            z-index: 1000;
+            z-index: 2000;
         }
         .modal-card-game {
             background: #16162e;
-            border-radius: 36px;
-            max-width: 340px;
+            border-radius: 40px;
+            max-width: 360px;
             width: 90%;
-            padding: 34px 22px 28px;
+            padding: 28px 22px 32px;
             position: relative;
-            border: 1px solid rgba(255,215,0,0.5);
-            box-shadow: 0 20px 35px black;
+            border: 1px solid #FDDA0D;
+            text-align: center;
         }
-        .modal-close-game {
-            position: absolute;
-            top: 14px;
-            right: 16px;
-            background: transparent !important;
-            border: none !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            color: #ffffff !important;
-            font-size: 22px;
-            cursor: pointer;
-        }
-        .modal-card-game button:not(.modal-close-game) {
-            width: 100%;
-            background: #FDDA0D;
-            border: none;
-            padding: 12px;
-            border-radius: 60px;
-            font-weight: 800;
-            cursor: pointer;
-            font-size: 16px;
-            color: #000;
-        }
-        .modal-card-game h3 {
-            font-size: 24px;
-            margin-bottom: 8px;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .modal-card-game p {
-            font-size: 14px;
-            color: #ccc;
-            margin-bottom: 20px;
-        }
-        .modal-card-game input {
-            width: 100%;
-            padding: 14px 16px;
-            border-radius: 60px;
-            border: none;
-            background: #252545;
-            color: white;
-            font-size: 15px;
-            margin-bottom: 20px;
-            outline: none;
-        }
-        
-        @media (max-width: 550px) {
-            .footer-btn { padding: 8px 12px; font-size: 12px; }
-        }
+        .modal-close-game { position: absolute; top: 14px; right: 20px; background: transparent; border: none; color: white; font-size: 28px; cursor: pointer; }
+        .modal-card-game h3 { font-size: 26px; margin-bottom: 8px; color: white; }
+        .modal-card-game p { font-size: 14px; color: #ddd; margin-bottom: 20px; background: #252545; padding: 10px; border-radius: 20px; }
+        .modal-card-game input { width: 100%; padding: 14px 16px; border-radius: 60px; border: none; background: #252545; color: white; margin-bottom: 18px; }
+        .modal-card-game button:not(.modal-close-game) { width: 100%; background: #FDDA0D; border: none; padding: 12px; border-radius: 60px; font-weight: 800; cursor: pointer; color: #000; font-size: 16px; }
+        #modalScoreInfo { background: #0f0f2a; font-weight: 500; color: #facc15; }
     </style>
 </head>
 <body>
-
 <div class="container">
-    <!-- HEADER with login elements -->
     <div class="header">
         <div class="header-left">
-            <img class="header-logo-img" src="brainplay-logo.webp" alt="BrainPlay Logo">
-            <div class="brand-text">
-                <span class="brainplay-text">BRAINPLAY</span>
-                <span class="ai-text">AI</span>
-            </div>
+            <img class="header-logo-img" src="brainplay-logo.webp" alt="Logo">
+            <div class="brand-text"><span class="brainplay-text">BRAINPLAY</span><span class="ai-text">AI</span></div>
         </div>
         <div class="header-right">
             <button id="joinNowBtnGame" class="join-now-btn-game">🔗 Join</button>
@@ -959,404 +556,93 @@
         <h1><span class="real">REAL</span> vs <span class="ai">AI</span></h1>
         <div class="subtitle"><span class="can-you-beat">👉 Can you beat this </span><span class="ai-test">AI test</span><span class="can-you-beat">?</span></div>
     </div>
-
-    <div class="stat">
-        🧩 Only <span class="highlight" id="percent">38%</span> players got this right today!
-    </div>
+    <div class="stat">🧩 Only <span class="highlight" id="percent">38%</span> players got this right today!</div>
 
     <div class="image-box" id="imageBox">
         <img id="img" alt="Challenge Image">
         <div class="score-card-overlay" id="scoreCardOverlay" style="display: none;">
             <div class="score-card-title">🏅 SCORE CARD</div>
-            <div class="score-row">
-                <span class="score-emoji" id="scoreEmoji">🤯</span>
-                <span class="score-value" id="finalScoreValue">Brilliant (5/5)</span>
-            </div>
-            <button class="start-new-btn" id="startNewFinalBtn">
-                <span>↻</span> Play Again
-            </button>
+            <div class="score-row"><span class="score-emoji" id="scoreEmoji">🤯</span><span class="score-value" id="finalScoreValue">Brilliant (5/5)</span></div>
+            <button class="start-new-btn" id="startNewFinalBtn"><span>↻</span> Play Again</button>
             <div class="challenge-text">🤔 Can your friends beat your score?</div>
-            <button class="final-whatsapp-btn" id="finalWhatsappBtn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
-                    <path d="M12.031 0C5.405 0 0 5.405 0 12.031c0 2.115.548 4.184 1.59 6.007L.425 23.57l5.658-1.485c1.761.97 3.754 1.481 5.811 1.481 6.626 0 12.03-5.405 12.03-12.03C23.924 5.405 18.519 0 12.031 0zM17.432 16.3c-.23.649-1.332 1.258-1.848 1.344-.516.086-1.168.172-3.411-.758-2.696-1.121-4.428-3.878-4.561-4.054-.133-.176-1.091-1.455-1.091-2.775 0-1.32.684-1.968.932-2.227.248-.259.54-.324.717-.324.177 0 .354 0 .506.008.163.009.38-.063.593.454.221.537.751 1.838.818 1.968.067.13.111.282.022.455-.089.173-.133.282-.266.434-.133.152-.28.324-.398.455-.133.152-.283.315-.12.593.163.278.723 1.196 1.558 1.944 1.077.967 1.977 1.267 2.254 1.4.277.133.443.111.61-.067.167-.178.718-.839.907-1.127.189-.288.378-.24.633-.152.255.088 1.618.764 1.895.902.277.138.461.208.528.324.067.116.067.668-.163 1.317z"/>
-                </svg>
-                Share Score
-            </button>
-            <div class="score-install-promo" style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 15px; color: white; font-size: 13px; flex-wrap: wrap;">
-                <span>🚀 Add this game to your phone </span>
-                <button id="scoreCardSaveBtn" style="background: #dc2626; color: white; border: none; border-radius: 8px; padding: 4px 12px; font-weight: 600; cursor: pointer; font-size: 12px;">Save</button>
-            </div>
+            <button class="final-whatsapp-btn" id="finalWhatsappBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12.031 0C5.405 0 0 5.405 0 12.031c0 2.115.548 4.184 1.59 6.007L.425 23.57l5.658-1.485c1.761.97 3.754 1.481 5.811 1.481 6.626 0 12.03-5.405 12.03-12.03C23.924 5.405 18.519 0 12.031 0zM17.432 16.3c-.23.649-1.332 1.258-1.848 1.344-.516.086-1.168.172-3.411-.758-2.696-1.121-4.428-3.878-4.561-4.054-.133-.176-1.091-1.455-1.091-2.775 0-1.32.684-1.968.932-2.227.248-.259.54-.324.717-.324.177 0 .354 0 .506.008.163.009.38-.063.593.454.221.537.751 1.838.818 1.968.067.13.111.282.022.455-.089.173-.133.282-.266.434-.133.152-.28.324-.398.455-.133.152-.283.315-.12.593.163.278.723 1.196 1.558 1.944 1.077.967 1.977 1.267 2.254 1.4.277.133.443.111.61-.067.167-.178.718-.839.907-1.127.189-.288.378-.24.633-.152.255.088 1.618.764 1.895.902.277.138.461.208.528.324.067.116.067.668-.163 1.317z"/></svg> Share Score</button>
+            <div class="score-install-promo" style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; font-size: 12px;"><span>🚀 Add to Home Screen</span><button id="scoreCardSaveBtn" style="background: #dc2626; color: white; border: none; border-radius: 20px; padding: 4px 12px;">Save</button></div>
         </div>
-        <div class="final-overlay" id="finalOverlay"></div>
     </div>
 
     <div class="image-footer" id="imageFooter">
         <span class="counter" id="counter">1/5</span>
         <span class="question-inline">🤔 Is this image Real or AI?</span>
         <button class="next-btn" id="nextBtn" onclick="next()">>> NEXT</button>
-        <div class="leaderboard-strip" id="leaderboardStrip">
-            <span class="today-top-players">🏆 Today's Top Players</span>
-            <button class="leaderboard-btn" id="leaderboardActionBtn">Leaderboard</button>
-        </div>
+        <div class="leaderboard-strip" id="leaderboardStrip"><span class="today-top-players">🏆 Today's Top Players</span><button class="leaderboard-btn" id="leaderboardActionBtn">Leaderboard</button></div>
     </div>
 
-    <div class="buttons" id="buttons">
-        <button class="btn btn-real" id="btnReal" onclick="answer('real')">
-            REAL <small>Looks authentic?</small>
-        </button>
-        <button class="btn btn-ai" id="btnAi" onclick="answer('ai')">
-            AI <small>Looks generated?</small>
-        </button>
+    <div class="buttons">
+        <button class="btn btn-real" id="btnReal" onclick="answer('real')">REAL <small>Looks authentic?</small></button>
+        <button class="btn btn-ai" id="btnAi" onclick="answer('ai')">AI <small>Looks generated?</small></button>
     </div>
 
-    <div class="result" id="result">
-        <div class="result-row">
-            <div id="circle" class="circle">✔</div>
-            <h3 id="title"></h3>
-        </div>
-        <p id="desc" class="desc-text"></p>
-    </div>
+    <div class="result" id="result"><div class="result-row"><div id="circle" class="circle">✔</div><h3 id="title"></h3></div><p id="desc" class="desc-text"></p></div>
 
-    <div class="share">
-        <div class="share-title">
-            <svg width="16" fill="#9ca3af" viewBox="0 0 24 24">
-                <path d="M18 8a3 3 0 10-2.83-4H15a3 3 0 003 3zM6 14a3 3 0 10-2.83-4H3a3 3 0 003 3zm12 6a3 3 0 10-2.83-4H15a3 3 0 003 3zM8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98" />
-            </svg>
-            Share this AI game with your friends!
-        </div>
-        <div class="share-buttons">
-            <button class="share-btn copy" onclick="copyLink()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-                Copy Link
-            </button>
-            <button class="share-btn facebook" onclick="shareFB()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                Facebook
-            </button>
-            <button class="share-btn whatsapp" onclick="shareWA()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                WhatsApp
-            </button>
-        </div>
-    </div>
+    <div class="share"><div class="share-title"><svg width="16" fill="#9ca3af" viewBox="0 0 24 24"><path d="M18 8a3 3 0 10-2.83-4H15a3 3 0 003 3zM6 14a3 3 0 10-2.83-4H3a3 3 0 003 3zm12 6a3 3 0 10-2.83-4H15a3 3 0 003 3zM8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg> Share this AI game with your friends!</div><div class="share-buttons"><button class="share-btn copy" id="copyLinkBtn">📋 Copy Link</button><button class="share-btn facebook" id="fbShareBtn">📘 Facebook</button><button class="share-btn whatsapp" id="waShareBtn">💬 WhatsApp</button></div></div>
 
-    <!-- NEW FOOTER: Leaderboard button (left) + How to Play button (right) -->
-    <div class="footer-buttons">
-        <button class="footer-btn leaderboard-footer-btn" id="footerLeaderboardBtn">🏆 Leaderboard</button>
-        <a href="https://brainplayai.in/how-to-play.html" class="footer-btn how-to-play-footer-btn">📖 How to Play</a>
-    </div>
-    <div style="text-align: center; margin-top: 10px; display: none;" id="playNowContainer">
-        <a href="https://brainplayai.in/play-now.html" class="simple-playnow-btn">▶ Play Now</a>
-    </div>
+    <div class="footer-buttons"><button class="footer-btn leaderboard-footer-btn" id="footerLeaderboardBtn">🏆 Leaderboard</button><a href="https://brainplayai.in/how-to-play.html" class="footer-btn how-to-play-footer-btn">📖 How to Play</a></div>
 </div>
 
-<!-- Login Modal -->
-<div id="loginModalGame" class="modal-game">
-    <div class="modal-card-game">
-        <button class="modal-close-game" id="closeModalGame">×</button>
-        <h3>✨ Join Now</h3>
-        <p>Enter your email to save scores & compete on leaderboard</p>
-        <input type="email" id="loginEmailGame" placeholder="you@example.com" autocomplete="email">
-        <button id="saveEmailBtnGame">Save & Continue</button>
-    </div>
-</div>
+<!-- Unified Join Now Popup with Score Saving Info -->
+<div id="loginModalGame" class="modal-game"><div class="modal-card-game"><button class="modal-close-game" id="closeModalGame">×</button><h3>✨ Join & Save Score</h3><p id="modalScoreInfo">🎯 Save your results, compete globally & unlock achievements!</p><input type="email" id="loginEmailGame" placeholder="Enter your email" autocomplete="email"><button id="saveEmailBtnGame">Join Contest & Save Score</button></div></div>
 
 <script>
-    // ======================= SOUND (unchanged) ========================
-    function playCorrectSound() {
-        try {
-            const ctx = new(window.AudioContext || window.webkitAudioContext)();
-            const now = ctx.currentTime;
-            const osc1 = ctx.createOscillator();
-            const gain1 = ctx.createGain();
-            osc1.type = 'sine';
-            osc1.frequency.value = 1175;
-            gain1.gain.setValueAtTime(0.4, now);
-            gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
-            osc1.connect(gain1).connect(ctx.destination);
-            osc1.start(now);
-            osc1.stop(now + 0.35);
-            const osc2 = ctx.createOscillator();
-            const gain2 = ctx.createGain();
-            osc2.type = 'sine';
-            osc2.frequency.value = 1480;
-            gain2.gain.setValueAtTime(0.25, now + 0.05);
-            gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
-            osc2.connect(gain2).connect(ctx.destination);
-            osc2.start(now + 0.05);
-            osc2.stop(now + 0.4);
-            const osc3 = ctx.createOscillator();
-            const gain3 = ctx.createGain();
-            osc3.type = 'sine';
-            osc3.frequency.value = 2349;
-            gain3.gain.setValueAtTime(0.15, now + 0.1);
-            gain3.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
-            osc3.connect(gain3).connect(ctx.destination);
-            osc3.start(now + 0.1);
-            osc3.stop(now + 0.3);
-        } catch (e) {}
-    }
-    function playWrongSound() {
-        try {
-            const ctx = new(window.AudioContext || window.webkitAudioContext)();
-            const now = ctx.currentTime;
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = 'square';
-            osc.frequency.value = 220;
-            gain.gain.setValueAtTime(0.25, now);
-            gain.gain.linearRampToValueAtTime(0.0001, now + 0.12);
-            osc.connect(gain).connect(ctx.destination);
-            osc.start(now);
-            osc.stop(now + 0.12);
-            const osc2 = ctx.createOscillator();
-            const gain2 = ctx.createGain();
-            osc2.type = 'square';
-            osc2.frequency.value = 200;
-            gain2.gain.setValueAtTime(0.25, now + 0.15);
-            gain2.gain.linearRampToValueAtTime(0.0001, now + 0.28);
-            osc2.connect(gain2).connect(ctx.destination);
-            osc2.start(now + 0.15);
-            osc2.stop(now + 0.28);
-        } catch (e) {}
-    }
-
-    // ======================= FIXED IMAGE POOL (consistent Real/AI) ========================
+    // LARGE, NON-REPEATING IMAGE POOL (30 distinct images) ensures same image not repeated frequently within a game session
     const imagePool = [
-        { url: "https://picsum.photos/id/1/800/600", isReal: true },
-        { url: "https://picsum.photos/id/2/800/600", isReal: false },
-        { url: "https://picsum.photos/id/3/800/600", isReal: true },
-        { url: "https://picsum.photos/id/4/800/600", isReal: false },
-        { url: "https://picsum.photos/id/5/800/600", isReal: true },
-        { url: "https://picsum.photos/id/6/800/600", isReal: false },
-        { url: "https://picsum.photos/id/7/800/600", isReal: true },
-        { url: "https://picsum.photos/id/8/800/600", isReal: false },
-        { url: "https://picsum.photos/id/9/800/600", isReal: true },
-        { url: "https://picsum.photos/id/10/800/600", isReal: false },
-        { url: "https://picsum.photos/id/11/800/600", isReal: true },
-        { url: "https://picsum.photos/id/12/800/600", isReal: false },
-        { url: "https://picsum.photos/id/13/800/600", isReal: true },
-        { url: "https://picsum.photos/id/14/800/600", isReal: false },
-        { url: "https://picsum.photos/id/15/800/600", isReal: true },
-        { url: "https://picsum.photos/id/16/800/600", isReal: false },
-        { url: "https://picsum.photos/id/17/800/600", isReal: true },
-        { url: "https://picsum.photos/id/18/800/600", isReal: false },
-        { url: "https://picsum.photos/id/19/800/600", isReal: true },
-        { url: "https://picsum.photos/id/20/800/600", isReal: false }
+        { url: "https://picsum.photos/id/101/800/600", isReal: true }, { url: "https://picsum.photos/id/104/800/600", isReal: false }, { url: "https://picsum.photos/id/107/800/600", isReal: true },
+        { url: "https://picsum.photos/id/116/800/600", isReal: false }, { url: "https://picsum.photos/id/119/800/600", isReal: true }, { url: "https://picsum.photos/id/20/800/600", isReal: false },
+        { url: "https://picsum.photos/id/22/800/600", isReal: true }, { url: "https://picsum.photos/id/26/800/600", isReal: false }, { url: "https://picsum.photos/id/28/800/600", isReal: true },
+        { url: "https://picsum.photos/id/32/800/600", isReal: false }, { url: "https://picsum.photos/id/36/800/600", isReal: true }, { url: "https://picsum.photos/id/40/800/600", isReal: false },
+        { url: "https://picsum.photos/id/42/800/600", isReal: true }, { url: "https://picsum.photos/id/45/800/600", isReal: false }, { url: "https://picsum.photos/id/47/800/600", isReal: true },
+        { url: "https://picsum.photos/id/55/800/600", isReal: false }, { url: "https://picsum.photos/id/59/800/600", isReal: true }, { url: "https://picsum.photos/id/60/800/600", isReal: false },
+        { url: "https://picsum.photos/id/66/800/600", isReal: true }, { url: "https://picsum.photos/id/67/800/600", isReal: false }, { url: "https://picsum.photos/id/71/800/600", isReal: true },
+        { url: "https://picsum.photos/id/76/800/600", isReal: false }, { url: "https://picsum.photos/id/77/800/600", isReal: true }, { url: "https://picsum.photos/id/80/800/600", isReal: false },
+        { url: "https://picsum.photos/id/83/800/600", isReal: true }, { url: "https://picsum.photos/id/84/800/600", isReal: false }, { url: "https://picsum.photos/id/88/800/600", isReal: true },
+        { url: "https://picsum.photos/id/91/800/600", isReal: false }, { url: "https://picsum.photos/id/96/800/600", isReal: true }, { url: "https://picsum.photos/id/99/800/600", isReal: false }
     ];
-    
-    function shuffleArray(arr) {
-        for (let i = arr.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [arr[i], arr[j]] = [arr[j], arr[i]];
-        }
-        return arr;
-    }
-    
-    let currentGameImages = [];
-    let index = 0;
-    let score = 0;
-    let answered = false;
-    let currentImageObj = null;
-
-    const btnReal = document.getElementById('btnReal');
-    const btnAi = document.getElementById('btnAi');
-    const nextBtn = document.getElementById('nextBtn');
-    const counterEl = document.getElementById('counter');
-    const resultCard = document.getElementById('result');
-    const imgElement = document.getElementById('img');
-    const scoreCardOverlay = document.getElementById('scoreCardOverlay');
-    const leaderboardStrip = document.getElementById('leaderboardStrip');
-    const questionSpan = document.querySelector('.question-inline');
-    const counterSpan = document.getElementById('counter');
-
-    function setLeaderboardMode(active) {
-        if (active) {
-            counterSpan.style.display = 'none';
-            questionSpan.style.display = 'none';
-            leaderboardStrip.style.display = 'flex';
-        } else {
-            counterSpan.style.display = '';
-            questionSpan.style.display = '';
-            leaderboardStrip.style.display = 'none';
-        }
-    }
-
-    function disableButtons() {
-        answered = true;
-        btnReal.disabled = true;
-        btnAi.disabled = true;
-    }
-    function enableButtons() {
-        answered = false;
-        btnReal.disabled = false;
-        btnAi.disabled = false;
-    }
-    
-    function initNewGameSet() {
-        const shuffled = shuffleArray([...imagePool]);
-        currentGameImages = shuffled.slice(0, 5);
-    }
-    
-    function load() {
-        if (currentGameImages.length === 0) initNewGameSet();
-        currentImageObj = currentGameImages[index];
-        imgElement.src = currentImageObj.url;
-        imgElement.style.display = "block";
-        scoreCardOverlay.style.display = "none";
-        resultCard.style.display = "none";
-        counterEl.innerText = (index + 1) + "/5";
-        nextBtn.style.display = "none";
-        enableButtons();
-        setLeaderboardMode(false);
-    }
-    
-    function answer(choice) {
-        if (answered) return;
-        disableButtons();
-        let correct = (choice === "real" && currentImageObj.isReal) || (choice === "ai" && !currentImageObj.isReal);
-        let circle = document.getElementById("circle");
-        let titleElement = document.getElementById("title");
-        let desc = document.getElementById("desc");
-        function highlightKeywords(text) {
-            return text.replace(/\bREAL\b/g, '<span class="real-word">REAL</span>')
-                       .replace(/\bAI\b/g, '<span class="ai-word">AI</span>')
-                       .replace(/\bAI-generated\b/gi, '<span class="ai-word">AI-generated</span>');
-        }
-        if (correct) {
-            playCorrectSound();
-            score++;
-            circle.className = "circle correct";
-            circle.innerHTML = "✔";
-            titleElement.innerHTML = "CORRECT";
-            if (currentImageObj.isReal) desc.innerHTML = highlightKeywords("Good catch! This image is REAL.");
-            else desc.innerHTML = highlightKeywords("Good catch! This image is AI generated.");
-        } else {
-            playWrongSound();
-            circle.className = "circle wrong";
-            circle.innerHTML = "✖";
-            titleElement.innerHTML = "WRONG";
-            if (currentImageObj.isReal) desc.innerHTML = highlightKeywords("This image is REAL. The lighting, textures and details match natural patterns.");
-            else desc.innerHTML = highlightKeywords("This image is AI-generated. Look for unnatural textures and repeating patterns.");
-        }
-        resultCard.style.display = "block";
-        nextBtn.style.display = "inline-block";
-    }
-    
-    function getScoreData(scoreValue) {
-        if (scoreValue === 5) return { label: "Brilliant", emoji: "🤯" };
-        if (scoreValue === 4) return { label: "Excellent", emoji: "🔥" };
-        if (scoreValue === 3) return { label: "Good", emoji: "👍" };
-        if (scoreValue === 2) return { label: "Average", emoji: "😐" };
-        if (scoreValue === 1) return { label: "Poor", emoji: "😬" };
-        return { label: "Very Bad", emoji: "😭" };
-    }
-    
-    async function next() {
-        index++;
-        if (index >= 5) {
-            const user = window.getCurrentUser ? window.getCurrentUser() : null;
-            if (user) {
-                const saved = await window.saveGameResultToFirestore(score);
-                if (!saved) alert("⚠️ Failed to save score. Please check your internet.");
-            } else {
-                alert("🔐 You are not logged in. Your score won't be saved to leaderboard. Click 'Join' to save scores.");
-            }
-            imgElement.style.display = "none";
-            const scoreData = getScoreData(score);
-            document.getElementById('scoreEmoji').innerText = scoreData.emoji;
-            document.getElementById('finalScoreValue').innerHTML = `${scoreData.label} (${score}/5)`;
-            scoreCardOverlay.style.display = "flex";
-            resultCard.style.display = "none";
-            btnReal.disabled = true;
-            btnAi.disabled = true;
-            nextBtn.style.display = "none";
-            setLeaderboardMode(true);
-        } else {
-            load();
-        }
-    }
-    
-    function restartGame() {
-        index = 0;
-        score = 0;
-        answered = false;
-        initNewGameSet();
-        scoreCardOverlay.style.display = "none";
-        imgElement.style.display = "block";
-        resultCard.innerHTML = `<div class="result-row"><div id="circle" class="circle">✔</div><h3 id="title"></h3></div><p id="desc" class="desc-text"></p>`;
-        resultCard.style.display = "none";
-        enableButtons();
-        nextBtn.style.display = "none";
-        setLeaderboardMode(false);
-        load();
-    }
-    
-    function startNewGame() { restartGame(); }
-    
-    function shareOnWhatsApp() {
-        const scoreData = getScoreData(score);
-        const message = `🎮 BrainPlay AI - Real vs AI Game!\n\nMy final score: ${scoreData.label} (${score}/5)\n\nWould you like to give challenge to your friend? Play here: ${location.href}`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(message)}`);
-    }
-    
-    document.getElementById('startNewFinalBtn').addEventListener('click', startNewGame);
-    document.getElementById('finalWhatsappBtn').addEventListener('click', shareOnWhatsApp);
-    
-    window.copyLink = function() { navigator.clipboard.writeText(location.href); alert("Link copied!"); }
-    window.shareWA = function() { window.open("https://wa.me/?text=Play this game: " + location.href); }
-    window.shareFB = function() { window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}&quote=${encodeURIComponent('🧠 Can you beat this AI test? Test your brain now!')}`); }
-    
+    function shuffleArray(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
+    let currentGameImages = [], index = 0, score = 0, answered = false, currentImageObj = null;
+    const btnReal = document.getElementById('btnReal'), btnAi = document.getElementById('btnAi'), nextBtn = document.getElementById('nextBtn'), counterEl = document.getElementById('counter');
+    const resultCard = document.getElementById('result'), imgElement = document.getElementById('img'), scoreCardOverlay = document.getElementById('scoreCardOverlay');
+    const leaderboardStrip = document.getElementById('leaderboardStrip'), questionSpan = document.querySelector('.question-inline'), counterSpan = document.getElementById('counter');
+    function setLeaderboardMode(active) { if(active) { counterSpan.style.display = 'none'; questionSpan.style.display = 'none'; leaderboardStrip.style.display = 'flex'; } else { counterSpan.style.display = ''; questionSpan.style.display = ''; leaderboardStrip.style.display = 'none'; } }
+    function disableButtons() { answered = true; btnReal.disabled = true; btnAi.disabled = true; }
+    function enableButtons() { answered = false; btnReal.disabled = false; btnAi.disabled = false; }
+    function initNewGameSet() { const shuffled = shuffleArray([...imagePool]); currentGameImages = shuffled.slice(0, 5); }
+    function load() { if (currentGameImages.length === 0) initNewGameSet(); currentImageObj = currentGameImages[index]; imgElement.src = currentImageObj.url; imgElement.style.display = "block"; scoreCardOverlay.style.display = "none"; resultCard.style.display = "none"; counterEl.innerText = (index + 1) + "/5"; nextBtn.style.display = "none"; enableButtons(); setLeaderboardMode(false); }
+    function playCorrectSound() { try { const ctx = new(window.AudioContext || window.webkitAudioContext)(); const now = ctx.currentTime; const osc = ctx.createOscillator(); const gain = ctx.createGain(); osc.frequency.value = 1175; gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3); osc.connect(gain).connect(ctx.destination); osc.start(now); osc.stop(now+0.3); } catch(e){} }
+    function playWrongSound() { try { const ctx = new(window.AudioContext || window.webkitAudioContext)(); const now = ctx.currentTime; const osc = ctx.createOscillator(); osc.type = 'square'; osc.frequency.value = 200; const gain = ctx.createGain(); gain.gain.setValueAtTime(0.25, now); gain.gain.linearRampToValueAtTime(0.0001, now+0.15); osc.connect(gain).connect(ctx.destination); osc.start(now); osc.stop(now+0.15); } catch(e){} }
+    function answer(choice) { if (answered) return; disableButtons(); let correct = (choice === "real" && currentImageObj.isReal) || (choice === "ai" && !currentImageObj.isReal); let circle = document.getElementById("circle"), titleEl = document.getElementById("title"), desc = document.getElementById("desc"); function highlight(text) { return text.replace(/\bREAL\b/g, '<span class="real-word">REAL</span>').replace(/\bAI\b/g, '<span class="ai-word">AI</span>'); } if (correct) { playCorrectSound(); score++; circle.className = "circle correct"; circle.innerHTML = "✔"; titleEl.innerHTML = "CORRECT"; desc.innerHTML = currentImageObj.isReal ? highlight("Good catch! This image is REAL.") : highlight("Good catch! This image is AI generated."); } else { playWrongSound(); circle.className = "circle wrong"; circle.innerHTML = "✖"; titleEl.innerHTML = "WRONG"; desc.innerHTML = currentImageObj.isReal ? highlight("This image is REAL. The lighting matches natural patterns.") : highlight("This image is AI-generated. Look for unnatural textures."); } resultCard.style.display = "block"; nextBtn.style.display = "inline-block"; }
+    function getScoreData(scoreValue) { if (scoreValue === 5) return { label: "Brilliant", emoji: "🤯" }; if (scoreValue === 4) return { label: "Excellent", emoji: "🔥" }; if (scoreValue === 3) return { label: "Good", emoji: "👍" }; if (scoreValue === 2) return { label: "Average", emoji: "😐" }; if (scoreValue === 1) return { label: "Poor", emoji: "😬" }; return { label: "Very Bad", emoji: "😭" }; }
+    window.next = async function() { index++; if (index >= 5) { const user = window.getCurrentUser ? window.getCurrentUser() : null; if (user) { const saved = await window.saveGameResultToFirestore(score); if (!saved) alert("⚠️ Failed to save score."); } else { window._pendingScore = score; alert("🔐 Not logged in! Your score will be saved after you Join. Click Join Now to save."); } const scoreData = getScoreData(score); document.getElementById('scoreEmoji').innerText = scoreData.emoji; document.getElementById('finalScoreValue').innerHTML = `${scoreData.label} (${score}/5)`; scoreCardOverlay.style.display = "flex"; resultCard.style.display = "none"; btnReal.disabled = true; btnAi.disabled = true; nextBtn.style.display = "none"; setLeaderboardMode(true); } else { load(); } };
+    function restartGame() { index = 0; score = 0; answered = false; initNewGameSet(); scoreCardOverlay.style.display = "none"; imgElement.style.display = "block"; resultCard.style.display = "none"; enableButtons(); nextBtn.style.display = "none"; setLeaderboardMode(false); load(); }
+    document.getElementById('startNewFinalBtn').addEventListener('click', restartGame);
+    document.getElementById('finalWhatsappBtn').addEventListener('click', () => { const scoreData = getScoreData(score); const msg = `🎮 BrainPlay AI - Real vs AI Game!\nMy final score: ${scoreData.label} (${score}/5)\nPlay here: ${location.href}`; window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`); });
+    function shareOnFB() { window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}&quote=${encodeURIComponent('🧠 Can you beat this AI test? BrainPlay AI')}`); }
+    function shareOnWA() { window.open(`https://wa.me/?text=Play this AI game: ${location.href}`); }
+    function copyLink() { navigator.clipboard.writeText(location.href); alert("Link copied!"); }
+    document.getElementById('copyLinkBtn').addEventListener('click', copyLink);
+    document.getElementById('fbShareBtn').addEventListener('click', shareOnFB);
+    document.getElementById('waShareBtn').addEventListener('click', shareOnWA);
     document.getElementById("percent").innerText = Math.floor(Math.random() * 50 + 30) + "%";
-    
-    // PWA Install
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
-    function triggerInstall() {
-        if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; }
-        else alert("To install: tap Share then 'Add to Home Screen' on iOS, or 'Install' on Android.");
-    }
-    document.getElementById('scoreCardSaveBtn')?.addEventListener('click', (e) => { e.preventDefault(); triggerInstall(); });
-    
-    // Hamburger menu
-    document.getElementById('hamburgerBtn').addEventListener('click', function(e) {
-        e.stopPropagation();
-        document.getElementById('hamburgerMenu').classList.toggle('active');
-    });
-    document.addEventListener('click', function(e) {
-        const menu = document.getElementById('hamburgerMenu');
-        const btn = document.getElementById('hamburgerBtn');
-        if (menu && btn && !menu.contains(e.target) && e.target !== btn) menu.classList.remove('active');
-    });
-    
-    // Leaderboard button (strip) opens in new tab
-    document.getElementById('leaderboardActionBtn')?.addEventListener('click', () => {
-        window.open('leaderboard.html', '_blank');
-    });
-    // Leaderboard link in hamburger menu
-    document.getElementById('leaderboardMenuLink')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        window.open('leaderboard.html', '_blank');
-    });
-    // Footer Leaderboard button
-    document.getElementById('footerLeaderboardBtn')?.addEventListener('click', () => {
-        window.open('leaderboard.html', '_blank');
-    });
-    
-    // Logout header button
+    let deferredPrompt; window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
+    document.getElementById('scoreCardSaveBtn')?.addEventListener('click', () => { if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt=null; } else alert("Tap Share → Add to Home Screen"); });
+    document.getElementById('hamburgerBtn').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('hamburgerMenu').classList.toggle('active'); });
+    document.addEventListener('click', (e) => { const menu = document.getElementById('hamburgerMenu'); const btn = document.getElementById('hamburgerBtn'); if(menu && btn && !menu.contains(e.target) && e.target !== btn) menu.classList.remove('active'); });
+    document.getElementById('leaderboardActionBtn')?.addEventListener('click', () => window.open('leaderboard.html', '_blank'));
+    document.getElementById('leaderboardMenuLink')?.addEventListener('click', (e) => { e.preventDefault(); window.open('leaderboard.html', '_blank'); });
+    document.getElementById('footerLeaderboardBtn')?.addEventListener('click', () => window.open('leaderboard.html', '_blank'));
     document.getElementById('logoutHeaderBtn')?.addEventListener('click', () => { window.logoutUser(); });
-    
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register(URL.createObjectURL(new Blob([`self.addEventListener('install', e => self.skipWaiting()); self.addEventListener('activate', e => e.waitUntil(clients.claim())); self.addEventListener('fetch', e => e.respondWith(fetch(e.request)));`], {type: 'application/javascript'}))).catch(console.log);
-        });
-    }
-    
-    initNewGameSet();
-    load();
-    if (window.location.pathname.includes('how-to-play.html')) {
-        document.getElementById('playNowContainer').style.display = 'block';
-    }
+    initNewGameSet(); load();
+    // Ensure popup shows score info
+    window._lastGameScore = 0;
+    setInterval(() => { if(score) window._lastGameScore = score; }, 500);
 </script>
 </body>
 </html>
