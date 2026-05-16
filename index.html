@@ -6,7 +6,7 @@
     <title>BrainPlay AI | Real vs AI Game</title>
     <meta name="description" content="Play viral AI brain games and challenge your mind with Real vs AI puzzles on BrainPlay AI.">
     <link rel="icon" type="image/png" href="favicon.png">
-    <!-- Open Graph / Social Media Sharing (UPDATED: custom Facebook share image) -->
+    <!-- Open Graph / Social Media Sharing (using required fb image) -->
     <meta property="og:title" content="BrainPlay AI – Real vs AI Game">
     <meta property="og:description" content="Can you beat this AI test? Test your skills and share your score!">
     <meta property="og:image" content="https://raw.githubusercontent.com/brainplayjoy/brainplay-daily/main/brainplayai-fb.webp">
@@ -49,7 +49,6 @@
             return null;
         }
         
-        // UPDATED: Saves score with proper perfect (5/5) and zero (0/5) counting
         async function saveGameResultToFirestore(score) {
             const user = getCurrentUser();
             if (!user) {
@@ -112,7 +111,6 @@
                     const newTotal = perfect + Math.floor(Math.random() * 3) + 1;
                     await updateDoc(userRef, { totalPlayedCount: newTotal });
                 }
-                // Ensure zeroCount field exists for old users
                 if (existing.allTimeZeroCount === undefined) {
                     await updateDoc(userRef, { allTimeZeroCount: 0 });
                 }
@@ -134,37 +132,54 @@
         window.getCurrentUser = getCurrentUser;
         window.saveGameResultToFirestore = saveGameResultToFirestore;
         
-        function updateLoginUI() {
+        // Central auth UI (center, small) - shows Join Now or User+Logout
+        function updateCenterAuthUI() {
+            const container = document.getElementById('centerAuthContainer');
+            if (!container) return;
             const user = getCurrentUser();
-            const joinBtn = document.getElementById('joinNowBtnGame');
-            const userDisplaySpan = document.getElementById('loggedUserDisplayGame');
-            const logoutBtn = document.getElementById('logoutHeaderBtn');
             if (user) {
-                if (joinBtn) joinBtn.style.display = 'none';
-                if (userDisplaySpan) {
-                    userDisplaySpan.style.display = 'inline-flex';
-                    userDisplaySpan.innerHTML = `👋 ${user.name}`;
-                }
-                if (logoutBtn) logoutBtn.style.display = 'flex';
+                // Logged in: show username + logout button (small, centered, red logout bg)
+                container.innerHTML = `
+                    <div class="center-auth-inline">
+                        <span class="center-username">👋 ${user.name}</span>
+                        <button id="centerLogoutBtn" class="center-logout-btn">Logout</button>
+                    </div>
+                `;
+                const logoutBtn = document.getElementById('centerLogoutBtn');
+                if (logoutBtn) logoutBtn.addEventListener('click', () => window.logoutUser());
             } else {
-                if (joinBtn) joinBtn.style.display = 'flex';
-                if (userDisplaySpan) userDisplaySpan.style.display = 'none';
-                if (logoutBtn) logoutBtn.style.display = 'none';
+                // Logged out: show "Join Now" button (small, centered)
+                container.innerHTML = `
+                    <button id="centerJoinNowBtn" class="center-join-btn">🔗 Join Now</button>
+                `;
+                const joinBtn = document.getElementById('centerJoinNowBtn');
+                const modal = document.getElementById('loginModalGame');
+                if (joinBtn && modal) {
+                    joinBtn.addEventListener('click', () => {
+                        if (modal) modal.style.display = 'flex';
+                    });
+                }
+            }
+        }
+        
+        // Leaderboard click handler: if not logged in, show modal; else open leaderboard
+        function handleLeaderboardClick(e) {
+            e.preventDefault();
+            const user = getCurrentUser();
+            if (!user) {
+                const modal = document.getElementById('loginModalGame');
+                if (modal) modal.style.display = 'flex';
+            } else {
+                window.open('leaderboard.html', '_blank');
             }
         }
         
         function initLoginModal() {
             const modal = document.getElementById('loginModalGame');
-            const joinBtn = document.getElementById('joinNowBtnGame');
             const closeModal = document.getElementById('closeModalGame');
             const saveEmailBtn = document.getElementById('saveEmailBtnGame');
             const emailInput = document.getElementById('loginEmailGame');
             
-            if (joinBtn) {
-                joinBtn.addEventListener('click', () => {
-                    if (modal) modal.style.display = 'flex';
-                });
-            }
             if (closeModal) {
                 closeModal.addEventListener('click', () => { if(modal) modal.style.display = 'none'; });
             }
@@ -179,7 +194,7 @@
                         await loginUser(email);
                         if (modal) modal.style.display = 'none';
                         emailInput.value = '';
-                        updateLoginUI();
+                        updateCenterAuthUI();
                         alert("✅ Logged in successfully! Your next game scores will be recorded.");
                     } catch(err) { alert("Error: "+err.message); }
                 });
@@ -187,13 +202,29 @@
             window.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
         }
         
-        window.updateLoginUI = updateLoginUI;
-        window.initLoginModal = initLoginModal;
+        // Attach leaderboard guards to all leaderboard-triggering elements
+        function attachLeaderboardGuards() {
+            const leaderboardBtns = [
+                document.getElementById('leaderboardActionBtn'),
+                document.getElementById('footerLeaderboardBtn'),
+                document.getElementById('leaderboardMenuLink')
+            ];
+            leaderboardBtns.forEach(btn => {
+                if (btn) {
+                    btn.removeEventListener('click', handleLeaderboardClick);
+                    btn.addEventListener('click', handleLeaderboardClick);
+                }
+            });
+        }
         
         document.addEventListener('DOMContentLoaded', () => {
-            updateLoginUI();
+            updateCenterAuthUI();
             initLoginModal();
+            attachLeaderboardGuards();
         });
+        
+        window.updateCenterAuthUI = updateCenterAuthUI;
+        window.attachLeaderboardGuards = attachLeaderboardGuards;
     </script>
     
     <style>
@@ -218,7 +249,7 @@
             width: 100%;
         }
 
-        /* HEADER */
+        /* HEADER - removed join/logout buttons, only logo + hamburger */
         .header {
             display: flex;
             justify-content: space-between;
@@ -237,7 +268,6 @@
         }
 
         .header-right {
-            position: relative;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -325,42 +355,61 @@
             background: rgba(255,255,255,0.1);
         }
 
-        /* Join Now / User Badge styles */
-        .join-now-btn-game {
+        /* CENTER AUTH UI (small, centered) */
+        .center-auth-container {
+            text-align: center;
+            margin: 12px 0 6px 0;
+        }
+        .center-auth-inline {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0,0,0,0.4);
+            padding: 4px 14px;
+            border-radius: 60px;
+            backdrop-filter: blur(4px);
+        }
+        .center-username {
+            font-size: 13px;
+            font-weight: 700;
+            background: #2d2d5a;
+            padding: 4px 12px;
+            border-radius: 30px;
+            color: white;
+        }
+        .center-logout-btn {
+            background: #dc2626;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 12px;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .center-logout-btn:hover {
+            background: #b91c1c;
+            transform: scale(0.96);
+        }
+        .center-join-btn {
             background: #FDDA0D;
             border: none;
-            padding: 6px 14px;
+            padding: 5px 14px;
             border-radius: 40px;
             font-weight: 800;
             color: #000;
             font-size: 12px;
             cursor: pointer;
             transition: 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .join-now-btn-game:hover { background: #ffea70; transform: scale(0.97);}
-        .logged-user-badge-game {
-            background: #23233f;
-            padding: 4px 12px;
-            border-radius: 60px;
-            font-weight: 600;
-            font-size: 12px;
-            gap: 8px;
-            align-items: center;
             display: inline-flex;
-            color: white;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
-        .logout-header-btn {
-            background: #dc2626;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 40px;
-            font-weight: 700;
-            font-size: 12px;
-            color: white;
-            cursor: pointer;
+        .center-join-btn:hover {
+            background: #ffea70;
+            transform: scale(0.97);
         }
 
         /* TITLE */
@@ -418,7 +467,7 @@
         .image-box {
             border-radius: 24px;
             overflow: hidden;
-            margin-top: 20px;
+            margin-top: 12px;
             position: relative;
             min-height: 320px;
             background: #000000;
@@ -774,7 +823,7 @@
             color: #fff;
         }
 
-        /* FOOTER - NEW: Side by side buttons (Leaderboard left, How to Play right) */
+        /* FOOTER BUTTONS */
         .footer-buttons {
             display: flex;
             justify-content: space-between;
@@ -852,7 +901,7 @@
             transform: translateY(-1px);
         }
 
-        /* MODAL */
+        /* MODAL with extra warning text */
         .modal-game {
             display: none;
             position: fixed;
@@ -921,7 +970,16 @@
             margin-bottom: 20px;
             outline: none;
         }
-        
+        .login-warning {
+            background: rgba(250,204,21,0.15);
+            border-left: 4px solid #facc15;
+            border-radius: 12px;
+            padding: 8px 10px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            text-align: left;
+            color: #ffec9f;
+        }
         @media (max-width: 550px) {
             .footer-btn { padding: 8px 12px; font-size: 12px; }
         }
@@ -930,7 +988,7 @@
 <body>
 
 <div class="container">
-    <!-- HEADER with login elements -->
+    <!-- HEADER (Join/Logout removed) -->
     <div class="header">
         <div class="header-left">
             <img class="header-logo-img" src="brainplay-logo.webp" alt="BrainPlay Logo">
@@ -940,9 +998,6 @@
             </div>
         </div>
         <div class="header-right">
-            <button id="joinNowBtnGame" class="join-now-btn-game">🔗 Join</button>
-            <span id="loggedUserDisplayGame" style="display: none;" class="logged-user-badge-game"></span>
-            <button id="logoutHeaderBtn" class="logout-header-btn" style="display: none;">Logout</button>
             <button class="hamburger-btn" id="hamburgerBtn">☰</button>
             <div class="hamburger-menu" id="hamburgerMenu">
                 <a href="https://brainplayai.in/">Home</a>
@@ -961,8 +1016,11 @@
     </div>
 
     <div class="stat">
-        🧩 Only <span class="highlight" id="percent">38%</span> players got this right today!
+        🧩 Only <span class="highlight" id="percent">57%</span> players got this right today!
     </div>
+
+    <!-- NEW CENTER AUTH: Join Now OR User+Logout (small, centered) -->
+    <div id="centerAuthContainer" class="center-auth-container"></div>
 
     <div class="image-box" id="imageBox">
         <img id="img" alt="Challenge Image">
@@ -1040,7 +1098,6 @@
         </div>
     </div>
 
-    <!-- NEW FOOTER: Leaderboard button (left) + How to Play button (right) -->
     <div class="footer-buttons">
         <button class="footer-btn leaderboard-footer-btn" id="footerLeaderboardBtn">🏆 Leaderboard</button>
         <a href="https://brainplayai.in/how-to-play.html" class="footer-btn how-to-play-footer-btn">📖 How to Play</a>
@@ -1050,313 +1107,55 @@
     </div>
 </div>
 
-<!-- Login Modal -->
+<!-- Login Modal with required warning text -->
 <div id="loginModalGame" class="modal-game">
     <div class="modal-card-game">
         <button class="modal-close-game" id="closeModalGame">×</button>
+        <div class="login-warning">🔐 You are not logged in. Your score won't be saved to leaderboard. Click 'Join' to save scores.</div>
         <h3>✨ Join Now</h3>
-        <p>Enter your email to save scores & compete on leaderboard</p>
+        <p>Enter your email to compete on leaderboard</p>
         <input type="email" id="loginEmailGame" placeholder="you@example.com" autocomplete="email">
         <button id="saveEmailBtnGame">Save & Continue</button>
     </div>
 </div>
 
 <script>
-    // ======================= SOUND (unchanged) ========================
-    function playCorrectSound() {
-        try {
-            const ctx = new(window.AudioContext || window.webkitAudioContext)();
-            const now = ctx.currentTime;
-            const osc1 = ctx.createOscillator();
-            const gain1 = ctx.createGain();
-            osc1.type = 'sine';
-            osc1.frequency.value = 1175;
-            gain1.gain.setValueAtTime(0.4, now);
-            gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
-            osc1.connect(gain1).connect(ctx.destination);
-            osc1.start(now);
-            osc1.stop(now + 0.35);
-            const osc2 = ctx.createOscillator();
-            const gain2 = ctx.createGain();
-            osc2.type = 'sine';
-            osc2.frequency.value = 1480;
-            gain2.gain.setValueAtTime(0.25, now + 0.05);
-            gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
-            osc2.connect(gain2).connect(ctx.destination);
-            osc2.start(now + 0.05);
-            osc2.stop(now + 0.4);
-            const osc3 = ctx.createOscillator();
-            const gain3 = ctx.createGain();
-            osc3.type = 'sine';
-            osc3.frequency.value = 2349;
-            gain3.gain.setValueAtTime(0.15, now + 0.1);
-            gain3.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
-            osc3.connect(gain3).connect(ctx.destination);
-            osc3.start(now + 0.1);
-            osc3.stop(now + 0.3);
-        } catch (e) {}
-    }
-    function playWrongSound() {
-        try {
-            const ctx = new(window.AudioContext || window.webkitAudioContext)();
-            const now = ctx.currentTime;
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = 'square';
-            osc.frequency.value = 220;
-            gain.gain.setValueAtTime(0.25, now);
-            gain.gain.linearRampToValueAtTime(0.0001, now + 0.12);
-            osc.connect(gain).connect(ctx.destination);
-            osc.start(now);
-            osc.stop(now + 0.12);
-            const osc2 = ctx.createOscillator();
-            const gain2 = ctx.createGain();
-            osc2.type = 'square';
-            osc2.frequency.value = 200;
-            gain2.gain.setValueAtTime(0.25, now + 0.15);
-            gain2.gain.linearRampToValueAtTime(0.0001, now + 0.28);
-            osc2.connect(gain2).connect(ctx.destination);
-            osc2.start(now + 0.15);
-            osc2.stop(now + 0.28);
-        } catch (e) {}
-    }
+    // ========== ORIGINAL GAME LOGIC (preserved) ==========
+    function playCorrectSound() { try { const ctx = new(window.AudioContext || window.webkitAudioContext)(); const now = ctx.currentTime; const osc1 = ctx.createOscillator(); const gain1 = ctx.createGain(); osc1.type = 'sine'; osc1.frequency.value = 1175; gain1.gain.setValueAtTime(0.4, now); gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.35); osc1.connect(gain1).connect(ctx.destination); osc1.start(now); osc1.stop(now + 0.35); const osc2 = ctx.createOscillator(); const gain2 = ctx.createGain(); osc2.type = 'sine'; osc2.frequency.value = 1480; gain2.gain.setValueAtTime(0.25, now + 0.05); gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.4); osc2.connect(gain2).connect(ctx.destination); osc2.start(now + 0.05); osc2.stop(now + 0.4); const osc3 = ctx.createOscillator(); const gain3 = ctx.createGain(); osc3.type = 'sine'; osc3.frequency.value = 2349; gain3.gain.setValueAtTime(0.15, now + 0.1); gain3.gain.exponentialRampToValueAtTime(0.0001, now + 0.3); osc3.connect(gain3).connect(ctx.destination); osc3.start(now + 0.1); osc3.stop(now + 0.3); } catch (e) {} }
+    function playWrongSound() { try { const ctx = new(window.AudioContext || window.webkitAudioContext)(); const now = ctx.currentTime; const osc = ctx.createOscillator(); const gain = ctx.createGain(); osc.type = 'square'; osc.frequency.value = 220; gain.gain.setValueAtTime(0.25, now); gain.gain.linearRampToValueAtTime(0.0001, now + 0.12); osc.connect(gain).connect(ctx.destination); osc.start(now); osc.stop(now + 0.12); const osc2 = ctx.createOscillator(); const gain2 = ctx.createGain(); osc2.type = 'square'; osc2.frequency.value = 200; gain2.gain.setValueAtTime(0.25, now + 0.15); gain2.gain.linearRampToValueAtTime(0.0001, now + 0.28); osc2.connect(gain2).connect(ctx.destination); osc2.start(now + 0.15); osc2.stop(now + 0.28); } catch (e) {} }
 
-    // ======================= FIXED IMAGE POOL (consistent Real/AI) ========================
     const imagePool = [
-        { url: "https://picsum.photos/id/1/800/600", isReal: true },
-        { url: "https://picsum.photos/id/2/800/600", isReal: false },
-        { url: "https://picsum.photos/id/3/800/600", isReal: true },
-        { url: "https://picsum.photos/id/4/800/600", isReal: false },
-        { url: "https://picsum.photos/id/5/800/600", isReal: true },
-        { url: "https://picsum.photos/id/6/800/600", isReal: false },
-        { url: "https://picsum.photos/id/7/800/600", isReal: true },
-        { url: "https://picsum.photos/id/8/800/600", isReal: false },
-        { url: "https://picsum.photos/id/9/800/600", isReal: true },
-        { url: "https://picsum.photos/id/10/800/600", isReal: false },
-        { url: "https://picsum.photos/id/11/800/600", isReal: true },
-        { url: "https://picsum.photos/id/12/800/600", isReal: false },
-        { url: "https://picsum.photos/id/13/800/600", isReal: true },
-        { url: "https://picsum.photos/id/14/800/600", isReal: false },
-        { url: "https://picsum.photos/id/15/800/600", isReal: true },
-        { url: "https://picsum.photos/id/16/800/600", isReal: false },
-        { url: "https://picsum.photos/id/17/800/600", isReal: true },
-        { url: "https://picsum.photos/id/18/800/600", isReal: false },
-        { url: "https://picsum.photos/id/19/800/600", isReal: true },
-        { url: "https://picsum.photos/id/20/800/600", isReal: false }
+        { url: "https://picsum.photos/id/1/800/600", isReal: true }, { url: "https://picsum.photos/id/2/800/600", isReal: false }, { url: "https://picsum.photos/id/3/800/600", isReal: true }, { url: "https://picsum.photos/id/4/800/600", isReal: false }, { url: "https://picsum.photos/id/5/800/600", isReal: true }, { url: "https://picsum.photos/id/6/800/600", isReal: false }, { url: "https://picsum.photos/id/7/800/600", isReal: true }, { url: "https://picsum.photos/id/8/800/600", isReal: false }, { url: "https://picsum.photos/id/9/800/600", isReal: true }, { url: "https://picsum.photos/id/10/800/600", isReal: false }, { url: "https://picsum.photos/id/11/800/600", isReal: true }, { url: "https://picsum.photos/id/12/800/600", isReal: false }, { url: "https://picsum.photos/id/13/800/600", isReal: true }, { url: "https://picsum.photos/id/14/800/600", isReal: false }, { url: "https://picsum.photos/id/15/800/600", isReal: true }, { url: "https://picsum.photos/id/16/800/600", isReal: false }, { url: "https://picsum.photos/id/17/800/600", isReal: true }, { url: "https://picsum.photos/id/18/800/600", isReal: false }, { url: "https://picsum.photos/id/19/800/600", isReal: true }, { url: "https://picsum.photos/id/20/800/600", isReal: false }
     ];
-    
-    function shuffleArray(arr) {
-        for (let i = arr.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [arr[i], arr[j]] = [arr[j], arr[i]];
-        }
-        return arr;
-    }
-    
-    let currentGameImages = [];
-    let index = 0;
-    let score = 0;
-    let answered = false;
-    let currentImageObj = null;
-
-    const btnReal = document.getElementById('btnReal');
-    const btnAi = document.getElementById('btnAi');
-    const nextBtn = document.getElementById('nextBtn');
-    const counterEl = document.getElementById('counter');
-    const resultCard = document.getElementById('result');
-    const imgElement = document.getElementById('img');
-    const scoreCardOverlay = document.getElementById('scoreCardOverlay');
-    const leaderboardStrip = document.getElementById('leaderboardStrip');
-    const questionSpan = document.querySelector('.question-inline');
-    const counterSpan = document.getElementById('counter');
-
-    function setLeaderboardMode(active) {
-        if (active) {
-            counterSpan.style.display = 'none';
-            questionSpan.style.display = 'none';
-            leaderboardStrip.style.display = 'flex';
-        } else {
-            counterSpan.style.display = '';
-            questionSpan.style.display = '';
-            leaderboardStrip.style.display = 'none';
-        }
-    }
-
-    function disableButtons() {
-        answered = true;
-        btnReal.disabled = true;
-        btnAi.disabled = true;
-    }
-    function enableButtons() {
-        answered = false;
-        btnReal.disabled = false;
-        btnAi.disabled = false;
-    }
-    
-    function initNewGameSet() {
-        const shuffled = shuffleArray([...imagePool]);
-        currentGameImages = shuffled.slice(0, 5);
-    }
-    
-    function load() {
-        if (currentGameImages.length === 0) initNewGameSet();
-        currentImageObj = currentGameImages[index];
-        imgElement.src = currentImageObj.url;
-        imgElement.style.display = "block";
-        scoreCardOverlay.style.display = "none";
-        resultCard.style.display = "none";
-        counterEl.innerText = (index + 1) + "/5";
-        nextBtn.style.display = "none";
-        enableButtons();
-        setLeaderboardMode(false);
-    }
-    
-    function answer(choice) {
-        if (answered) return;
-        disableButtons();
-        let correct = (choice === "real" && currentImageObj.isReal) || (choice === "ai" && !currentImageObj.isReal);
-        let circle = document.getElementById("circle");
-        let titleElement = document.getElementById("title");
-        let desc = document.getElementById("desc");
-        function highlightKeywords(text) {
-            return text.replace(/\bREAL\b/g, '<span class="real-word">REAL</span>')
-                       .replace(/\bAI\b/g, '<span class="ai-word">AI</span>')
-                       .replace(/\bAI-generated\b/gi, '<span class="ai-word">AI-generated</span>');
-        }
-        if (correct) {
-            playCorrectSound();
-            score++;
-            circle.className = "circle correct";
-            circle.innerHTML = "✔";
-            titleElement.innerHTML = "CORRECT";
-            if (currentImageObj.isReal) desc.innerHTML = highlightKeywords("Good catch! This image is REAL.");
-            else desc.innerHTML = highlightKeywords("Good catch! This image is AI generated.");
-        } else {
-            playWrongSound();
-            circle.className = "circle wrong";
-            circle.innerHTML = "✖";
-            titleElement.innerHTML = "WRONG";
-            if (currentImageObj.isReal) desc.innerHTML = highlightKeywords("This image is REAL. The lighting, textures and details match natural patterns.");
-            else desc.innerHTML = highlightKeywords("This image is AI-generated. Look for unnatural textures and repeating patterns.");
-        }
-        resultCard.style.display = "block";
-        nextBtn.style.display = "inline-block";
-    }
-    
-    function getScoreData(scoreValue) {
-        if (scoreValue === 5) return { label: "Brilliant", emoji: "🤯" };
-        if (scoreValue === 4) return { label: "Excellent", emoji: "🔥" };
-        if (scoreValue === 3) return { label: "Good", emoji: "👍" };
-        if (scoreValue === 2) return { label: "Average", emoji: "😐" };
-        if (scoreValue === 1) return { label: "Poor", emoji: "😬" };
-        return { label: "Very Bad", emoji: "😭" };
-    }
-    
-    async function next() {
-        index++;
-        if (index >= 5) {
-            const user = window.getCurrentUser ? window.getCurrentUser() : null;
-            if (user) {
-                const saved = await window.saveGameResultToFirestore(score);
-                if (!saved) alert("⚠️ Failed to save score. Please check your internet.");
-            } else {
-                alert("🔐 You are not logged in. Your score won't be saved to leaderboard. Click 'Join' to save scores.");
-            }
-            imgElement.style.display = "none";
-            const scoreData = getScoreData(score);
-            document.getElementById('scoreEmoji').innerText = scoreData.emoji;
-            document.getElementById('finalScoreValue').innerHTML = `${scoreData.label} (${score}/5)`;
-            scoreCardOverlay.style.display = "flex";
-            resultCard.style.display = "none";
-            btnReal.disabled = true;
-            btnAi.disabled = true;
-            nextBtn.style.display = "none";
-            setLeaderboardMode(true);
-        } else {
-            load();
-        }
-    }
-    
-    function restartGame() {
-        index = 0;
-        score = 0;
-        answered = false;
-        initNewGameSet();
-        scoreCardOverlay.style.display = "none";
-        imgElement.style.display = "block";
-        resultCard.innerHTML = `<div class="result-row"><div id="circle" class="circle">✔</div><h3 id="title"></h3></div><p id="desc" class="desc-text"></p>`;
-        resultCard.style.display = "none";
-        enableButtons();
-        nextBtn.style.display = "none";
-        setLeaderboardMode(false);
-        load();
-    }
-    
+    function shuffleArray(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
+    let currentGameImages = []; let index = 0; let score = 0; let answered = false; let currentImageObj = null;
+    const btnReal = document.getElementById('btnReal'), btnAi = document.getElementById('btnAi'), nextBtn = document.getElementById('nextBtn'), counterEl = document.getElementById('counter'), resultCard = document.getElementById('result'), imgElement = document.getElementById('img'), scoreCardOverlay = document.getElementById('scoreCardOverlay'), leaderboardStrip = document.getElementById('leaderboardStrip'), questionSpan = document.querySelector('.question-inline'), counterSpan = document.getElementById('counter');
+    function setLeaderboardMode(active) { if (active) { counterSpan.style.display = 'none'; questionSpan.style.display = 'none'; leaderboardStrip.style.display = 'flex'; } else { counterSpan.style.display = ''; questionSpan.style.display = ''; leaderboardStrip.style.display = 'none'; } }
+    function disableButtons() { answered = true; btnReal.disabled = true; btnAi.disabled = true; }
+    function enableButtons() { answered = false; btnReal.disabled = false; btnAi.disabled = false; }
+    function initNewGameSet() { const shuffled = shuffleArray([...imagePool]); currentGameImages = shuffled.slice(0, 5); }
+    function load() { if (currentGameImages.length === 0) initNewGameSet(); currentImageObj = currentGameImages[index]; imgElement.src = currentImageObj.url; imgElement.style.display = "block"; scoreCardOverlay.style.display = "none"; resultCard.style.display = "none"; counterEl.innerText = (index + 1) + "/5"; nextBtn.style.display = "none"; enableButtons(); setLeaderboardMode(false); }
+    function answer(choice) { if (answered) return; disableButtons(); let correct = (choice === "real" && currentImageObj.isReal) || (choice === "ai" && !currentImageObj.isReal); let circle = document.getElementById("circle"); let titleElement = document.getElementById("title"); let desc = document.getElementById("desc"); function highlightKeywords(text) { return text.replace(/\bREAL\b/g, '<span class="real-word">REAL</span>').replace(/\bAI\b/g, '<span class="ai-word">AI</span>').replace(/\bAI-generated\b/gi, '<span class="ai-word">AI-generated</span>'); } if (correct) { playCorrectSound(); score++; circle.className = "circle correct"; circle.innerHTML = "✔"; titleElement.innerHTML = "CORRECT"; if (currentImageObj.isReal) desc.innerHTML = highlightKeywords("Good catch! This image is REAL."); else desc.innerHTML = highlightKeywords("Good catch! This image is AI generated."); } else { playWrongSound(); circle.className = "circle wrong"; circle.innerHTML = "✖"; titleElement.innerHTML = "WRONG"; if (currentImageObj.isReal) desc.innerHTML = highlightKeywords("This image is REAL. The lighting, textures and details match natural patterns."); else desc.innerHTML = highlightKeywords("This image is AI-generated. Look for unnatural textures and repeating patterns."); } resultCard.style.display = "block"; nextBtn.style.display = "inline-block"; }
+    function getScoreData(scoreValue) { if (scoreValue === 5) return { label: "Brilliant", emoji: "🤯" }; if (scoreValue === 4) return { label: "Excellent", emoji: "🔥" }; if (scoreValue === 3) return { label: "Good", emoji: "👍" }; if (scoreValue === 2) return { label: "Average", emoji: "😐" }; if (scoreValue === 1) return { label: "Poor", emoji: "😬" }; return { label: "Very Bad", emoji: "😭" }; }
+    async function next() { index++; if (index >= 5) { const user = window.getCurrentUser ? window.getCurrentUser() : null; if (user) { await window.saveGameResultToFirestore(score); } else { alert("🔐 You are not logged in. Your score won't be saved to leaderboard. Click 'Join' to save scores."); } imgElement.style.display = "none"; const scoreData = getScoreData(score); document.getElementById('scoreEmoji').innerText = scoreData.emoji; document.getElementById('finalScoreValue').innerHTML = `${scoreData.label} (${score}/5)`; scoreCardOverlay.style.display = "flex"; resultCard.style.display = "none"; btnReal.disabled = true; btnAi.disabled = true; nextBtn.style.display = "none"; setLeaderboardMode(true); } else { load(); } }
+    function restartGame() { index = 0; score = 0; answered = false; initNewGameSet(); scoreCardOverlay.style.display = "none"; imgElement.style.display = "block"; resultCard.innerHTML = `<div class="result-row"><div id="circle" class="circle">✔</div><h3 id="title"></h3></div><p id="desc" class="desc-text"></p>`; resultCard.style.display = "none"; enableButtons(); nextBtn.style.display = "none"; setLeaderboardMode(false); load(); }
     function startNewGame() { restartGame(); }
-    
-    function shareOnWhatsApp() {
-        const scoreData = getScoreData(score);
-        const message = `🎮 BrainPlay AI - Real vs AI Game!\n\nMy final score: ${scoreData.label} (${score}/5)\n\nWould you like to give challenge to your friend? Play here: ${location.href}`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(message)}`);
-    }
-    
-    document.getElementById('startNewFinalBtn').addEventListener('click', startNewGame);
-    document.getElementById('finalWhatsappBtn').addEventListener('click', shareOnWhatsApp);
-    
+    function shareOnWhatsApp() { const scoreData = getScoreData(score); const message = `🎮 BrainPlay AI - Real vs AI Game!\n\nMy final score: ${scoreData.label} (${score}/5)\n\nWould you like to give challenge to your friend? Play here: ${location.href}`; window.open(`https://wa.me/?text=${encodeURIComponent(message)}`); }
+    document.getElementById('startNewFinalBtn').addEventListener('click', startNewGame); document.getElementById('finalWhatsappBtn').addEventListener('click', shareOnWhatsApp);
     window.copyLink = function() { navigator.clipboard.writeText(location.href); alert("Link copied!"); }
     window.shareWA = function() { window.open("https://wa.me/?text=Play this game: " + location.href); }
     window.shareFB = function() { window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}&quote=${encodeURIComponent('🧠 Can you beat this AI test? Test your brain now!')}`); }
-    
     document.getElementById("percent").innerText = Math.floor(Math.random() * 50 + 30) + "%";
-    
-    // PWA Install
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
-    function triggerInstall() {
-        if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; }
-        else alert("To install: tap Share then 'Add to Home Screen' on iOS, or 'Install' on Android.");
-    }
+    let deferredPrompt; window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
+    function triggerInstall() { if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; } else alert("To install: tap Share then 'Add to Home Screen' on iOS, or 'Install' on Android."); }
     document.getElementById('scoreCardSaveBtn')?.addEventListener('click', (e) => { e.preventDefault(); triggerInstall(); });
-    
-    // Hamburger menu
-    document.getElementById('hamburgerBtn').addEventListener('click', function(e) {
-        e.stopPropagation();
-        document.getElementById('hamburgerMenu').classList.toggle('active');
-    });
-    document.addEventListener('click', function(e) {
-        const menu = document.getElementById('hamburgerMenu');
-        const btn = document.getElementById('hamburgerBtn');
-        if (menu && btn && !menu.contains(e.target) && e.target !== btn) menu.classList.remove('active');
-    });
-    
-    // Leaderboard button (strip) opens in new tab
-    document.getElementById('leaderboardActionBtn')?.addEventListener('click', () => {
-        window.open('leaderboard.html', '_blank');
-    });
-    // Leaderboard link in hamburger menu
-    document.getElementById('leaderboardMenuLink')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        window.open('leaderboard.html', '_blank');
-    });
-    // Footer Leaderboard button
-    document.getElementById('footerLeaderboardBtn')?.addEventListener('click', () => {
-        window.open('leaderboard.html', '_blank');
-    });
-    
-    // Logout header button
-    document.getElementById('logoutHeaderBtn')?.addEventListener('click', () => { window.logoutUser(); });
-    
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register(URL.createObjectURL(new Blob([`self.addEventListener('install', e => self.skipWaiting()); self.addEventListener('activate', e => e.waitUntil(clients.claim())); self.addEventListener('fetch', e => e.respondWith(fetch(e.request)));`], {type: 'application/javascript'}))).catch(console.log);
-        });
-    }
-    
-    initNewGameSet();
-    load();
-    if (window.location.pathname.includes('how-to-play.html')) {
-        document.getElementById('playNowContainer').style.display = 'block';
-    }
+    document.getElementById('hamburgerBtn').addEventListener('click', function(e) { e.stopPropagation(); document.getElementById('hamburgerMenu').classList.toggle('active'); });
+    document.addEventListener('click', function(e) { const menu = document.getElementById('hamburgerMenu'); const btn = document.getElementById('hamburgerBtn'); if (menu && btn && !menu.contains(e.target) && e.target !== btn) menu.classList.remove('active'); });
+    if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register(URL.createObjectURL(new Blob([`self.addEventListener('install', e => self.skipWaiting()); self.addEventListener('activate', e => e.waitUntil(clients.claim())); self.addEventListener('fetch', e => e.respondWith(fetch(e.request)));`], {type: 'application/javascript'}))).catch(console.log); }); }
+    initNewGameSet(); load();
+    if (window.location.pathname.includes('how-to-play.html')) document.getElementById('playNowContainer').style.display = 'block';
+    // Ensure leaderboard guards reattach after dynamic content (already in module)
+    setTimeout(() => { if(window.attachLeaderboardGuards) window.attachLeaderboardGuards(); }, 100);
 </script>
 </body>
 </html>
