@@ -225,22 +225,22 @@
         }
         .hamburger-menu.active { display: block; }
         .hamburger-menu a { display: block; padding: 12px 18px; color: #fff; text-decoration: none; font-weight: 600; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.08); }
-        /* user panel before image */
+        /* user panel before image - CENTERED */
         .before-image-user-panel {
             margin: 16px 0 12px 0;
             display: flex;
-            justify-content: flex-end;
+            justify-content: center;
             align-items: center;
             gap: 12px;
         }
         .join-now-btn-before {
             background: #FDDA0D;
             border: none;
-            padding: 8px 18px;
+            padding: 8px 22px;
             border-radius: 40px;
             font-weight: 800;
             color: #000;
-            font-size: 14px;
+            font-size: 15px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -249,20 +249,20 @@
         }
         .logged-user-panel {
             background: #23233f;
-            padding: 5px 16px;
+            padding: 5px 20px;
             border-radius: 60px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
         }
-        .logged-user-name { font-weight: 700; font-size: 14px; color: white; }
+        .logged-user-name { font-weight: 700; font-size: 15px; color: white; }
         .logout-btn-small {
             background: #dc2626;
             border: none;
-            padding: 5px 12px;
+            padding: 5px 14px;
             border-radius: 40px;
             font-weight: 700;
-            font-size: 12px;
+            font-size: 13px;
             color: white;
             cursor: pointer;
         }
@@ -276,9 +276,29 @@
         .ai-test { color: #facc15; font-size: 14px; }
         .stat { margin: 12px auto; padding: 10px; border-radius: 15px; text-align: center; background: #121226; font-size: 14px; }
         .highlight { color: #facc15; font-weight: 800; }
-        .image-box { border-radius: 24px; overflow: hidden; margin-top: 8px; position: relative; min-height: 310px; background: #000000; }
-        .image-box img { width: 100%; height: auto; min-height: 280px; object-fit: cover; display: block; border-radius: 24px; }
-        @media (max-width: 600px) { .image-box img { min-height: 260px; } .image-box { min-height: 260px; } }
+        /* image box - slightly reduced image width */
+        .image-box {
+            border-radius: 24px;
+            overflow: hidden;
+            margin-top: 8px;
+            position: relative;
+            background: #000000;
+            display: flex;
+            justify-content: center;
+        }
+        .image-box img {
+            width: 92%;
+            max-width: 92%;
+            height: auto;
+            min-height: 260px;
+            object-fit: cover;
+            display: block;
+            border-radius: 24px;
+            margin: 0 auto;
+        }
+        @media (max-width: 600px) {
+            .image-box img { width: 90%; min-height: 240px; }
+        }
         .score-card-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(145deg, rgba(15,16,32,0.96) 0%, rgba(5,5,16,0.98) 100%);
@@ -309,10 +329,22 @@
         .share { margin-top: 20px; }
         .share-title { text-align: center; color: #9ca3af; display: flex; justify-content: center; align-items: center; gap: 6px; font-size: 13px; }
         .share-buttons { display: flex; gap: 10px; margin-top: 10px; }
-        .share-btn { flex: 1; padding: 10px; border-radius: 40px; font-weight: 700; display: flex; justify-content: center; align-items: center; gap: 6px; cursor: pointer; }
+        .share-btn {
+            flex: 1; padding: 10px; border-radius: 40px; font-weight: 700;
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+            cursor: pointer; border: none; font-size: 14px;
+        }
         .copy { background: #1f2937; color: #fff; }
         .whatsapp { background: #25D366; color: #000; }
         .facebook { background: #1877F2; color: #fff; }
+        /* custom SVG icons for share buttons */
+        .share-icon {
+            width: 18px;
+            height: 18px;
+            display: inline-block;
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
         .footer-buttons { display: flex; justify-content: space-between; gap: 12px; margin-top: 24px; margin-bottom: 10px; }
         .footer-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 16px; border-radius: 40px; font-weight: 800; font-size: 13px; cursor: pointer; background: #000; color: white; border: 2px solid #facc15; text-decoration: none; }
         .how-to-play-footer-btn { background: transparent; }
@@ -329,7 +361,7 @@
 </head>
 <body>
 <div class="container">
-    <!-- Header: only brand + hamburger (no join/logout) -->
+    <!-- Header: only brand + hamburger -->
     <div class="header">
         <div class="header-left">
             <img class="header-logo-img" src="brainplay-logo.webp" alt="BrainPlay Logo">
@@ -357,7 +389,7 @@
         🧩 Only <span class="highlight" id="percent">38%</span> players got this right today!
     </div>
 
-    <!-- User Panel placed before image (Join / Logged + logout) -->
+    <!-- User Panel - Centered Join or Logged section -->
     <div id="beforeImageUserPanel" class="before-image-user-panel">
         <button id="joinNowBeforeImage" class="join-now-btn-before">🔗 Join Now</button>
         <div id="beforeImageLoggedPanel" style="display: none;" class="logged-user-panel">
@@ -392,7 +424,23 @@
 
     <div class="result" id="result"><div class="result-row"><div id="circle" class="circle">✔</div><h3 id="title"></h3></div><p id="desc" class="desc-text"></p></div>
 
-    <div class="share"><div class="share-title"><svg width="16" fill="#9ca3af" viewBox="0 0 24 24"><path d="M18 8a3 3 0 10-2.83-4H15a3 3 0 003 3zM6 14a3 3 0 10-2.83-4H3a3 3 0 003 3zm12 6a3 3 0 10-2.83-4H15a3 3 0 003 3zM8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg> Share this AI game with your friends!</div><div class="share-buttons"><button class="share-btn copy" id="copyLinkBtn">📋 Copy Link</button><button class="share-btn facebook" id="fbShareBtn">📘 Facebook</button><button class="share-btn whatsapp" id="waShareBtn">💬 WhatsApp</button></div></div>
+    <div class="share">
+        <div class="share-title"><svg width="16" fill="#9ca3af" viewBox="0 0 24 24"><path d="M18 8a3 3 0 10-2.83-4H15a3 3 0 003 3zM6 14a3 3 0 10-2.83-4H3a3 3 0 003 3zm12 6a3 3 0 10-2.83-4H15a3 3 0 003 3zM8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg> Share this AI game with your friends!</div>
+        <div class="share-buttons">
+            <button class="share-btn copy" id="copyLinkBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                Copy Link
+            </button>
+            <button class="share-btn facebook" id="fbShareBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                Facebook
+            </button>
+            <button class="share-btn whatsapp" id="waShareBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#000000"><path d="M12.031 0C5.405 0 0 5.405 0 12.031c0 2.115.548 4.184 1.59 6.007L.425 23.57l5.658-1.485c1.761.97 3.754 1.481 5.811 1.481 6.626 0 12.03-5.405 12.03-12.03C23.924 5.405 18.519 0 12.031 0zM17.432 16.3c-.23.649-1.332 1.258-1.848 1.344-.516.086-1.168.172-3.411-.758-2.696-1.121-4.428-3.878-4.561-4.054-.133-.176-1.091-1.455-1.091-2.775 0-1.32.684-1.968.932-2.227.248-.259.54-.324.717-.324.177 0 .354 0 .506.008.163.009.38-.063.593.454.221.537.751 1.838.818 1.968.067.13.111.282.022.455-.089.173-.133.282-.266.434-.133.152-.28.324-.398.455-.133.152-.283.315-.12.593.163.278.723 1.196 1.558 1.944 1.077.967 1.977 1.267 2.254 1.4.277.133.443.111.61-.067.167-.178.718-.839.907-1.127.189-.288.378-.24.633-.152.255.088 1.618.764 1.895.902.277.138.461.208.528.324.067.116.067.668-.163 1.317z"/></svg>
+                WhatsApp
+            </button>
+        </div>
+    </div>
 
     <div class="footer-buttons"><button class="footer-btn leaderboard-footer-btn" id="footerLeaderboardBtn">🏆 Leaderboard</button><a href="https://brainplayai.in/how-to-play.html" class="footer-btn how-to-play-footer-btn">📖 How to Play</a></div>
 </div>
@@ -443,22 +491,29 @@
     function restartGame(){ index=0; score=0; answered=false; initNewGameSet(); scoreCardOverlay.style.display="none"; imgElement.style.display="block"; resultCard.style.display="none"; enableButtons(); nextBtn.style.display="none"; setLeaderboardMode(false); load(); }
     document.getElementById('startNewFinalBtn').addEventListener('click', restartGame);
     document.getElementById('finalWhatsappBtn').addEventListener('click',()=>{ const sd=getScoreData(score); const msg=`🎮 BrainPlay AI - Real vs AI Game!\nMy final score: ${sd.label} (${score}/5)\nPlay here: ${location.href}`; window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`); });
-    // Sharing with separate images
+    
+    // Sharing: Facebook uses OG image, WhatsApp only text+link (no extra image link)
     window.shareFB = function() { window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}&quote=${encodeURIComponent('🧠 Can you beat this AI test? BrainPlay AI')}`); };
-    window.shareWA = function() { const squareImg = "https://raw.githubusercontent.com/brainplayjoy/brainplay-daily/main/brainplayai-square.webp"; const msg = `🎮 BrainPlay AI - Real vs AI Game!\nPlay here: ${location.href}\n📸 Game thumbnail: ${squareImg}`; window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`); };
+    window.shareWA = function() { 
+        const message = `🎮 BrainPlay AI - Real vs AI Game!\nTest your skills: ${location.href}`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(message)}`);
+    };
     document.getElementById('copyLinkBtn').addEventListener('click',()=>{ navigator.clipboard.writeText(location.href); alert("Link copied!"); });
     document.getElementById('fbShareBtn').addEventListener('click',()=>{ window.shareFB(); });
     document.getElementById('waShareBtn').addEventListener('click',()=>{ window.shareWA(); });
+    
     document.getElementById("percent").innerText = Math.floor(Math.random() * 50 + 30) + "%";
     let deferredPrompt; window.addEventListener('beforeinstallprompt',(e)=>{ e.preventDefault(); deferredPrompt=e; });
     document.getElementById('scoreCardSaveBtn')?.addEventListener('click',()=>{ if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt=null; } else alert("Tap Share → Add to Home Screen"); });
     document.getElementById('hamburgerBtn').addEventListener('click',(e)=>{ e.stopPropagation(); document.getElementById('hamburgerMenu').classList.toggle('active'); });
     document.addEventListener('click',(e)=>{ const menu=document.getElementById('hamburgerMenu'); const btn=document.getElementById('hamburgerBtn'); if(menu && btn && !menu.contains(e.target) && e.target!==btn) menu.classList.remove('active'); });
-    // Leaderboard click logic: if not logged in -> show popup with warning, else open leaderboard
+    
+    // Leaderboard click: if not logged in -> show popup with warning
     function handleLeaderboardClick(e){ e?.preventDefault(); const user=window.getCurrentUser?.(); if(!user){ window.showJoinPopup?.("🔐 You are not logged in. Your score won't be saved to leaderboard. Click 'Join' to save scores."); } else { window.open('leaderboard.html', '_blank'); } }
     document.getElementById('leaderboardActionBtn')?.addEventListener('click', handleLeaderboardClick);
     document.getElementById('leaderboardMenuLink')?.addEventListener('click', handleLeaderboardClick);
     document.getElementById('footerLeaderboardBtn')?.addEventListener('click', handleLeaderboardClick);
+    
     initNewGameSet(); load();
 </script>
 </body>
