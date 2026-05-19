@@ -18,6 +18,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <link rel="manifest" href="manifest.json">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Anton&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    
     <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -79,7 +80,7 @@
                     lastResetDate: currentData.lastResetDate || new Date().toISOString().slice(0,10),
                     createdAt: currentData.createdAt || new Date().toISOString()
                 }, { merge: true });
-                console.log(`✅ Score saved: ${score}/5. Total:${newTotal}, Perfect:${newPerfect}, Zero:${newZero}`);
+                console.log(`✅ Score saved: ${score}/5`);
                 return true;
             } catch (err) {
                 console.error("Firestore error:", err);
@@ -132,7 +133,6 @@
         window.getCurrentUser = getCurrentUser;
         window.saveGameResultToFirestore = saveGameResultToFirestore;
         
-        // Central auth UI (small, centered) - shows Join Now or User+Logout
         function updateCenterAuthUI() {
             const container = document.getElementById('centerAuthContainer');
             if (!container) return;
@@ -160,8 +160,6 @@
             }
         }
         
-        // Leaderboard button handlers:
-        // 1. Image-footer leaderboard (red rectangle) -> if logged out, show warning modal; if logged in, open leaderboard
         function handleImageFooterLeaderboard(e) {
             e.preventDefault();
             const user = getCurrentUser();
@@ -173,20 +171,17 @@
             }
         }
         
-        // 2. Footer leaderboard button (bottom left) -> ALWAYS redirect to leaderboard page, no popup
         function handleFooterLeaderboard(e) {
             e.preventDefault();
             window.open('leaderboard.html', '_blank');
         }
         
-        // 3. Hamburger menu leaderboard link -> same as footer? For consistency, also direct (no popup)
         function handleMenuLeaderboard(e) {
             e.preventDefault();
             window.open('leaderboard.html', '_blank');
         }
         
         function initModals() {
-            // Warning modal (for leaderboard button when logged out)
             const warningModal = document.getElementById('loginModalGame');
             const closeWarning = document.getElementById('closeModalGame');
             const saveWarningBtn = document.getElementById('saveEmailBtnGame');
@@ -212,7 +207,6 @@
                 });
             }
             
-            // Simple join modal (for Join Now button before image)
             const simpleModal = document.getElementById('simpleJoinModal');
             const closeSimple = document.getElementById('closeSimpleModal');
             const saveSimpleBtn = document.getElementById('saveSimpleEmailBtn');
@@ -245,19 +239,16 @@
         }
         
         function attachLeaderboardHandlers() {
-            // Red rectangle leaderboard (inside image-footer)
             const imageFooterLeaderboard = document.getElementById('leaderboardActionBtn');
             if (imageFooterLeaderboard) {
                 imageFooterLeaderboard.removeEventListener('click', handleImageFooterLeaderboard);
                 imageFooterLeaderboard.addEventListener('click', handleImageFooterLeaderboard);
             }
-            // Footer button (bottom left)
             const footerLeaderboard = document.getElementById('footerLeaderboardBtn');
             if (footerLeaderboard) {
                 footerLeaderboard.removeEventListener('click', handleFooterLeaderboard);
                 footerLeaderboard.addEventListener('click', handleFooterLeaderboard);
             }
-            // Hamburger menu leaderboard link
             const menuLeaderboard = document.getElementById('leaderboardMenuLink');
             if (menuLeaderboard) {
                 menuLeaderboard.removeEventListener('click', handleMenuLeaderboard);
@@ -296,7 +287,6 @@
             width: 100%;
         }
 
-        /* HEADER */
         .header {
             display: flex;
             justify-content: space-between;
@@ -351,7 +341,6 @@
             margin-left: 3px;
         }
 
-        /* Hamburger */
         .hamburger-btn {
             background: none;
             border: none;
@@ -388,7 +377,6 @@
         .hamburger-menu a:last-child { border-bottom: none; }
         .hamburger-menu a:hover { background: rgba(255,255,255,0.1); }
 
-        /* CENTER AUTH */
         .center-auth-container {
             text-align: center;
             margin: 12px 0 6px 0;
@@ -437,7 +425,6 @@
         }
         .center-join-btn:hover { background: #ffea70; transform: scale(0.97); }
 
-        /* TITLE */
         .title { text-align: center; margin-top: 18px; }
         .title h1 { font-family: 'Anton', sans-serif; font-size: 40px; letter-spacing: 2px; }
         .real { color: #fff; text-shadow: 0 0 12px cyan; }
@@ -446,7 +433,6 @@
         .can-you-beat { color: #ffffff; font-size: 13px; }
         .ai-test { color: #facc15; font-size: 14px; }
 
-        /* STAT */
         .stat {
             margin: 12px auto;
             padding: 10px;
@@ -457,7 +443,6 @@
         }
         .highlight { color: #facc15; font-weight: 800; }
 
-        /* IMAGE BOX */
         .image-box {
             border-radius: 24px;
             overflow: hidden;
@@ -478,7 +463,6 @@
             .image-box { min-height: 285px; }
         }
 
-        /* SCORE CARD OVERLAY */
         .image-box .score-card-overlay {
             position: absolute;
             top: 0; left: 0;
@@ -512,7 +496,6 @@
         .final-whatsapp-btn:hover { transform: translateY(-2px); }
         .score-install-promo { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 15px; color: white; font-size: 13px; flex-wrap: wrap; }
 
-        /* IMAGE FOOTER */
         .image-footer {
             display: flex;
             justify-content: space-between;
@@ -532,7 +515,6 @@
         }
         .leaderboard-btn:hover { background: #1a1a1a; transform: scale(0.97); }
 
-        /* BUTTONS */
         .buttons { display: flex; gap: 12px; margin-top: 16px; }
         .btn { flex: 1; padding: 16px; border-radius: 18px; font-weight: 800; border: none; cursor: pointer; color: #fff; }
         .btn:disabled { opacity: 0.5; pointer-events: none; }
@@ -540,7 +522,6 @@
         .btn-ai { background: linear-gradient(#ef4444, #7f1d1d); }
         .btn small { display: block; font-size: 12px; opacity: 0.7; }
 
-        /* RESULT */
         .result { margin-top: 20px; padding: 20px; border-radius: 20px; background: #121226; display: none; }
         .result-row { display: flex; align-items: center; gap: 12px; }
         .circle { width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 28px; flex-shrink: 0; }
@@ -550,7 +531,6 @@
         .desc-text .real-word { color: #22c55e; font-weight: 700; }
         .desc-text .ai-word { color: #ef4444; font-weight: 700; }
 
-        /* SHARE */
         .share { margin-top: 20px; }
         .share-title { text-align: center; color: #9ca3af; display: flex; justify-content: center; align-items: center; gap: 6px; font-size: 14px; }
         .share-buttons { display: flex; gap: 10px; margin-top: 10px; }
@@ -559,7 +539,6 @@
         .whatsapp { background: #25D366; color: #000; }
         .facebook { background: #1877F2; color: #fff; }
 
-        /* FOOTER BUTTONS */
         .footer-buttons { display: flex; justify-content: space-between; gap: 12px; margin-top: 24px; margin-bottom: 10px; }
         .footer-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: 40px; font-weight: 800; font-size: 14px; cursor: pointer; text-align: center; }
         .leaderboard-footer-btn { background: #000; color: white; border: 2px solid #facc15; }
@@ -567,7 +546,6 @@
         .how-to-play-footer-btn { background: transparent; color: #ffffff; border: 2px solid #facc15; text-decoration: none; }
         .how-to-play-footer-btn:hover { background: rgba(250, 204, 21, 0.1); transform: translateY(-2px); }
 
-        /* MODALS */
         .modal-game {
             display: none;
             position: fixed;
@@ -652,7 +630,6 @@
         🧩 Only <span class="highlight" id="percent">57%</span> players got this right today!
     </div>
 
-    <!-- Center Join/Logout UI -->
     <div id="centerAuthContainer" class="center-auth-container"></div>
 
     <div class="image-box" id="imageBox">
@@ -711,7 +688,7 @@
     </div>
 </div>
 
-<!-- Warning Modal (for leaderboard button when logged out) -->
+<!-- Warning Modal -->
 <div id="loginModalGame" class="modal-game">
     <div class="modal-card-game">
         <button class="modal-close-game" id="closeModalGame">×</button>
@@ -723,7 +700,7 @@
     </div>
 </div>
 
-<!-- Simple Join Modal (for Join Now button before image) -->
+<!-- Simple Join Modal -->
 <div id="simpleJoinModal" class="modal-game">
     <div class="modal-card-game">
         <button class="modal-close-game" id="closeSimpleModal">×</button>
@@ -735,54 +712,18 @@
 </div>
 
 <script>
-    // ========== DAILY IMAGE SET (no repeats across day) ==========
-    const imagePool = [
-        { url: "https://picsum.photos/id/1/800/600", isReal: true }, { url: "https://picsum.photos/id/2/800/600", isReal: false },
-        { url: "https://picsum.photos/id/3/800/600", isReal: true }, { url: "https://picsum.photos/id/4/800/600", isReal: false },
-        { url: "https://picsum.photos/id/5/800/600", isReal: true }, { url: "https://picsum.photos/id/6/800/600", isReal: false },
-        { url: "https://picsum.photos/id/7/800/600", isReal: true }, { url: "https://picsum.photos/id/8/800/600", isReal: false },
-        { url: "https://picsum.photos/id/9/800/600", isReal: true }, { url: "https://picsum.photos/id/10/800/600", isReal: false },
-        { url: "https://picsum.photos/id/11/800/600", isReal: true }, { url: "https://picsum.photos/id/12/800/600", isReal: false },
-        { url: "https://picsum.photos/id/13/800/600", isReal: true }, { url: "https://picsum.photos/id/14/800/600", isReal: false },
-        { url: "https://picsum.photos/id/15/800/600", isReal: true }, { url: "https://picsum.photos/id/16/800/600", isReal: false },
-        { url: "https://picsum.photos/id/17/800/600", isReal: true }, { url: "https://picsum.photos/id/18/800/600", isReal: false },
-        { url: "https://picsum.photos/id/19/800/600", isReal: true }, { url: "https://picsum.photos/id/20/800/600", isReal: false }
-    ];
+    // ==================== JSON URL ====================
+    // ⚠️ IMPORTANT: Replace this URL with your actual GitHub Gist RAW URL
+    const JSON_URL = "https://gist.githubusercontent.com/brainplayjoy/edb2e7cea9cbf7487920240b5f89a05e/raw/09f6c4b1b4b73e98cd4508b5eac082022f00f2e7/images.json";
     
-    // Seeded random based on date (YYYY-MM-DD)
-    function getDailySeed() {
-        const today = new Date().toISOString().slice(0,10);
-        let hash = 0;
-        for (let i = 0; i < today.length; i++) {
-            hash = ((hash << 5) - hash) + today.charCodeAt(i);
-            hash |= 0;
-        }
-        return Math.abs(hash);
-    }
-    
-    function seededShuffle(array, seed) {
-        let m = array.length;
-        while (m) {
-            const seedRand = (seed = (seed * 9301 + 49297) % 233280);
-            const rng = seedRand / 233280;
-            const i = Math.floor(rng * m--);
-            [array[m], array[i]] = [array[i], array[m]];
-        }
-        return array;
-    }
-    
-    function getDailyImageSet() {
-        const seed = getDailySeed();
-        const shuffled = seededShuffle([...imagePool], seed);
-        return shuffled.slice(0, 5);
-    }
-    
+    let globalImagePool = [];
     let currentGameImages = [];
     let index = 0;
     let score = 0;
     let answered = false;
     let currentImageObj = null;
     
+    // Get DOM elements
     const btnReal = document.getElementById('btnReal'), btnAi = document.getElementById('btnAi'), nextBtn = document.getElementById('nextBtn');
     const counterEl = document.getElementById('counter'), resultCard = document.getElementById('result'), imgElement = document.getElementById('img');
     const scoreCardOverlay = document.getElementById('scoreCardOverlay'), leaderboardStrip = document.getElementById('leaderboardStrip');
@@ -799,11 +740,68 @@
             leaderboardStrip.style.display = 'none';
         }
     }
+    
     function disableButtons() { answered = true; btnReal.disabled = true; btnAi.disabled = true; }
     function enableButtons() { answered = false; btnReal.disabled = false; btnAi.disabled = false; }
-    function initNewGameSet() { currentGameImages = getDailyImageSet(); }
+    
+    // ==================== NO REPEAT LOGIC ====================
+    function getSeenImages() {
+        const seen = localStorage.getItem('seenImageUrls');
+        return seen ? JSON.parse(seen) : [];
+    }
+    
+    function saveSeenImages(seen) {
+        localStorage.setItem('seenImageUrls', JSON.stringify(seen));
+    }
+    
+    function getUnseenImages(pool, seen) {
+        return pool.filter(img => !seen.includes(img.url));
+    }
+    
+    function getRandomImagesFromPool(count) {
+        let pool = [...globalImagePool];
+        let seen = getSeenImages();
+        let unseen = getUnseenImages(pool, seen);
+        
+        // If not enough unseen images, reset the seen list and start over
+        if (unseen.length < count) {
+            console.log("Resetting seen images - starting fresh cycle");
+            seen = [];
+            saveSeenImages(seen);
+            unseen = [...pool];
+        }
+        
+        // Shuffle unseen and pick first 'count' images
+        for (let i = unseen.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [unseen[i], unseen[j]] = [unseen[j], unseen[i]];
+        }
+        
+        const selected = unseen.slice(0, count);
+        
+        // Add selected URLs to seen list
+        const newSeen = [...seen, ...selected.map(img => img.url)];
+        saveSeenImages(newSeen);
+        
+        return selected;
+    }
+    
+    function initNewGameSet() {
+        if (globalImagePool.length === 0) {
+            console.warn("No images loaded yet");
+            return;
+        }
+        currentGameImages = getRandomImagesFromPool(5);
+    }
+    
     function load() {
-        if (currentGameImages.length === 0) initNewGameSet();
+        if (currentGameImages.length === 0 && globalImagePool.length > 0) {
+            initNewGameSet();
+        }
+        if (currentGameImages.length === 0) {
+            console.error("No images available");
+            return;
+        }
         currentImageObj = currentGameImages[index];
         imgElement.src = currentImageObj.url;
         imgElement.style.display = "block";
@@ -815,6 +813,7 @@
         setLeaderboardMode(false);
     }
     
+    // ==================== SOUND FUNCTIONS ====================
     function playCorrectSound() { try { const ctx = new(window.AudioContext || window.webkitAudioContext)(); const now = ctx.currentTime; const osc1 = ctx.createOscillator(); const gain1 = ctx.createGain(); osc1.type = 'sine'; osc1.frequency.value = 1175; gain1.gain.setValueAtTime(0.4, now); gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.35); osc1.connect(gain1).connect(ctx.destination); osc1.start(now); osc1.stop(now + 0.35); const osc2 = ctx.createOscillator(); const gain2 = ctx.createGain(); osc2.type = 'sine'; osc2.frequency.value = 1480; gain2.gain.setValueAtTime(0.25, now + 0.05); gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.4); osc2.connect(gain2).connect(ctx.destination); osc2.start(now + 0.05); osc2.stop(now + 0.4); const osc3 = ctx.createOscillator(); const gain3 = ctx.createGain(); osc3.type = 'sine'; osc3.frequency.value = 2349; gain3.gain.setValueAtTime(0.15, now + 0.1); gain3.gain.exponentialRampToValueAtTime(0.0001, now + 0.3); osc3.connect(gain3).connect(ctx.destination); osc3.start(now + 0.1); osc3.stop(now + 0.3); } catch (e) {} }
     function playWrongSound() { try { const ctx = new(window.AudioContext || window.webkitAudioContext)(); const now = ctx.currentTime; const osc = ctx.createOscillator(); const gain = ctx.createGain(); osc.type = 'square'; osc.frequency.value = 220; gain.gain.setValueAtTime(0.25, now); gain.gain.linearRampToValueAtTime(0.0001, now + 0.12); osc.connect(gain).connect(ctx.destination); osc.start(now); osc.stop(now + 0.12); const osc2 = ctx.createOscillator(); const gain2 = ctx.createGain(); osc2.type = 'square'; osc2.frequency.value = 200; gain2.gain.setValueAtTime(0.25, now + 0.15); gain2.gain.linearRampToValueAtTime(0.0001, now + 0.28); osc2.connect(gain2).connect(ctx.destination); osc2.start(now + 0.15); osc2.stop(now + 0.28); } catch (e) {} }
     
@@ -921,8 +920,31 @@
     document.addEventListener('click', function(e) { const menu = document.getElementById('hamburgerMenu'); const btn = document.getElementById('hamburgerBtn'); if (menu && btn && !menu.contains(e.target) && e.target !== btn) menu.classList.remove('active'); });
     if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register(URL.createObjectURL(new Blob([`self.addEventListener('install', e => self.skipWaiting()); self.addEventListener('activate', e => e.waitUntil(clients.claim())); self.addEventListener('fetch', e => e.respondWith(fetch(e.request)));`], {type: 'application/javascript'}))).catch(console.log); }); }
     
-    initNewGameSet();
-    load();
+    // ==================== FETCH IMAGES FROM JSON ====================
+    async function fetchImages() {
+        try {
+            console.log("Fetching images from:", JSON_URL);
+            const response = await fetch(JSON_URL);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            if (Array.isArray(data) && data.length > 0) {
+                globalImagePool = data;
+                console.log(`✅ Loaded ${globalImagePool.length} images from JSON`);
+                initNewGameSet();
+                load();
+            } else {
+                throw new Error("JSON does not contain a valid array");
+            }
+        } catch (error) {
+            console.error("Failed to load images:", error);
+            document.getElementById('img').alt = "Failed to load images. Please check your JSON URL.";
+            document.getElementById('img').src = "";
+        }
+    }
+    
+    fetchImages();
 </script>
 </body>
 </html>
