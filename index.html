@@ -379,7 +379,7 @@
 
         .center-auth-container {
             text-align: center;
-            margin: 12px 0 6px 0;
+            margin: 4px 0 2px 0; /* Reduced gap */
         }
         .center-auth-inline {
             display: inline-flex;
@@ -434,8 +434,8 @@
         .ai-test { color: #facc15; font-size: 14px; }
 
         .stat {
-            margin: 12px auto;
-            padding: 10px;
+            margin: 8px auto 6px auto; /* Reduced gap */
+            padding: 8px;
             border-radius: 15px;
             text-align: center;
             background: #121226;
@@ -446,7 +446,7 @@
         .image-box {
             border-radius: 24px;
             overflow: hidden;
-            margin-top: 12px;
+            margin-top: 6px; /* Reduced gap */
             position: relative;
             min-height: 320px;
             background: #000000;
@@ -633,7 +633,7 @@
     <div id="centerAuthContainer" class="center-auth-container"></div>
 
     <div class="image-box" id="imageBox">
-        <img id="img" alt="Challenge Image">
+        <img id="img" alt="">
         <div class="score-card-overlay" id="scoreCardOverlay" style="display: none;">
             <div class="score-card-title">🏅 SCORE CARD</div>
             <div class="score-row">
@@ -713,7 +713,7 @@
 
 <script>
     // ---------- GLOBALS ----------
-    let globalImagePool = [];      // Array of { url, isReal }
+    let globalImagePool = [];
     let currentGameImages = [];
     let index = 0;
     let score = 0;
@@ -906,16 +906,15 @@
     document.addEventListener('click', function(e) { const menu = document.getElementById('hamburgerMenu'); const btn = document.getElementById('hamburgerBtn'); if (menu && btn && !menu.contains(e.target) && e.target !== btn) menu.classList.remove('active'); });
     if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register(URL.createObjectURL(new Blob([`self.addEventListener('install', e => self.skipWaiting()); self.addEventListener('activate', e => e.waitUntil(clients.claim())); self.addEventListener('fetch', e => e.respondWith(fetch(e.request)));`], {type: 'application/javascript'}))).catch(console.log); }); }
 
-    // ---------- NEW: DYNAMIC IMAGE POOL (AI from GitHub + REAL from Picsum) ----------
+    // ---------- DYNAMIC IMAGE POOL (AI from GitHub + REAL from Picsum) ----------
     const GITHUB_API_URL = "https://api.github.com/repos/brainplayjoy/brainplay-daily/contents/images/ai";
     const RAW_BASE = "https://raw.githubusercontent.com/brainplayjoy/brainplay-daily/main/images/ai/";
 
-    // Helper: generate N unique real images from Picsum (random IDs)
     function generateRealImages(count = 40) {
         const images = [];
         const usedIds = new Set();
         while (images.length < count) {
-            let id = Math.floor(Math.random() * 300) + 1; // IDs 1..300 are safe
+            let id = Math.floor(Math.random() * 300) + 1;
             if (!usedIds.has(id)) {
                 usedIds.add(id);
                 images.push({
@@ -946,7 +945,6 @@
         } catch (err) {
             console.error("Failed to fetch AI images:", err);
             alert("⚠️ Could not load AI images from GitHub. Using fallback images. Please check folder path.");
-            // Fallback: provide a few placeholder AI images (so game still works)
             return [
                 { url: "https://placehold.co/500x500/ff0000/white?text=AI+Fallback+1", isReal: false },
                 { url: "https://placehold.co/500x500/ff4444/white?text=AI+Fallback+2", isReal: false }
@@ -955,16 +953,12 @@
     }
 
     async function buildGlobalImagePool() {
-        // Show loading state on image
-        imgElement.alt = "Loading images...";
-        imgElement.src = "https://placehold.co/500x500/1a1a2e/white?text=Loading...";
-        
+        // No placeholder or loading text – we wait silently
         const [aiImages, realImages] = await Promise.all([
             fetchAIImagesFromGitHub(),
-            Promise.resolve(generateRealImages(40))   // 40 varied real images from Picsum
+            Promise.resolve(generateRealImages(40))
         ]);
         
-        // Combine and shuffle slightly (optional)
         let combined = [...aiImages, ...realImages];
         for (let i = combined.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -973,12 +967,10 @@
         globalImagePool = combined;
         console.log(`🎯 Total pool size: ${globalImagePool.length} (AI: ${aiImages.length}, Real: ${realImages.length})`);
         
-        // Initialize game
         initNewGameSet();
-        load();
+        load(); // image appears directly, no blank
     }
 
-    // Start everything
     buildGlobalImagePool();
 </script>
 </body>
