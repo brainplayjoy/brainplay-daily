@@ -19,7 +19,7 @@
     <link rel="manifest" href="manifest.json">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Anton&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Firebase SDKs -->
+    <!-- Firebase SDKs (unchanged) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -712,23 +712,20 @@
 </div>
 
 <script>
-    // ==================== JSON URL ====================
-    // ⚠️ IMPORTANT: Replace this URL with your actual GitHub Gist RAW URL
-    const JSON_URL = "https://gist.githubusercontent.com/brainplayjoy/edb2e7cea9cbf7487920240b5f89a05e/raw/09f6c4b1b4b73e98cd4508b5eac082022f00f2e7/images.json";
-    
-    let globalImagePool = [];
+    // ---------- GLOBALS ----------
+    let globalImagePool = [];      // Array of { url, isReal }
     let currentGameImages = [];
     let index = 0;
     let score = 0;
     let answered = false;
     let currentImageObj = null;
-    
-    // Get DOM elements
+
+    // DOM elements
     const btnReal = document.getElementById('btnReal'), btnAi = document.getElementById('btnAi'), nextBtn = document.getElementById('nextBtn');
     const counterEl = document.getElementById('counter'), resultCard = document.getElementById('result'), imgElement = document.getElementById('img');
     const scoreCardOverlay = document.getElementById('scoreCardOverlay'), leaderboardStrip = document.getElementById('leaderboardStrip');
     const questionSpan = document.querySelector('.question-inline'), counterSpan = document.getElementById('counter');
-    
+
     function setLeaderboardMode(active) {
         if (active) {
             counterSpan.style.display = 'none';
@@ -740,52 +737,41 @@
             leaderboardStrip.style.display = 'none';
         }
     }
-    
+
     function disableButtons() { answered = true; btnReal.disabled = true; btnAi.disabled = true; }
     function enableButtons() { answered = false; btnReal.disabled = false; btnAi.disabled = false; }
-    
-    // ==================== NO REPEAT LOGIC ====================
+
+    // ---------- SEEN TRACKING (no repeats across sessions) ----------
     function getSeenImages() {
         const seen = localStorage.getItem('seenImageUrls');
         return seen ? JSON.parse(seen) : [];
     }
-    
     function saveSeenImages(seen) {
         localStorage.setItem('seenImageUrls', JSON.stringify(seen));
     }
-    
     function getUnseenImages(pool, seen) {
         return pool.filter(img => !seen.includes(img.url));
     }
-    
     function getRandomImagesFromPool(count) {
         let pool = [...globalImagePool];
         let seen = getSeenImages();
         let unseen = getUnseenImages(pool, seen);
-        
-        // If not enough unseen images, reset the seen list and start over
         if (unseen.length < count) {
-            console.log("Resetting seen images - starting fresh cycle");
+            console.log("Resetting seen images – fresh cycle");
             seen = [];
             saveSeenImages(seen);
             unseen = [...pool];
         }
-        
-        // Shuffle unseen and pick first 'count' images
         for (let i = unseen.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [unseen[i], unseen[j]] = [unseen[j], unseen[i]];
         }
-        
         const selected = unseen.slice(0, count);
-        
-        // Add selected URLs to seen list
         const newSeen = [...seen, ...selected.map(img => img.url)];
         saveSeenImages(newSeen);
-        
         return selected;
     }
-    
+
     function initNewGameSet() {
         if (globalImagePool.length === 0) {
             console.warn("No images loaded yet");
@@ -793,7 +779,7 @@
         }
         currentGameImages = getRandomImagesFromPool(5);
     }
-    
+
     function load() {
         if (currentGameImages.length === 0 && globalImagePool.length > 0) {
             initNewGameSet();
@@ -812,11 +798,11 @@
         enableButtons();
         setLeaderboardMode(false);
     }
-    
-    // ==================== SOUND FUNCTIONS ====================
+
+    // ---------- SOUND (unchanged) ----------
     function playCorrectSound() { try { const ctx = new(window.AudioContext || window.webkitAudioContext)(); const now = ctx.currentTime; const osc1 = ctx.createOscillator(); const gain1 = ctx.createGain(); osc1.type = 'sine'; osc1.frequency.value = 1175; gain1.gain.setValueAtTime(0.4, now); gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.35); osc1.connect(gain1).connect(ctx.destination); osc1.start(now); osc1.stop(now + 0.35); const osc2 = ctx.createOscillator(); const gain2 = ctx.createGain(); osc2.type = 'sine'; osc2.frequency.value = 1480; gain2.gain.setValueAtTime(0.25, now + 0.05); gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.4); osc2.connect(gain2).connect(ctx.destination); osc2.start(now + 0.05); osc2.stop(now + 0.4); const osc3 = ctx.createOscillator(); const gain3 = ctx.createGain(); osc3.type = 'sine'; osc3.frequency.value = 2349; gain3.gain.setValueAtTime(0.15, now + 0.1); gain3.gain.exponentialRampToValueAtTime(0.0001, now + 0.3); osc3.connect(gain3).connect(ctx.destination); osc3.start(now + 0.1); osc3.stop(now + 0.3); } catch (e) {} }
     function playWrongSound() { try { const ctx = new(window.AudioContext || window.webkitAudioContext)(); const now = ctx.currentTime; const osc = ctx.createOscillator(); const gain = ctx.createGain(); osc.type = 'square'; osc.frequency.value = 220; gain.gain.setValueAtTime(0.25, now); gain.gain.linearRampToValueAtTime(0.0001, now + 0.12); osc.connect(gain).connect(ctx.destination); osc.start(now); osc.stop(now + 0.12); const osc2 = ctx.createOscillator(); const gain2 = ctx.createGain(); osc2.type = 'square'; osc2.frequency.value = 200; gain2.gain.setValueAtTime(0.25, now + 0.15); gain2.gain.linearRampToValueAtTime(0.0001, now + 0.28); osc2.connect(gain2).connect(ctx.destination); osc2.start(now + 0.15); osc2.stop(now + 0.28); } catch (e) {} }
-    
+
     function answer(choice) {
         if (answered) return;
         disableButtons();
@@ -848,7 +834,7 @@
         resultCard.style.display = "block";
         nextBtn.style.display = "inline-block";
     }
-    
+
     function getScoreData(scoreValue) {
         if (scoreValue === 5) return { label: "Brilliant", emoji: "🤯" };
         if (scoreValue === 4) return { label: "Excellent", emoji: "🔥" };
@@ -857,7 +843,7 @@
         if (scoreValue === 1) return { label: "Poor", emoji: "😬" };
         return { label: "Very Bad", emoji: "😭" };
     }
-    
+
     async function next() {
         index++;
         if (index >= 5) {
@@ -881,7 +867,7 @@
             load();
         }
     }
-    
+
     function restartGame() {
         index = 0;
         score = 0;
@@ -896,55 +882,104 @@
         setLeaderboardMode(false);
         load();
     }
-    
+
     function startNewGame() { restartGame(); }
     function shareOnWhatsApp() {
         const scoreData = getScoreData(score);
         const message = `🎮 BrainPlay AI - Real vs AI Game!\n\nMy final score: ${scoreData.label} (${score}/5)\n\nWould you like to give challenge to your friend? Play here: ${location.href}`;
         window.open(`https://wa.me/?text=${encodeURIComponent(message)}`);
     }
-    
+
     document.getElementById('startNewFinalBtn').addEventListener('click', startNewGame);
     document.getElementById('finalWhatsappBtn').addEventListener('click', shareOnWhatsApp);
     window.copyLink = function() { navigator.clipboard.writeText(location.href); alert("Link copied!"); };
     window.shareWA = function() { window.open("https://wa.me/?text=Play this game: " + location.href); };
     window.shareFB = function() { window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}&quote=${encodeURIComponent('🧠 Can you beat this AI test? Test your brain now!')}`); };
     document.getElementById("percent").innerText = Math.floor(Math.random() * 50 + 30) + "%";
-    
+
     let deferredPrompt;
     window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
     function triggerInstall() { if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; } else alert("To install: tap Share then 'Add to Home Screen' on iOS, or 'Install' on Android."); }
     document.getElementById('scoreCardSaveBtn')?.addEventListener('click', (e) => { e.preventDefault(); triggerInstall(); });
-    
+
     document.getElementById('hamburgerBtn').addEventListener('click', function(e) { e.stopPropagation(); document.getElementById('hamburgerMenu').classList.toggle('active'); });
     document.addEventListener('click', function(e) { const menu = document.getElementById('hamburgerMenu'); const btn = document.getElementById('hamburgerBtn'); if (menu && btn && !menu.contains(e.target) && e.target !== btn) menu.classList.remove('active'); });
     if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register(URL.createObjectURL(new Blob([`self.addEventListener('install', e => self.skipWaiting()); self.addEventListener('activate', e => e.waitUntil(clients.claim())); self.addEventListener('fetch', e => e.respondWith(fetch(e.request)));`], {type: 'application/javascript'}))).catch(console.log); }); }
-    
-    // ==================== FETCH IMAGES FROM JSON ====================
-    async function fetchImages() {
+
+    // ---------- NEW: DYNAMIC IMAGE POOL (AI from GitHub + REAL from Picsum) ----------
+    const GITHUB_API_URL = "https://api.github.com/repos/brainplayjoy/brainplay-daily/contents/images/ai";
+    const RAW_BASE = "https://raw.githubusercontent.com/brainplayjoy/brainplay-daily/main/images/ai/";
+
+    // Helper: generate N unique real images from Picsum (random IDs)
+    function generateRealImages(count = 40) {
+        const images = [];
+        const usedIds = new Set();
+        while (images.length < count) {
+            let id = Math.floor(Math.random() * 300) + 1; // IDs 1..300 are safe
+            if (!usedIds.has(id)) {
+                usedIds.add(id);
+                images.push({
+                    url: `https://picsum.photos/id/${id}/500/500`,
+                    isReal: true
+                });
+            }
+        }
+        return images;
+    }
+
+    async function fetchAIImagesFromGitHub() {
         try {
-            console.log("Fetching images from:", JSON_URL);
-            const response = await fetch(JSON_URL);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
-            if (Array.isArray(data) && data.length > 0) {
-                globalImagePool = data;
-                console.log(`✅ Loaded ${globalImagePool.length} images from JSON`);
-                initNewGameSet();
-                load();
-            } else {
-                throw new Error("JSON does not contain a valid array");
-            }
-        } catch (error) {
-            console.error("Failed to load images:", error);
-            document.getElementById('img').alt = "Failed to load images. Please check your JSON URL.";
-            document.getElementById('img').src = "";
+            const response = await fetch(GITHUB_API_URL);
+            if (!response.ok) throw new Error(`GitHub API error: ${response.status}`);
+            const files = await response.json();
+            if (!Array.isArray(files)) throw new Error("Invalid response");
+            const imageExtensions = ['.webp', '.png', '.jpg', '.jpeg'];
+            const aiImages = files
+                .filter(file => file.type === 'file' && imageExtensions.some(ext => file.name.toLowerCase().endsWith(ext)))
+                .map(file => ({
+                    url: RAW_BASE + file.name,
+                    isReal: false
+                }));
+            if (aiImages.length === 0) throw new Error("No AI images found in folder");
+            console.log(`✅ Loaded ${aiImages.length} AI images from GitHub`);
+            return aiImages;
+        } catch (err) {
+            console.error("Failed to fetch AI images:", err);
+            alert("⚠️ Could not load AI images from GitHub. Using fallback images. Please check folder path.");
+            // Fallback: provide a few placeholder AI images (so game still works)
+            return [
+                { url: "https://placehold.co/500x500/ff0000/white?text=AI+Fallback+1", isReal: false },
+                { url: "https://placehold.co/500x500/ff4444/white?text=AI+Fallback+2", isReal: false }
+            ];
         }
     }
-    
-    fetchImages();
+
+    async function buildGlobalImagePool() {
+        // Show loading state on image
+        imgElement.alt = "Loading images...";
+        imgElement.src = "https://placehold.co/500x500/1a1a2e/white?text=Loading...";
+        
+        const [aiImages, realImages] = await Promise.all([
+            fetchAIImagesFromGitHub(),
+            Promise.resolve(generateRealImages(40))   // 40 varied real images from Picsum
+        ]);
+        
+        // Combine and shuffle slightly (optional)
+        let combined = [...aiImages, ...realImages];
+        for (let i = combined.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [combined[i], combined[j]] = [combined[j], combined[i]];
+        }
+        globalImagePool = combined;
+        console.log(`🎯 Total pool size: ${globalImagePool.length} (AI: ${aiImages.length}, Real: ${realImages.length})`);
+        
+        // Initialize game
+        initNewGameSet();
+        load();
+    }
+
+    // Start everything
+    buildGlobalImagePool();
 </script>
 </body>
 </html>
