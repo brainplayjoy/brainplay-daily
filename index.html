@@ -506,7 +506,18 @@
         }
         .counter { font-weight: 700; font-size: 15px; color: #d1d5db; white-space: nowrap; }
         .question-inline { flex: 1; text-align: center; font-weight: 700; font-size: 15px; color: #fff; white-space: nowrap; }
-        .next-btn { background: none; border: none; color: #facc15; font-weight: 800; font-size: 15px; cursor: pointer; display: none; }
+        .next-btn { background: none; border: none; color: #facc15; font-weight: 800; font-size: 15px; cursor: pointer; }
+        .next-btn:disabled { color: #6b7280; cursor: default; }
+        .next-wrap { display: flex; align-items: center; gap: 5px; }
+        .timer-circle {
+            width: 22px; height: 22px; border-radius: 50%;
+            background: #facc15; color: #ffffff; font-weight: 800; font-size: 13px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; visibility: hidden;
+            text-shadow: 0 0 2px rgba(0,0,0,0.45);
+        }
+        .timer-circle.active { visibility: visible; }
+        @media (max-width: 400px) { .next-wrap { margin-left: -4px; gap: 4px; } }
         .leaderboard-strip { display: none; align-items: center; justify-content: space-between; width: 100%; gap: 12px; }
         .today-top-players { font-weight: 700; font-size: 14px; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 20px; }
         .leaderboard-btn {
@@ -656,7 +667,10 @@
     <div class="image-footer" id="imageFooter">
         <span class="counter" id="counter">1/5</span>
         <span class="question-inline">🤔 Is this image Real or AI?</span>
-        <button class="next-btn" id="nextBtn" onclick="next()">>> NEXT</button>
+        <div class="next-wrap" id="nextWrap">
+            <button class="next-btn" id="nextBtn" onclick="next()" disabled>>> NEXT</button>
+            <span class="timer-circle" id="timerCircle"></span>
+        </div>
         <div class="leaderboard-strip" id="leaderboardStrip">
             <span class="today-top-players">🏆 Today's Top Players</span>
             <button class="leaderboard-btn" id="leaderboardActionBtn">Leaderboard</button>
@@ -725,6 +739,41 @@
     const counterEl = document.getElementById('counter'), resultCard = document.getElementById('result'), imgElement = document.getElementById('img');
     const scoreCardOverlay = document.getElementById('scoreCardOverlay'), leaderboardStrip = document.getElementById('leaderboardStrip');
     const questionSpan = document.querySelector('.question-inline'), counterSpan = document.getElementById('counter');
+    const nextWrap = document.getElementById('nextWrap'), timerCircle = document.getElementById('timerCircle');
+
+    // ---------- AUTO-NEXT TIMER (2, 1, then next image) ----------
+    let autoTimer = null;
+
+    function clearAutoTimer() {
+        if (autoTimer !== null) { clearTimeout(autoTimer); autoTimer = null; }
+        timerCircle.classList.remove('active');
+    }
+
+    function preloadNextImage() {
+        const nextObj = currentGameImages[index + 1];
+        if (nextObj) { const pre = new Image(); pre.src = nextObj.url; }
+    }
+
+    function startAutoTimer() {
+        clearAutoTimer();
+        nextBtn.disabled = false;
+        preloadNextImage();
+        let remaining = 2;
+        timerCircle.textContent = remaining;
+        timerCircle.classList.add('active');
+        function tick() {
+            remaining = remaining - 1;
+            if (remaining === 0) {
+                autoTimer = null;
+                timerCircle.classList.remove('active');
+                next();
+            } else {
+                timerCircle.textContent = remaining;
+                autoTimer = setTimeout(tick, 1000);
+            }
+        }
+        autoTimer = setTimeout(tick, 1000);
+    }
 
     function setLeaderboardMode(active) {
         if (active) {
@@ -794,7 +843,9 @@
         scoreCardOverlay.style.display = "none";
         resultCard.style.display = "none";
         counterEl.innerText = (index + 1) + "/5";
-        nextBtn.style.display = "none";
+        clearAutoTimer();
+        nextWrap.style.display = "flex";
+        nextBtn.disabled = true;
         enableButtons();
         setLeaderboardMode(false);
     }
@@ -832,7 +883,7 @@
             else desc.innerHTML = highlightKeywords("This image is AI-generated. Look for unnatural textures and repeating patterns.");
         }
         resultCard.style.display = "block";
-        nextBtn.style.display = "inline-block";
+        startAutoTimer();
     }
 
     function getScoreData(scoreValue) {
@@ -845,6 +896,8 @@
     }
 
     async function next() {
+        clearAutoTimer();
+        nextBtn.disabled = true;
         index++;
         if (index >= 5) {
             const user = window.getCurrentUser ? window.getCurrentUser() : null;
@@ -861,7 +914,7 @@
             resultCard.style.display = "none";
             btnReal.disabled = true;
             btnAi.disabled = true;
-            nextBtn.style.display = "none";
+            nextWrap.style.display = "none";
             setLeaderboardMode(true);
         } else {
             load();
@@ -878,7 +931,8 @@
         resultCard.innerHTML = `<div class="result-row"><div id="circle" class="circle">✔</div><h3 id="title"></h3></div><p id="desc" class="desc-text"></p>`;
         resultCard.style.display = "none";
         enableButtons();
-        nextBtn.style.display = "none";
+        clearAutoTimer();
+        nextBtn.disabled = true;
         setLeaderboardMode(false);
         load();
     }
